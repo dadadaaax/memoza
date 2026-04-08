@@ -21,7 +21,7 @@ class DeletePostsByCommentsModule extends PostsModule {
 		$this->meta_box_slug = 'bd_by_comments';
 		$this->action        = 'delete_posts_by_comments';
 		$this->cron_hook     = 'do-bulk-delete-posts-by-comments';
-		$this->scheduler_url = 'https://bulkwp.com/addons/scheduler-for-deleting-posts-by-comments/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow&utm_content=bds-p-c';
+		$this->scheduler_url = 1;
 		$this->messages      = array(
 			'box_label'         => __( 'By Comment count', 'bulk-delete' ),
 			'scheduled'         => __( 'The selected posts are scheduled for deletion', 'bulk-delete' ),
@@ -41,14 +41,14 @@ class DeletePostsByCommentsModule extends PostsModule {
 	 */
 	public function render() {
 		?>
-		<h4><?php _e( 'Delete Posts based on the number of comments', 'bulk-delete' ); ?></h4>
+		<h4><?php esc_html_e( 'Delete Posts based on the number of comments', 'bulk-delete' ); ?></h4>
 
 		<!-- Comments start-->
 		<fieldset class="options">
 			<table class="optiontable">
 				<tr>
 					<td scope="row" colspan="2">
-						<?php _e( 'Delete posts that have comments', 'bulk-delete' ); ?>
+						<?php esc_html_e( 'Delete posts that have comments', 'bulk-delete' ); ?>
 					</td>
 					<td>
 						<?php $this->render_number_comparison_operators(); ?>

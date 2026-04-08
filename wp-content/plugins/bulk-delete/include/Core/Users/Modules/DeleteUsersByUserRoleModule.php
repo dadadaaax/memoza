@@ -24,7 +24,7 @@ class DeleteUsersByUserRoleModule extends UsersModule {
 		$this->meta_box_slug = 'bd_users_by_role';
 		$this->action        = 'delete_users_by_role';
 		$this->cron_hook     = 'do-bulk-delete-users-by-role';
-		$this->scheduler_url = 'https://bulkwp.com/addons/scheduler-for-deleting-users-by-role/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow&utm_content=bd-u-ur';
+		$this->scheduler_url = 1;
 		$this->messages      = array(
 			'box_label'  => __( 'By User Role', 'bulk-delete' ),
 			'scheduled'  => __( 'Users from the selected user role are scheduled for deletion.', 'bulk-delete' ),
@@ -39,7 +39,7 @@ class DeleteUsersByUserRoleModule extends UsersModule {
 	 */
 	public function render() {
 		?>
-		<h4><?php _e( 'Select the user roles from which you want to delete users', 'bulk-delete' ); ?></h4>
+		<h4><?php esc_html_e( 'Select the user roles from which you want to delete users', 'bulk-delete' ); ?></h4>
 
 		<fieldset class="options">
 			<table class="optiontable">

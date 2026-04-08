@@ -15,7 +15,7 @@ class Bulk_Delete_Posts {
 	public static function render_delete_posts_by_status_box() {
 		if ( BD_Util::is_posts_box_hidden( Bulk_Delete::BOX_POST_STATUS ) ) {
 			/* translators: 1 Number of posts that are deleted. */
-			printf( __( 'This section just got enabled. Kindly <a href = "%1$s">refresh</a> the page to fully enable it.', 'bulk-delete' ), 'admin.php?page=' . Bulk_Delete::POSTS_PAGE_SLUG );
+			bd_wp_kses_wf(sprintf( __( 'This section just got enabled. Kindly <a href = "%1$s">refresh</a> the page to fully enable it.', 'bulk-delete' ), 'admin.php?page=' . Bulk_Delete::POSTS_PAGE_SLUG ));
 
 			return;
 		}
@@ -23,7 +23,7 @@ class Bulk_Delete_Posts {
 		$post_statuses = bd_get_post_statuses();
 		$post_count    = wp_count_posts();
 ?>
-		<h4><?php _e( 'Select the post statuses from which you want to delete posts', 'bulk-delete' ); ?></h4>
+		<h4><?php esc_html_e( 'Select the post statuses from which you want to delete posts', 'bulk-delete' ); ?></h4>
 
 		<fieldset class="options">
 		<table class="optiontable">
@@ -37,7 +37,7 @@ class Bulk_Delete_Posts {
 						<label for="smbd_<?php echo esc_attr( $post_status->name ); ?>">
 							<?php echo esc_html( $post_status->label ), ' '; ?>
 							<?php if ( property_exists( $post_count, $post_status->name ) ) : ?>
-								(<?php echo absint( $post_count->{ $post_status->name } ) . ' ', __( 'Posts', 'bulk-delete' ); ?>)
+								(<?php echo esc_html(absint( $post_count->{ $post_status->name } ) . ' ', __( 'Posts', 'bulk-delete' )); ?>)
 							<?php endif; ?>
 						</label>
 					</td>
@@ -50,9 +50,9 @@ class Bulk_Delete_Posts {
 				<td>
 					<input name="smbd_sticky" id="smbd_sticky" value="on" type="checkbox">
 					<label for="smbd_sticky">
-						<?php echo __( 'All Sticky Posts', 'bulk-delete' ), ' '; ?>
-						(<?php echo absint( $sticky_post_count ), ' ', __( 'Posts', 'bulk-delete' ); ?>)
-						<?php echo '<strong>', __( 'Note', 'bulk-delete' ), '</strong>: ', __( 'The date filter will not work for sticky posts', 'bulk-delete' ); ?>
+						<?php echo esc_html__( 'All Sticky Posts', 'bulk-delete' ), ' '; ?>
+						(<?php echo esc_html(absint( $sticky_post_count ), ' ', __( 'Posts', 'bulk-delete' )); ?>)
+						<?php echo '<strong>', esc_html__( 'Note', 'bulk-delete' ), '</strong>: ', esc_html__( 'The date filter will not work for sticky posts', 'bulk-delete' ); ?>
 					</label>
 				</td>
 			</tr>
@@ -64,7 +64,7 @@ class Bulk_Delete_Posts {
 			<?php bd_render_restrict_settings( 'post_status' ); ?>
 			<?php bd_render_delete_settings( 'post_status' ); ?>
 			<?php bd_render_limit_settings( 'post_status' ); ?>
-			<?php bd_render_cron_settings( 'post_status', 'http://bulkwp.com/addons/scheduler-for-deleting-posts-by-status/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow&utm_content=bd-sps' ); ?>
+			<?php bd_render_cron_settings( 'post_status', 'https://bulkwp.com/' ); ?>
 		</table>
 
 		</fieldset>
@@ -84,20 +84,20 @@ class Bulk_Delete_Posts {
 	public static function do_delete_posts_by_status() {
 		$delete_options = array();
 
-		$delete_options['restrict']     = bd_array_get_bool( $_POST, 'smbd_post_status_restrict', false );
-		$delete_options['limit_to']     = absint( bd_array_get( $_POST, 'smbd_post_status_limit_to', 0 ) );
-		$delete_options['force_delete'] = bd_array_get_bool( $_POST, 'smbd_post_status_force_delete', false );
+		$delete_options['restrict']     = bd_array_get_bool( $_POST, 'smbd_post_status_restrict', false ); //phpcs:ignore
+		$delete_options['limit_to']     = absint( bd_array_get( $_POST, 'smbd_post_status_limit_to', 0 ) );//phpcs:ignore
+		$delete_options['force_delete'] = bd_array_get_bool( $_POST, 'smbd_post_status_force_delete', false );//phpcs:ignore
 
-		$delete_options['date_op'] = bd_array_get( $_POST, 'smbd_post_status_op' );
-		$delete_options['days']    = absint( bd_array_get( $_POST, 'smbd_post_status_days' ) );
+		$delete_options['date_op'] = bd_array_get( $_POST, 'smbd_post_status_op' );//phpcs:ignore
+		$delete_options['days']    = absint( bd_array_get( $_POST, 'smbd_post_status_days' ) );//phpcs:ignore
 
-		$delete_options['post_status'] = array_map( 'sanitize_text_field', bd_array_get( $_POST, 'smbd_post_status', array() ) );
+		$delete_options['post_status'] = array_map( 'sanitize_text_field', bd_array_get( $_POST, 'smbd_post_status', array() ) );//phpcs:ignore
 
-		$delete_options['delete-sticky-posts'] = bd_array_get_bool( $_POST, 'smbd_sticky', false );
+		$delete_options['delete-sticky-posts'] = bd_array_get_bool( $_POST, 'smbd_sticky', false );//phpcs:ignore
 
-		if ( bd_array_get_bool( $_POST, 'smbd_post_status_cron', false ) ) {
-			$freq = sanitize_text_field( $_POST['smbd_post_status_cron_freq'] );
-			$time = strtotime( $_POST['smbd_post_status_cron_start'] ) - ( get_option( 'gmt_offset' ) * 60 * 60 );
+		if ( bd_array_get_bool( $_POST, 'smbd_post_status_cron', false ) ) {//phpcs:ignore
+			$freq = sanitize_text_field( $_POST['smbd_post_status_cron_freq'] );//phpcs:ignore
+			$time = strtotime( $_POST['smbd_post_status_cron_start'] ) - ( get_option( 'gmt_offset' ) * 60 * 60 );//phpcs:ignore
 
 			if ( -1 === $freq ) {
 				wp_schedule_single_event( $time, Bulk_Delete::CRON_HOOK_POST_STATUS, array( $delete_options ) );
@@ -136,7 +136,7 @@ class Bulk_Delete_Posts {
 	 */
 	public static function delete_posts_by_status( $delete_options ) {
 		$delete_options = bd_convert_old_options_for_delete_post_by_status( $delete_options );
-		$delete_options = apply_filters( 'bd_delete_options', $delete_options );
+		$delete_options = apply_filters( 'bd_delete_options', $delete_options ); //phpcs:ignore
 
 		$posts_deleted = 0;
 
@@ -189,20 +189,21 @@ class Bulk_Delete_Posts {
 	 */
 	public static function render_delete_posts_by_category_box() {
 		if ( BD_Util::is_posts_box_hidden( Bulk_Delete::BOX_CATEGORY ) ) {
-			printf( __( 'This section just got enabled. Kindly <a href = "%1$s">refresh</a> the page to fully enable it.', 'bulk-delete' ), 'admin.php?page=' . Bulk_Delete::POSTS_PAGE_SLUG );
+			/* translators: %1$s is the URL to refresh the page */
+			bd_wp_kses_wf(sprintf( __( 'This section just got enabled. Kindly <a href = "%1$s">refresh</a> the page to fully enable it.', 'bulk-delete' ), 'admin.php?page=' . Bulk_Delete::POSTS_PAGE_SLUG ));
 
 			return;
 		}
 ?>
         <!-- Category Start-->
-        <h4><?php _e( 'Select the post type from which you want to delete posts by category', 'bulk-delete' ); ?></h4>
+        <h4><?php esc_html_e( 'Select the post type from which you want to delete posts by category', 'bulk-delete' ); ?></h4>
         <fieldset class="options">
         <table class="optiontable">
 			<?php bd_render_post_type_dropdown( 'cats' ); ?>
         </table>
 
-        <h4><?php _e( 'Select the categories from which you wan to delete posts', 'bulk-delete' ); ?></h4>
-        <p><?php _e( 'Note: The post count below for each category is the total number of posts in that category, irrespective of post type', 'bulk-delete' ); ?>.</p>
+        <h4><?php esc_html_e( 'Select the categories from which you wan to delete posts', 'bulk-delete' ); ?></h4>
+        <p><?php esc_html_e( 'Note: The post count below for each category is the total number of posts in that category, irrespective of post type', 'bulk-delete' ); ?>.</p>
 <?php
 		$categories = get_categories( array(
 				'hide_empty' => false,
@@ -212,10 +213,10 @@ class Bulk_Delete_Posts {
         <table class="form-table">
             <tr>
                 <td scope="row">
-				<select class="select2" name="smbd_cats[]" multiple data-placeholder="<?php _e( 'Select Categories', 'bulk-delete' ); ?>">
-					<option value="all"><?php _e( 'All Categories', 'bulk-delete' ); ?></option>
+				<select class="select2" name="smbd_cats[]" multiple data-placeholder="<?php esc_html_e( 'Select Categories', 'bulk-delete' ); ?>">
+					<option value="all"><?php esc_html_e( 'All Categories', 'bulk-delete' ); ?></option>
 		<?php foreach ( $categories as $category ) { ?>
-			<option value="<?php echo $category->cat_ID; ?>"><?php echo $category->cat_name, ' (', $category->count, ' ', __( 'Posts', 'bulk-delete' ), ')'; ?></option>
+			<option value="<?php echo esc_attr($category->cat_ID); ?>"><?php echo esc_html($category->cat_name), ' (', esc_html($category->count), ' ', esc_html__( 'Posts', 'bulk-delete' ), ')'; ?></option>
 		<?php } ?>
 					</select>
                 </td>
@@ -228,7 +229,7 @@ class Bulk_Delete_Posts {
 			<?php bd_render_delete_settings( 'cats' ); ?>
 			<?php bd_render_private_post_settings( 'cats' ); ?>
 			<?php bd_render_limit_settings( 'cats' ); ?>
-			<?php bd_render_cron_settings( 'cats', 'http://bulkwp.com/addons/scheduler-for-deleting-posts-by-category/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow&utm_content=bd-sc' ); ?>
+			<?php bd_render_cron_settings( 'cats', 'https://bulkwp.com/' ); ?>
         </table>
 
         </fieldset>
@@ -238,26 +239,26 @@ class Bulk_Delete_Posts {
 
 	/**
 	 * Process delete posts by category.
-	 *
+	 * phpcs:ignore nonce check is performed in parent function
 	 * @since 5.0
 	 * @static
 	 */
 	public static function do_delete_posts_by_category() {
 		$delete_options = array();
 
-		$delete_options['post_type']     = array_get( $_POST, 'smbd_cats_post_type', 'post' );
-		$delete_options['selected_cats'] = array_get( $_POST, 'smbd_cats' );
-		$delete_options['restrict']      = array_get_bool( $_POST, 'smbd_cats_restrict', false );
-		$delete_options['private']       = array_get_bool( $_POST, 'smbd_cats_private', false );
-		$delete_options['limit_to']      = absint( array_get( $_POST, 'smbd_cats_limit_to', 0 ) );
-		$delete_options['force_delete']  = array_get_bool( $_POST, 'smbd_cats_force_delete', false );
+		$delete_options['post_type']     = array_get( $_POST, 'smbd_cats_post_type', 'post' ); //phpcs:ignore
+		$delete_options['selected_cats'] = array_get( $_POST, 'smbd_cats' ); //phpcs:ignore
+		$delete_options['restrict']      = array_get_bool( $_POST, 'smbd_cats_restrict', false ); //phpcs:ignore
+		$delete_options['private']       = array_get_bool( $_POST, 'smbd_cats_private', false ); //phpcs:ignore
+		$delete_options['limit_to']      = absint( array_get( $_POST, 'smbd_cats_limit_to', 0 ) ); //phpcs:ignore
+		$delete_options['force_delete']  = array_get_bool( $_POST, 'smbd_cats_force_delete', false ); //phpcs:ignore
 
-		$delete_options['date_op']       = array_get( $_POST, 'smbd_cats_op' );
-		$delete_options['days']          = absint( array_get( $_POST, 'smbd_cats_days' ) );
+		$delete_options['date_op']       = array_get( $_POST, 'smbd_cats_op' ); //phpcs:ignore
+		$delete_options['days']          = absint( array_get( $_POST, 'smbd_cats_days' ) ); //phpcs:ignore
 
-		if ( array_get_bool( $_POST, 'smbd_cats_cron', false ) ) {
-			$freq = $_POST['smbd_cats_cron_freq'];
-			$time = strtotime( $_POST['smbd_cats_cron_start'] ) - ( get_option( 'gmt_offset' ) * 60 * 60 );
+		if ( array_get_bool( $_POST, 'smbd_cats_cron', false ) ) { //phpcs:ignore
+			$freq = $_POST['smbd_cats_cron_freq']; //phpcs:ignore
+			$time = strtotime( $_POST['smbd_cats_cron_start'] ) - ( get_option( 'gmt_offset' ) * 60 * 60 ); //phpcs:ignore
 
 			if ( $freq == -1 ) {
 				wp_schedule_single_event( $time, Bulk_Delete::CRON_HOOK_CATEGORY, array( $delete_options ) );
@@ -265,10 +266,11 @@ class Bulk_Delete_Posts {
 				wp_schedule_event( $time, $freq , Bulk_Delete::CRON_HOOK_CATEGORY, array( $delete_options ) );
 			}
 
-			$msg = __( 'Posts from the selected categories are scheduled for deletion.', 'bulk-delete' ) . ' ' .
-				sprintf( __( 'See the full list of <a href = "%s">scheduled tasks</a>' , 'bulk-delete' ), get_bloginfo( 'wpurl' ) . '/wp-admin/admin.php?page=' . Bulk_Delete::CRON_PAGE_SLUG );
+			/* translators: %s is the URL to sheduled tasks page */
+			$msg = __( 'Posts from the selected categories are scheduled for deletion.', 'bulk-delete' ) . ' ' . sprintf( __( 'See the full list of <a href = "%s">scheduled tasks</a>' , 'bulk-delete' ), get_bloginfo( 'wpurl' ) . '/wp-admin/admin.php?page=' . Bulk_Delete::CRON_PAGE_SLUG );
 		} else {
 			$deleted_count = self::delete_posts_by_category( $delete_options );
+			/* translators: %d number of posts */
 			$msg           = sprintf( _n( 'Deleted %d post from the selected categories', 'Deleted %d posts from the selected categories' , $deleted_count, 'bulk-delete' ), $deleted_count );
 		}
 
@@ -299,7 +301,7 @@ class Bulk_Delete_Posts {
 			$delete_options['days']    = $delete_options['cats_days'];
 		}
 
-		$delete_options = apply_filters( 'bd_delete_options', $delete_options );
+		$delete_options = apply_filters( 'bd_delete_options', $delete_options ); //phpcs:ignore
 
 		$options       = array();
 		$selected_cats = $delete_options['selected_cats'];
@@ -329,7 +331,8 @@ class Bulk_Delete_Posts {
 	 */
 	public static function render_delete_posts_by_tag_box() {
 		if ( BD_Util::is_posts_box_hidden( Bulk_Delete::BOX_TAG ) ) {
-			printf( __( 'This section just got enabled. Kindly <a href = "%1$s">refresh</a> the page to fully enable it.', 'bulk-delete' ), 'admin.php?page=' . Bulk_Delete::POSTS_PAGE_SLUG );
+			/* translators: %1$s is the URL to refresh the page */
+			bd_wp_kses_wf(sprintf( __( 'This section just got enabled. Kindly <a href = "%1$s">refresh</a> the page to fully enable it.', 'bulk-delete' ), 'admin.php?page=' . Bulk_Delete::POSTS_PAGE_SLUG ));
 
 			return;
 		}
@@ -337,17 +340,17 @@ class Bulk_Delete_Posts {
 		$tags = get_tags();
 		if ( count( $tags ) > 0 ) {
 ?>
-            <h4><?php _e( 'Select the tags from which you want to delete posts', 'bulk-delete' ) ?></h4>
+            <h4><?php esc_html_e( 'Select the tags from which you want to delete posts', 'bulk-delete' ) ?></h4>
 
             <!-- Tags start-->
             <fieldset class="options">
             <table class="form-table">
                 <tr>
 				<td scope="row" colspan="2">
-					<select class="select2" name="smbd_tags[]" multiple data-placeholder="<?php _e( 'Select Tags', 'bulk-delete' ); ?>">
-					<option value="all"><?php _e( 'All Tags', 'bulk-delete' ); ?></option>
+					<select class="select2" name="smbd_tags[]" multiple data-placeholder="<?php esc_html_e( 'Select Tags', 'bulk-delete' ); ?>">
+					<option value="all"><?php esc_html_e( 'All Tags', 'bulk-delete' ); ?></option>
 				<?php foreach ( $tags as $tag ) { ?>
-					<option value="<?php echo absint( $tag->term_id ); ?>"><?php echo $tag->name, ' (', $tag->count, ' ', __( 'Posts', 'bulk-delete' ), ')'; ?></option>
+					<option value="<?php echo esc_attr(absint( $tag->term_id )); ?>"><?php echo esc_html($tag->name, ' (', $tag->count, ' ', __( 'Posts', 'bulk-delete' ), ')'); ?></option>
 				<?php } ?>
 					</select>
 				</td>
@@ -360,49 +363,50 @@ class Bulk_Delete_Posts {
 				<?php bd_render_delete_settings( 'tags' ); ?>
 				<?php bd_render_private_post_settings( 'tags' ); ?>
 				<?php bd_render_limit_settings( 'tags' ); ?>
-				<?php bd_render_cron_settings( 'tags', 'http://bulkwp.com/addons/scheduler-for-deleting-posts-by-tag/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow&utm_content=bd-st' ); ?>
+				<?php bd_render_cron_settings( 'tags', 'https://bulkwp.com/' ); ?>
             </table>
             </fieldset>
 <?php
 			bd_render_submit_button( 'delete_posts_by_tag' );
 		} else {
 ?>
-            <h4><?php _e( "You don't have any posts assigned to tags in this blog.", 'bulk-delete' ) ?></h4>
+            <h4><?php esc_html_e( "You don't have any posts assigned to tags in this blog.", 'bulk-delete' ) ?></h4>
 <?php
 		}
 	}
 
 	/**
 	 * Process Delete Posts by tag request.
-	 *
+	 * phpcs:ignore nonce check is performed in parent function
 	 * @static
 	 *
 	 * @since 5.0
 	 */
 	public static function do_delete_posts_by_tag() {
 		$delete_options                  = array();
-		$delete_options['selected_tags'] = array_get( $_POST, 'smbd_tags' );
-		$delete_options['restrict']      = array_get_bool( $_POST, 'smbd_tags_restrict', false );
-		$delete_options['private']       = array_get( $_POST, 'smbd_tags_private' );
-		$delete_options['limit_to']      = absint( array_get( $_POST, 'smbd_tags_limit_to', 0 ) );
-		$delete_options['force_delete']  = array_get_bool( $_POST, 'smbd_tags_force_delete', false );
+		$delete_options['selected_tags'] = array_get( $_POST, 'smbd_tags' ); //phpcs:ignore
+		$delete_options['restrict']      = array_get_bool( $_POST, 'smbd_tags_restrict', false ); //phpcs:ignore
+		$delete_options['private']       = array_get( $_POST, 'smbd_tags_private' ); //phpcs:ignore
+		$delete_options['limit_to']      = absint( array_get( $_POST, 'smbd_tags_limit_to', 0 ) ); //phpcs:ignore
+		$delete_options['force_delete']  = array_get_bool( $_POST, 'smbd_tags_force_delete', false ); //phpcs:ignore
 
-		$delete_options['date_op']       = array_get( $_POST, 'smbd_tags_op' );
-		$delete_options['days']          = absint( array_get( $_POST, 'smbd_tags_days' ) );
+		$delete_options['date_op']       = array_get( $_POST, 'smbd_tags_op' ); //phpcs:ignore
+		$delete_options['days']          = absint( array_get( $_POST, 'smbd_tags_days' ) ); //phpcs:ignore
 
-		if ( array_get( $_POST, 'smbd_tags_cron', 'false' ) == 'true' ) {
-			$freq = $_POST['smbd_tags_cron_freq'];
-			$time = strtotime( $_POST['smbd_tags_cron_start'] ) - ( get_option( 'gmt_offset' ) * 60 * 60 );
+		if ( array_get( $_POST, 'smbd_tags_cron', 'false' ) == 'true' ) { //phpcs:ignore
+			$freq = $_POST['smbd_tags_cron_freq']; //phpcs:ignore
+			$time = strtotime( $_POST['smbd_tags_cron_start'] ) - ( get_option( 'gmt_offset' ) * 60 * 60 ); //phpcs:ignore
 
 			if ( $freq == -1 ) {
 				wp_schedule_single_event( $time, Bulk_Delete::CRON_HOOK_TAG, array( $delete_options ) );
 			} else {
 				wp_schedule_event( $time, $freq, Bulk_Delete::CRON_HOOK_TAG, array( $delete_options ) );
 			}
-			$msg = __( 'Posts from the selected tags are scheduled for deletion.', 'bulk-delete' ) . ' ' .
-				sprintf( __( 'See the full list of <a href = "%s">scheduled tasks</a>' , 'bulk-delete' ), get_bloginfo( 'wpurl' ) . '/wp-admin/admin.php?page=' . Bulk_Delete::CRON_PAGE_SLUG );
+			/* translators: %s is the URL to sheduled tasks page */
+			$msg = __( 'Posts from the selected tags are scheduled for deletion.', 'bulk-delete' ) . ' ' . sprintf( __( 'See the full list of <a href = "%s">scheduled tasks</a>' , 'bulk-delete' ), get_bloginfo( 'wpurl' ) . '/wp-admin/admin.php?page=' . Bulk_Delete::CRON_PAGE_SLUG );
 		} else {
 			$deleted_count = self::delete_posts_by_tag( $delete_options );
+			/* translators: %d number of posts */
 			$msg           = sprintf( _n( 'Deleted %d post from the selected tags', 'Deleted %d posts from the selected tags' , $deleted_count, 'bulk-delete' ), $deleted_count );
 		}
 
@@ -431,7 +435,7 @@ class Bulk_Delete_Posts {
 			$delete_options['days']    = $delete_options['tags_days'];
 		}
 
-		$delete_options = apply_filters( 'bd_delete_options', $delete_options );
+		$delete_options = apply_filters( 'bd_delete_options', $delete_options ); //phpcs:ignore
 
 		$options       = array();
 		$selected_tags = $delete_options['selected_tags'];
@@ -455,7 +459,8 @@ class Bulk_Delete_Posts {
 	 */
 	public static function render_delete_posts_by_taxonomy_box() {
 		if ( BD_Util::is_posts_box_hidden( Bulk_Delete::BOX_TAX ) ) {
-			printf( __( 'This section just got enabled. Kindly <a href = "%1$s">refresh</a> the page to fully enable it.', 'bulk-delete' ), 'admin.php?page=' . Bulk_Delete::POSTS_PAGE_SLUG );
+			/* translators: %1$s is the URL to refresh the page */
+			bd_wp_kses_wf(sprintf( __( 'This section just got enabled. Kindly <a href = "%1$s">refresh</a> the page to fully enable it.', 'bulk-delete' ), 'admin.php?page=' . Bulk_Delete::POSTS_PAGE_SLUG ));
 
 			return;
 		}
@@ -479,14 +484,14 @@ class Bulk_Delete_Posts {
 		if ( count( $terms_array ) > 0 ) {
 ?>
         <!-- Custom tax Start-->
-        <h4><?php _e( 'Select the post type from which you want to delete posts by custom taxonomy', 'bulk-delete' ); ?></h4>
+        <h4><?php esc_html_e( 'Select the post type from which you want to delete posts by custom taxonomy', 'bulk-delete' ); ?></h4>
 
         <fieldset class="options">
             <table class="optiontable">
 				<?php bd_render_post_type_dropdown( 'tax' ); ?>
             </table>
 
-            <h4><?php _e( 'Select the taxonomies from which you want to delete posts', 'bulk-delete' ) ?></h4>
+            <h4><?php esc_html_e( 'Select the taxonomies from which you want to delete posts', 'bulk-delete' ) ?></h4>
 
             <table class="optiontable">
 <?php
@@ -494,10 +499,10 @@ class Bulk_Delete_Posts {
 ?>
                 <tr>
                     <td scope="row" >
-                        <input name="smbd_taxs" value="<?php echo $tax; ?>" type="radio" class="custom-tax">
+                        <input name="smbd_taxs" value="<?php echo esc_html($tax); ?>" type="radio" class="custom-tax">
                     </td>
                     <td>
-                        <label for="smbd_taxs"><?php echo $taxs[$tax]->labels->name; ?> </label>
+                        <label for="smbd_taxs"><?php echo esc_html($taxs[$tax]->labels->name); ?> </label>
                     </td>
                 </tr>
 <?php
@@ -505,21 +510,21 @@ class Bulk_Delete_Posts {
 ?>
             </table>
 
-            <h4><?php _e( 'The selected taxonomy has the following terms. Select the terms from which you want to delete posts', 'bulk-delete' ) ?></h4>
-            <p><?php _e( 'Note: The post count below for each term is the total number of posts in that term, irrespective of post type', 'bulk-delete' ); ?>.</p>
+            <h4><?php esc_html_e( 'The selected taxonomy has the following terms. Select the terms from which you want to delete posts', 'bulk-delete' ) ?></h4>
+            <p><?php esc_html_e( 'Note: The post count below for each term is the total number of posts in that term, irrespective of post type', 'bulk-delete' ); ?>.</p>
 <?php
 			foreach ( $terms_array as $tax => $terms ) {
 ?>
-            <table class="optiontable terms_<?php echo $tax;?> terms">
+            <table class="optiontable terms_<?php echo esc_html($tax);?> terms">
 <?php
 				foreach ( $terms as $term ) {
 ?>
                     <tr>
                         <td scope="row" >
-                            <input name="smbd_tax_terms[]" value="<?php echo $term->slug; ?>" type="checkbox" class="terms">
+                            <input name="smbd_tax_terms[]" value="<?php echo esc_html($term->slug); ?>" type="checkbox" class="terms">
                         </td>
                         <td>
-                            <label for="smbd_tax_terms"><?php echo $term->name; ?> (<?php echo $term->count . ' '; _e( 'Posts', 'bulk-delete' ); ?>)</label>
+                            <label for="smbd_tax_terms"><?php echo esc_html($term->name); ?> (<?php echo esc_html($term->count) . ' '; esc_html_e( 'Posts', 'bulk-delete' ); ?>)</label>
                         </td>
                     </tr>
 <?php
@@ -535,7 +540,7 @@ class Bulk_Delete_Posts {
 				<?php bd_render_delete_settings( 'taxs' ); ?>
 				<?php bd_render_private_post_settings( 'taxs' ); ?>
 				<?php bd_render_limit_settings( 'taxs' ); ?>
-				<?php bd_render_cron_settings( 'taxs', 'http://bulkwp.com/addons/scheduler-for-deleting-posts-by-taxonomy/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow&utm_content=bd-stx' ); ?>
+				<?php bd_render_cron_settings( 'taxs', 'https://bulkwp.com/' ); ?>
             </table>
 
             </fieldset>
@@ -543,44 +548,45 @@ class Bulk_Delete_Posts {
 			bd_render_submit_button( 'delete_posts_by_taxonomy' );
 		} else {
 ?>
-            <h4><?php _e( "This WordPress installation doesn't have any non-empty custom taxonomies defined", 'bulk-delete' ) ?></h4>
+            <h4><?php esc_html_e( "This WordPress installation doesn't have any non-empty custom taxonomies defined", 'bulk-delete' ) ?></h4>
 <?php
 		}
 	}
 
 	/**
 	 * Process Delete posts by Taxonomy Request.
-	 *
+	 * phpcs:ignore nonce check is performed in parent function
 	 * @static
 	 *
 	 * @since 5.0
 	 */
 	public static function do_delete_posts_by_taxonomy() {
 		$delete_options                       = array();
-		$delete_options['post_type']          = array_get( $_POST, 'smbd_tax_post_type', 'post' );
-		$delete_options['selected_taxs']      = array_get( $_POST, 'smbd_taxs' );
-		$delete_options['selected_tax_terms'] = array_get( $_POST, 'smbd_tax_terms' );
-		$delete_options['restrict']           = array_get_bool( $_POST, 'smbd_taxs_restrict', false );
-		$delete_options['private']            = array_get_bool( $_POST, 'smbd_taxs_private' );
-		$delete_options['limit_to']           = absint( array_get( $_POST, 'smbd_taxs_limit_to', 0 ) );
-		$delete_options['force_delete']       = array_get_bool( $_POST, 'smbd_taxs_force_delete', false );
+		$delete_options['post_type']          = array_get( $_POST, 'smbd_tax_post_type', 'post' ); //phpcs:ignore
+		$delete_options['selected_taxs']      = array_get( $_POST, 'smbd_taxs' ); //phpcs:ignore
+		$delete_options['selected_tax_terms'] = array_get( $_POST, 'smbd_tax_terms' ); //phpcs:ignore
+		$delete_options['restrict']           = array_get_bool( $_POST, 'smbd_taxs_restrict', false ); //phpcs:ignore
+		$delete_options['private']            = array_get_bool( $_POST, 'smbd_taxs_private' ); //phpcs:ignore
+		$delete_options['limit_to']           = absint( array_get( $_POST, 'smbd_taxs_limit_to', 0 ) ); //phpcs:ignore
+		$delete_options['force_delete']       = array_get_bool( $_POST, 'smbd_taxs_force_delete', false ); //phpcs:ignore
 
-		$delete_options['date_op']            = array_get( $_POST, 'smbd_taxs_op' );
-		$delete_options['days']               = absint( array_get( $_POST, 'smbd_taxs_days' ) );
+		$delete_options['date_op']            = array_get( $_POST, 'smbd_taxs_op' ); //phpcs:ignore
+		$delete_options['days']               = absint( array_get( $_POST, 'smbd_taxs_days' ) ); //phpcs:ignore
 
-		if ( array_get( $_POST, 'smbd_taxs_cron', 'false' ) == 'true' ) {
-			$freq = $_POST['smbd_taxs_cron_freq'];
-			$time = strtotime( $_POST['smbd_taxs_cron_start'] ) - ( get_option( 'gmt_offset' ) * 60 * 60 );
+		if ( array_get( $_POST, 'smbd_taxs_cron', 'false' ) == 'true' ) { //phpcs:ignore
+			$freq = $_POST['smbd_taxs_cron_freq']; //phpcs:ignore
+			$time = strtotime( $_POST['smbd_taxs_cron_start'] ) - ( get_option( 'gmt_offset' ) * 60 * 60 ); //phpcs:ignore
 
 			if ( $freq == -1 ) {
 				wp_schedule_single_event( $time, Bulk_Delete::CRON_HOOK_TAXONOMY, array( $delete_options ) );
 			} else {
 				wp_schedule_event( $time, $freq, Bulk_Delete::CRON_HOOK_TAXONOMY, array( $delete_options ) );
 			}
-			$msg = __( 'Posts from the selected custom taxonomies are scheduled for deletion.', 'bulk-delete' ) . ' ' .
-				sprintf( __( 'See the full list of <a href = "%s">scheduled tasks</a>' , 'bulk-delete' ), get_bloginfo( 'wpurl' ) . '/wp-admin/admin.php?page=' . Bulk_Delete::CRON_PAGE_SLUG );
+			/* translators: %s is the URL to sheduled tasks page */
+			$msg = __( 'Posts from the selected custom taxonomies are scheduled for deletion.', 'bulk-delete' ) . ' ' .	sprintf( __( 'See the full list of <a href = "%s">scheduled tasks</a>' , 'bulk-delete' ), get_bloginfo( 'wpurl' ) . '/wp-admin/admin.php?page=' . Bulk_Delete::CRON_PAGE_SLUG );
 		} else {
 			$deleted_count = self::delete_posts_by_taxonomy( $delete_options );
+			/* translators: %d number of posts */
 			$msg           = sprintf( _n( 'Deleted %d post from the selected custom taxonomies', 'Deleted %d posts from the selected custom taxonomies' , $deleted_count, 'bulk-delete' ), $deleted_count );
 		}
 
@@ -611,7 +617,7 @@ class Bulk_Delete_Posts {
 			$delete_options['days']    = $delete_options['taxs_days'];
 		}
 
-		$delete_options = apply_filters( 'bd_delete_options', $delete_options );
+		$delete_options = apply_filters( 'bd_delete_options', $delete_options ); //phpcs:ignore
 
 		$selected_taxs      = $delete_options['selected_taxs'];
 		$selected_tax_terms = $delete_options['selected_tax_terms'];
@@ -649,7 +655,8 @@ class Bulk_Delete_Posts {
 	 */
 	public static function render_delete_posts_by_post_type_box() {
 		if ( BD_Util::is_posts_box_hidden( Bulk_Delete::BOX_POST_TYPE ) ) {
-			printf( __( 'This section just got enabled. Kindly <a href = "%1$s">refresh</a> the page to fully enable it.', 'bulk-delete' ), 'admin.php?page=' . Bulk_Delete::POSTS_PAGE_SLUG );
+			/* translators: %1$s is the URL to refresh the page */
+			bd_wp_kses_wf(sprintf( __( 'This section just got enabled. Kindly <a href = "%1$s">refresh</a> the page to fully enable it.', 'bulk-delete' ), 'admin.php?page=' . Bulk_Delete::POSTS_PAGE_SLUG ));
 
 			return;
 		}
@@ -685,7 +692,7 @@ class Bulk_Delete_Posts {
 		if ( count( $types_array ) > 0 ) {
 ?>
             <!-- Custom post type Start-->
-            <h4><?php _e( 'Select the custom post types from which you want to delete posts', 'bulk-delete' ) ?></h4>
+            <h4><?php esc_html_e( 'Select the custom post types from which you want to delete posts', 'bulk-delete' ) ?></h4>
 
             <fieldset class="options">
             <table class="optiontable">
@@ -694,10 +701,10 @@ class Bulk_Delete_Posts {
 ?>
                 <tr>
                     <td scope="row" >
-                        <input name="smbd_types[]" value="<?php echo $type; ?>" type="checkbox">
+                        <input name="smbd_types[]" value="<?php echo esc_html($type); ?>" type="checkbox">
                     </td>
                     <td>
-						<label for="smbd_types"><?php echo BD_Util::display_post_type_status( $type ), ' (', $count, ')'; ?></label>
+						<label for="smbd_types"><?php echo esc_html(BD_Util::display_post_type_status( $type ), ' (', $count, ')'); ?></label>
                     </td>
                 </tr>
 <?php
@@ -707,20 +714,20 @@ class Bulk_Delete_Posts {
 			bd_render_restrict_settings( 'types' );
 			bd_render_delete_settings( 'types' );
 			bd_render_limit_settings( 'types' );
-			bd_render_cron_settings( 'types', 'http://bulkwp.com/addons/scheduler-for-deleting-posts-by-post-type/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow&utm_content=bd-spt' );
+			bd_render_cron_settings( 'types', 'https://bulkwp.com/' );
 ?>
             </table>
             </fieldset>
 <?php
 			bd_render_submit_button( 'delete_posts_by_post_type' );
 		} else {
-            printf( '<h4>%s</h4>', __( "This WordPress installation doesn't have any non-empty custom post types", 'bulk-delete' ) );
+            bd_wp_kses_wf(sprintf( '<h4>%s</h4>', __( "This WordPress installation doesn't have any non-empty custom post types", 'bulk-delete' ) ));
 		}
 	}
 
 	/**
 	 * Process request to delete posts by post type.
-	 *
+	 * phpcs:ignore nonce check is performed in parent function
 	 * @static
 	 *
 	 * @since 5.0
@@ -728,17 +735,17 @@ class Bulk_Delete_Posts {
 	public static function do_delete_posts_by_post_type() {
 		$delete_options                   = array();
 
-		$delete_options['selected_types'] = array_get( $_POST, 'smbd_types' );
-		$delete_options['restrict']       = array_get_bool( $_POST, 'smbd_types_restrict', false );
-		$delete_options['limit_to']       = absint( array_get( $_POST, 'smbd_types_limit_to', 0 ) );
-		$delete_options['force_delete']   = array_get_bool( $_POST, 'smbd_types_force_delete', false );
+		$delete_options['selected_types'] = array_get( $_POST, 'smbd_types' );  //phpcs:ignore
+		$delete_options['restrict']       = array_get_bool( $_POST, 'smbd_types_restrict', false ); //phpcs:ignore
+		$delete_options['limit_to']       = absint( array_get( $_POST, 'smbd_types_limit_to', 0 ) ); //phpcs:ignore
+		$delete_options['force_delete']   = array_get_bool( $_POST, 'smbd_types_force_delete', false ); //phpcs:ignore
 
-		$delete_options['date_op']        = array_get( $_POST, 'smbd_types_op' );
-		$delete_options['days']           = absint( array_get( $_POST, 'smbd_types_days' ) );
+		$delete_options['date_op']        = array_get( $_POST, 'smbd_types_op' ); //phpcs:ignore
+		$delete_options['days']           = absint( array_get( $_POST, 'smbd_types_days' ) ); //phpcs:ignore
 
-		if ( array_get( $_POST, 'smbd_types_cron', 'false' ) == 'true' ) {
-			$freq = $_POST['smbd_types_cron_freq'];
-			$time = strtotime( $_POST['smbd_types_cron_start'] ) - ( get_option( 'gmt_offset' ) * 60 * 60 );
+		if ( array_get( $_POST, 'smbd_types_cron', 'false' ) == 'true' ) { //phpcs:ignore
+			$freq = $_POST['smbd_types_cron_freq']; //phpcs:ignore
+			$time = strtotime( $_POST['smbd_types_cron_start'] ) - ( get_option( 'gmt_offset' ) * 60 * 60 ); //phpcs:ignore
 
 			if ( $freq == -1 ) {
 				wp_schedule_single_event( $time, Bulk_Delete::CRON_HOOK_POST_TYPE, array( $delete_options ) );
@@ -746,10 +753,11 @@ class Bulk_Delete_Posts {
 				wp_schedule_event( $time, $freq, Bulk_Delete::CRON_HOOK_POST_TYPE, array( $delete_options ) );
 			}
 
-			$msg = __( 'Posts from the selected custom post type are scheduled for deletion.', 'bulk-delete' ) . ' ' .
-				sprintf( __( 'See the full list of <a href = "%s">scheduled tasks</a>' , 'bulk-delete' ), get_bloginfo( 'wpurl' ) . '/wp-admin/admin.php?page=' . Bulk_Delete::CRON_PAGE_SLUG );
+			/* translators: %s is the URL to sheduled tasks page */
+			$msg = __( 'Posts from the selected custom post type are scheduled for deletion.', 'bulk-delete' ) . ' ' . sprintf( __( 'See the full list of <a href = "%s">scheduled tasks</a>' , 'bulk-delete' ), get_bloginfo( 'wpurl' ) . '/wp-admin/admin.php?page=' . Bulk_Delete::CRON_PAGE_SLUG );
 		} else {
 			$deleted_count = self::delete_posts_by_post_type( $delete_options );
+			/* translators: %d number of posts */
 			$msg           = sprintf( _n( 'Deleted %d post from the selected custom post type', 'Deleted %d posts from the selected custom post type' , $deleted_count, 'bulk-delete' ), $deleted_count );
 		}
 
@@ -779,7 +787,7 @@ class Bulk_Delete_Posts {
 			$delete_options['days']    = $delete_options['types_days'];
 		}
 
-		$delete_options = apply_filters( 'bd_delete_options', $delete_options );
+		$delete_options = apply_filters( 'bd_delete_options', $delete_options ); //phpcs:ignore
 
 		$count          = 0;
 		$selected_types = $delete_options['selected_types'];
@@ -819,19 +827,20 @@ class Bulk_Delete_Posts {
 	 */
 	public static function render_delete_posts_by_url_box() {
 		if ( BD_Util::is_posts_box_hidden( Bulk_Delete::BOX_URL ) ) {
-			printf( __( 'This section just got enabled. Kindly <a href = "%1$s">refresh</a> the page to fully enable it.', 'bulk-delete' ), 'admin.php?page=' . Bulk_Delete::POSTS_PAGE_SLUG );
+			/* translators: %1$s is the URL to refresh the page */
+			bd_wp_kses_wf(sprintf( __( 'This section just got enabled. Kindly <a href = "%1$s">refresh</a> the page to fully enable it.', 'bulk-delete' ), 'admin.php?page=' . Bulk_Delete::POSTS_PAGE_SLUG ));
 
 			return;
 		}
 ?>
         <!-- URLs start-->
-        <h4><?php _e( 'Delete posts and pages that have the following Permalink', 'bulk-delete' ); ?></h4>
+        <h4><?php esc_html_e( 'Delete posts and pages that have the following Permalink', 'bulk-delete' ); ?></h4>
 
         <fieldset class="options">
         <table class="optiontable">
             <tr>
                 <td scope="row" colspan="2">
-                    <label for="smdb_specific_pages"><?php _e( 'Enter one post url (not post ids) per line', 'bulk-delete' ); ?></label>
+                    <label for="smdb_specific_pages"><?php esc_html_e( 'Enter one post url (not post ids) per line', 'bulk-delete' ); ?></label>
                     <br>
                     <textarea style="width: 450px; height: 80px;" id="smdb_specific_pages_urls" name="smdb_specific_pages_urls" rows="5" columns="80"></textarea>
                 </td>
@@ -848,15 +857,15 @@ class Bulk_Delete_Posts {
 
 	/**
 	 * Delete posts by url.
-	 *
+	 * phpcs:ignore nonce check is performed in parent function
 	 * @static
 	 *
 	 * @since 5.0
 	 */
 	public static function do_delete_posts_by_url() {
-		$force_delete = array_get_bool( $_POST, 'smbd_specific_force_delete', false );
+		$force_delete = array_get_bool( $_POST, 'smbd_specific_force_delete', false ); //phpcs:ignore
 
-		$urls = preg_split( '/\r\n|\r|\n/', array_get( $_POST, 'smdb_specific_pages_urls' ) );
+		$urls = preg_split( '/\r\n|\r|\n/', array_get( $_POST, 'smdb_specific_pages_urls' ) ); //phpcs:ignore
 		foreach ( $urls as $url ) {
 			$checkedurl = $url;
 			if ( substr( $checkedurl , 0, 1 ) == '/' ) {
@@ -867,6 +876,7 @@ class Bulk_Delete_Posts {
 		}
 
 		$deleted_count = count( $urls );
+		/* translators: %d number of posts */
 		$msg           = sprintf( _n( 'Deleted %d post with the specified urls', 'Deleted %d posts with the specified urls' , $deleted_count, 'bulk-delete' ), $deleted_count );
 
 		add_settings_error(
@@ -886,22 +896,23 @@ class Bulk_Delete_Posts {
 		global $wpdb;
 
 		if ( BD_Util::is_posts_box_hidden( Bulk_Delete::BOX_POST_REVISION ) ) {
-			printf( __( 'This section just got enabled. Kindly <a href = "%1$s">refresh</a> the page to fully enable it.', 'bulk-delete' ), 'admin.php?page=' . Bulk_Delete::POSTS_PAGE_SLUG );
+			/* translators: %1$s is the URL to refresh the page */
+			bd_wp_kses_wf(sprintf( __( 'This section just got enabled. Kindly <a href = "%1$s">refresh</a> the page to fully enable it.', 'bulk-delete' ), 'admin.php?page=' . Bulk_Delete::POSTS_PAGE_SLUG ));
 
 			return;
 		}
 
-		$revisions = $wpdb->get_var( "select count(*) from $wpdb->posts where post_type = 'revision'" );
+		$revisions = $wpdb->get_var( "select count(*) from $wpdb->posts where post_type = 'revision'" ); //phpcs:ignore
 ?>
         <!-- Post Revisions start-->
-        <h4><?php _e( 'Select the posts which you want to delete', 'bulk-delete' ); ?></h4>
+        <h4><?php esc_html_e( 'Select the posts which you want to delete', 'bulk-delete' ); ?></h4>
 
         <fieldset class="options">
         <table class="optiontable">
             <tr>
                 <td>
                     <input name="smbd_revisions" id ="smbd_revisions" value="revisions" type="checkbox">
-                    <label for="smbd_revisions"><?php _e( 'All Revisions', 'bulk-delete' ); ?> (<?php echo $revisions . ' '; _e( 'Revisions', 'bulk-delete' ); ?>)</label>
+                    <label for="smbd_revisions"><?php esc_html_e( 'All Revisions', 'bulk-delete' ); ?> (<?php echo esc_html($revisions) . ' '; esc_html_e( 'Revisions', 'bulk-delete' ); ?>)</label>
                 </td>
             </tr>
 
@@ -913,16 +924,17 @@ class Bulk_Delete_Posts {
 
 	/**
 	 * Process delete revisions request.
-	 *
+	 * phpcs:ignore nonce check is performed in parent function
 	 * @static
 	 *
 	 * @since 5.0
 	 */
 	public static function do_delete_posts_by_revision() {
-		$delete_options = array( 'revisions' => array_get( $_POST, 'smbd_revisions' ) );
+		$delete_options = array( 'revisions' => array_get( $_POST, 'smbd_revisions' ) ); //phpcs:ignore
 
 		$deleted_count = self::delete_posts_by_revision( $delete_options );
 
+		/* translators: %d number of posts */
 		$msg = sprintf( _n( 'Deleted %d post revision', 'Deleted %d post revisions' , $deleted_count, 'bulk-delete' ), $deleted_count );
 
 		add_settings_error(
@@ -948,7 +960,7 @@ class Bulk_Delete_Posts {
 
 		// Revisions
 		if ( 'revisions' == $delete_options['revisions'] ) {
-			$revisions = $wpdb->get_results( "select ID from $wpdb->posts where post_type = 'revision'" );
+			$revisions = $wpdb->get_results( "select ID from $wpdb->posts where post_type = 'revision'" ); //phpcs:ignore
 
 			foreach ( $revisions as $revision ) {
 				wp_delete_post( $revision->ID );
@@ -999,12 +1011,12 @@ class Bulk_Delete_Posts {
 	 * Process delete cron job request.
 	 * This should ideally go in a separate class. But I was
 	 * lazy to create a separate class for a single function.
-	 *
+	 * phpcs:ignore nonce check is performed in parent function
 	 * @since 5.0
 	 * @static
 	 */
 	public static function do_delete_cron() {
-		$cron_id    = absint( $_GET['cron_id'] );
+		$cron_id    = absint( $_GET['cron_id'] ); //phpcs:ignore
 		$cron_items = BD_Util::get_cron_schedules();
 		wp_unschedule_event( $cron_items[$cron_id]['timestamp'], $cron_items[$cron_id]['type'], $cron_items[$cron_id]['args'] );
 

@@ -38,7 +38,7 @@ abstract class Renderer extends Fetcher {
 					<label for="smbd_<?php echo esc_attr( $post_status->name ); ?>">
 						<?php echo esc_html( $post_status->label ), ' '; ?>
 						<?php if ( property_exists( $post_count, $post_status->name ) ) : ?>
-							(<?php echo absint( $post_count->{ $post_status->name } ) . ' ', __( 'Posts', 'bulk-delete' ); ?>)
+							(<?php echo esc_html(absint( $post_count->{ $post_status->name } )) . ' ', esc_html__( 'Posts', 'bulk-delete' ); ?>)
 						<?php endif; ?>
 					</label>
 				</td>
@@ -149,15 +149,15 @@ abstract class Renderer extends Fetcher {
 		<tr>
 			<td scope="row" colspan="2">
 				<label><input name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_post_reassign" value="false" type="radio"
-					checked="checked" class="post-reassign"> <?php _e( 'Also delete all posts of the users', 'bulk-delete' ); ?></label>
+					checked="checked" class="post-reassign"> <?php esc_html_e( 'Also delete all posts of the users', 'bulk-delete' ); ?></label>
 				<label><input name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_post_reassign" value="true" type="radio"
-					id="smbd_<?php echo esc_attr( $this->field_slug ); ?>_post_reassign" class="post-reassign"> <?php _e( 'Re-assign the posts to', 'bulk-delete' ); ?></label>
+					id="smbd_<?php echo esc_attr( $this->field_slug ); ?>_post_reassign" class="post-reassign"> <?php esc_html_e( 'Re-assign the posts to', 'bulk-delete' ); ?></label>
 				<?php
 				wp_dropdown_users(
 					array(
 						'name'             => 'smbd_' . esc_attr( $this->field_slug ) . '_reassign_user_id',
 						'class'            => 'reassign-user',
-						'show_option_none' => __( 'Select User', 'bulk-delete' ),
+						'show_option_none' => esc_html__( 'Select User', 'bulk-delete' ),
 					)
 				);
 				?>
@@ -177,18 +177,18 @@ abstract class Renderer extends Fetcher {
 		?>
 
 		<select name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_roles[]" class="enhanced-role-dropdown"
-				multiple="multiple" data-placeholder="<?php _e( 'Select User Role', 'bulk-delete' ); ?>">
+				multiple="multiple" data-placeholder="<?php esc_html_e( 'Select User Role', 'bulk-delete' ); ?>">
 
 			<?php foreach ( $roles as $role => $role_details ) : ?>
 				<option value="<?php echo esc_attr( $role ); ?>">
-					<?php echo esc_html( $role_details['name'] ), ' (', absint( $this->get_user_count_by_role( $role, $users_count ) ), ' ', __( 'Users', 'bulk-delete' ), ')'; ?>
+					<?php echo esc_html( $role_details['name'] ), ' (', esc_html(absint( $this->get_user_count_by_role( $role, $users_count ) )), ' ', esc_html__( 'Users', 'bulk-delete' ), ')'; ?>
 				</option>
 			<?php endforeach; ?>
 
 			<?php if ( $show_users_with_no_roles ) : ?>
 				<?php if ( isset( $users_count['avail_roles']['none'] ) && $users_count['avail_roles']['none'] > 0 ) : ?>
 					<option value="none">
-						<?php echo __( 'No role', 'bulk-delete' ), ' (', absint( $users_count['avail_roles']['none'] ), ' ', __( 'Users', 'bulk-delete' ), ')'; ?>
+						<?php echo esc_html__( 'No role', 'bulk-delete' ), ' (', esc_html(absint( $users_count['avail_roles']['none'] )), ' ', esc_html__( 'Users', 'bulk-delete' ), ')'; ?>
 					</option>
 				<?php endif; ?>
 			<?php endif; ?>
@@ -238,17 +238,17 @@ abstract class Renderer extends Fetcher {
 		$categories = $this->get_categories();
 		?>
 
-		<select name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_category[]" data-placeholder="<?php _e( 'Select Categories', 'bulk-delete' ); ?>"
+		<select name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_category[]" data-placeholder="<?php esc_html_e( 'Select Categories', 'bulk-delete' ); ?>"
 				class="<?php echo sanitize_html_class( $this->enable_ajax_if_needed_to_dropdown_class_name( count( $categories ), 'select2-taxonomy' ) ); ?>"
 				data-taxonomy="category" multiple>
 
 			<option value="all">
-				<?php _e( 'All Categories', 'bulk-delete' ); ?>
+				<?php esc_html_e( 'All Categories', 'bulk-delete' ); ?>
 			</option>
 
 			<?php foreach ( $categories as $category ) : ?>
 				<option value="<?php echo absint( $category->cat_ID ); ?>">
-					<?php echo esc_html( $category->cat_name ), ' (', absint( $category->count ), ' ', __( 'Posts', 'bulk-delete' ), ')'; ?>
+					<?php echo esc_html( $category->cat_name ), ' (', esc_html(absint( $category->count )), ' ', esc_html__( 'Posts', 'bulk-delete' ), ')'; ?>
 				</option>
 			<?php endforeach; ?>
 
@@ -262,12 +262,12 @@ abstract class Renderer extends Fetcher {
 	protected function render_string_comparison_operators() {
 		?>
 		<select name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_operator">
-			<option value="equal_to"><?php _e( 'equal to', 'bulk-delete' ); ?></option>
-			<option value="not_equal_to"><?php _e( 'not equal to', 'bulk-delete' ); ?></option>
-			<option value="starts_with"><?php _e( 'starts with', 'bulk-delete' ); ?></option>
-			<option value="ends_with"><?php _e( 'ends with', 'bulk-delete' ); ?></option>
-			<option value="contains"><?php _e( 'contains', 'bulk-delete' ); ?></option>
-			<option value="not_contains"><?php _e( 'not contains', 'bulk-delete' ); ?></option>
+			<option value="equal_to"><?php esc_html_e( 'equal to', 'bulk-delete' ); ?></option>
+			<option value="not_equal_to"><?php esc_html_e( 'not equal to', 'bulk-delete' ); ?></option>
+			<option value="starts_with"><?php esc_html_e( 'starts with', 'bulk-delete' ); ?></option>
+			<option value="ends_with"><?php esc_html_e( 'ends with', 'bulk-delete' ); ?></option>
+			<option value="contains"><?php esc_html_e( 'contains', 'bulk-delete' ); ?></option>
+			<option value="not_contains"><?php esc_html_e( 'not contains', 'bulk-delete' ); ?></option>
 		</select>
 		<?php
 	}
@@ -278,10 +278,10 @@ abstract class Renderer extends Fetcher {
 	protected function render_number_comparison_operators() {
 		?>
 		<select name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_operator">
-			<option value="="><?php _e( 'equal to', 'bulk-delete' ); ?></option>
-			<option value="!="><?php _e( 'not equal to', 'bulk-delete' ); ?></option>
-			<option value="<"><?php _e( 'less than', 'bulk-delete' ); ?></option>
-			<option value=">"><?php _e( 'greater than', 'bulk-delete' ); ?></option>
+			<option value="="><?php esc_html_e( 'equal to', 'bulk-delete' ); ?></option>
+			<option value="!="><?php esc_html_e( 'not equal to', 'bulk-delete' ); ?></option>
+			<option value="<"><?php esc_html_e( 'less than', 'bulk-delete' ); ?></option>
+			<option value=">"><?php esc_html_e( 'greater than', 'bulk-delete' ); ?></option>
 		</select>
 		<?php
 	}
@@ -292,9 +292,9 @@ abstract class Renderer extends Fetcher {
 	protected function render_data_types_dropdown() {
 		?>
 		<select name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_type" class="meta-type">
-			<option value="numeric"><?php _e( 'Number', 'bulk-delete' ); ?></option>
-			<option value="string"><?php _e( 'Character', 'bulk-delete' ); ?></option>
-			<option value="date"><?php _e( 'Date', 'bulk-delete' ); ?></option>
+			<option value="numeric"><?php esc_html_e( 'Number', 'bulk-delete' ); ?></option>
+			<option value="string"><?php esc_html_e( 'Character', 'bulk-delete' ); ?></option>
+			<option value="date"><?php esc_html_e( 'Date', 'bulk-delete' ); ?></option>
 		</select>
 		<?php
 	}
@@ -326,7 +326,7 @@ abstract class Renderer extends Fetcher {
 		<select name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_operator" class= "<?php echo esc_attr( $class ); ?>">
 		<?php
 		foreach ( $operators as $operator ) {
-			echo '<option value="' . $operator . '">' . __( $all_numeric_operators[ $operator ], 'bulk-delete' ) . '</option>';
+			echo '<option value="' . esc_html($operator) . '">' . esc_html($all_numeric_operators[ $operator ]) . '</option>';
 		}
 		?>
 		</select>
@@ -359,7 +359,7 @@ abstract class Renderer extends Fetcher {
 		<select name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_operator" class="<?php echo esc_attr( $class ); ?>">
 		<?php
 		foreach ( $operators as $operator ) {
-			echo '<option value="' . $operator . '">' . __( $all_string_operators[ $operator ], 'bulk-delete' ) . '</option>';
+			echo '<option value="' . esc_html($operator) . '">' . esc_html($all_string_operators[ $operator ]) . '</option>';
 		}
 		?>
 		</select>
@@ -373,17 +373,17 @@ abstract class Renderer extends Fetcher {
 		$tags = $this->get_tags();
 		?>
 
-		<select name="smbd_<?php echo esc_attr( $this->field_slug ); ?>[]" data-placeholder="<?php _e( 'Select Tags', 'bulk-delete' ); ?>"
+		<select name="smbd_<?php echo esc_attr( $this->field_slug ); ?>[]" data-placeholder="<?php esc_html_e( 'Select Tags', 'bulk-delete' ); ?>"
 				class="<?php echo sanitize_html_class( $this->enable_ajax_if_needed_to_dropdown_class_name( count( $tags ), 'select2-taxonomy' ) ); ?>"
 				data-taxonomy="post_tag" multiple>
 
 			<option value="all">
-				<?php _e( 'All Tags', 'bulk-delete' ); ?>
+				<?php esc_html_e( 'All Tags', 'bulk-delete' ); ?>
 			</option>
 
 			<?php foreach ( $tags as $tag ) : ?>
 				<option value="<?php echo absint( $tag->term_id ); ?>">
-					<?php echo esc_html( $tag->name ), ' (', absint( $tag->count ), ' ', __( 'Posts', 'bulk-delete' ), ')'; ?>
+					<?php echo esc_html( $tag->name ), ' (', absint( $tag->count ), ' ', esc_html__( 'Posts', 'bulk-delete' ), ')'; ?>
 				</option>
 			<?php endforeach; ?>
 		</select>
@@ -399,7 +399,7 @@ abstract class Renderer extends Fetcher {
 	 * @return string Class name.
 	 */
 	protected function enable_ajax_if_needed_to_dropdown_class_name( $count, $class_name ) {
-		if ( $count >= $this->get_enhanced_select_threshold() ) {
+		if ( 1 || $count >= $this->get_enhanced_select_threshold() ) {
 			$class_name .= '-ajax';
 		}
 
@@ -419,7 +419,7 @@ abstract class Renderer extends Fetcher {
 					<td scope="row">
 						<label>
 							<input type="checkbox" name="smbd_<?php echo esc_attr( $this->field_slug ); ?>[]" value="all">
-							<?php echo __( 'All sticky posts', 'bulk-delete' ), ' (', count( $sticky_posts ), ' ', __( 'Posts', 'bulk-delete' ), ')'; ?>
+							<?php echo esc_html__( 'All sticky posts', 'bulk-delete' ), ' (', count( $sticky_posts ), ' ', esc_html__( 'Posts', 'bulk-delete' ), ')'; ?>
 						</label>
 					</td>
 				</tr>
@@ -433,8 +433,8 @@ abstract class Renderer extends Fetcher {
 							<input type="checkbox" name="smbd_<?php echo esc_attr( $this->field_slug ); ?>[]" value="<?php echo absint( $post->ID ); ?>">
 							<?php
 								echo esc_html( $post->post_title ), ' - ',
-									__( 'Published on', 'bulk-delete' ), ' ', get_the_date( get_option( 'date_format' ), $post->ID ),
-									__( ' by ', 'bulk-delete' ), esc_html( $author->display_name );
+									esc_html__( 'Published on', 'bulk-delete' ), ' ', get_the_date( get_option( 'date_format' ), $post->ID ),
+									esc_html__( ' by ', 'bulk-delete' ), esc_html( $author->display_name );
 							?>
 						</label>
 					</td>
@@ -454,7 +454,7 @@ abstract class Renderer extends Fetcher {
 				<input name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_exclude_sticky" id="smbd_<?php echo esc_attr( $this->field_slug ); ?>_exclude_sticky" value="true" type="checkbox">
 			</td>
 			<td>
-				<label for="smbd_<?php echo esc_attr( $this->field_slug ); ?>_exclude_sticky"><?php _e( 'Exclude sticky posts', 'bulk-delete' ); ?></label>
+				<label for="smbd_<?php echo esc_attr( $this->field_slug ); ?>_exclude_sticky"><?php esc_html_e( 'Exclude sticky posts', 'bulk-delete' ); ?></label>
 			</td>
 		</tr>
 		<?php endif; // phpcs:ignore?>
@@ -505,11 +505,11 @@ abstract class Renderer extends Fetcher {
 			<td scope="row" colspan="2">
 				<label>
 					<input name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_sticky_action" value="unsticky" type="radio" checked>
-					<?php _e( 'Remove Sticky', 'bulk-delete' ); ?>
+					<?php esc_html_e( 'Remove Sticky', 'bulk-delete' ); ?>
 				</label>
 				<label>
 					<input name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_sticky_action" value="delete" type="radio">
-					<?php _e( 'Delete Post', 'bulk-delete' ); ?>
+					<?php esc_html_e( 'Delete Post', 'bulk-delete' ); ?>
 				</label>
 			</td>
 		</tr>
@@ -542,7 +542,7 @@ abstract class Renderer extends Fetcher {
 		 *
 		 * @param \BulkWP\BulkDelete\Core\Base\BaseModule The delete module.
 		 */
-		do_action( 'bd_render_attachment_settings', $this );
+		do_action( 'bd_render_attachment_settings', $this ); //phpcs:ignore
 	}
 
 	/**
@@ -574,23 +574,23 @@ abstract class Renderer extends Fetcher {
 				<label>
 					<input name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_cron" value="false" type="radio"
 					checked="checked" class="schedule-deletion">
-					<?php _e( 'Delete now', 'bulk-delete' ); ?>
+					<?php esc_html_e( 'Delete now', 'bulk-delete' ); ?>
 				</label>
 
 				<label>
 					<input name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_cron" value="true" type="radio"
 					class="schedule-deletion" id="smbd_<?php echo esc_attr( $this->field_slug ); ?>_cron" <?php echo esc_attr( $disabled_attr ); ?>>
-					<?php _e( 'Schedule', 'bulk-delete' ); ?>
+					<?php esc_html_e( 'Schedule', 'bulk-delete' ); ?>
 				</label>
 
 				<input name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_cron_start"
 					id="smbd_<?php echo esc_attr( $this->field_slug ); ?>_cron_start" value="now"
-					type="text" <?php echo esc_attr( $disabled_attr ); ?> autocomplete="off"><?php _e( 'repeat ', 'bulk-delete' ); ?>
+					type="text" <?php echo esc_attr( $disabled_attr ); ?> autocomplete="off"><?php esc_html_e( 'repeat ', 'bulk-delete' ); ?>
 
 				<select name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_cron_freq"
 						id="smbd_<?php echo esc_attr( $this->field_slug ); ?>_cron_freq" <?php echo esc_attr( $disabled_attr ); ?>>
 
-					<option value="-1"><?php _e( "Don't repeat", 'bulk-delete' ); ?></option>
+					<option value="-1"><?php esc_html_e( "Don't repeat", 'bulk-delete' ); ?></option>
 					<?php
 					/**
 					 * List of cron schedules.
@@ -600,7 +600,7 @@ abstract class Renderer extends Fetcher {
 					 * @param array                                   $cron_schedules List of cron schedules.
 					 * @param \BulkWP\BulkDelete\Core\Base\BaseModule $module         Module.
 					 */
-					$cron_schedules = apply_filters( 'bd_cron_schedules', wp_get_schedules(), $this );
+					$cron_schedules = apply_filters( 'bd_cron_schedules', wp_get_schedules(), $this ); //phpcs:ignore
 					?>
 
 					<?php foreach ( $cron_schedules as $key => $value ) : ?>
@@ -622,12 +622,11 @@ abstract class Renderer extends Fetcher {
 					 * @param string                                  $field_slug Field Slug of module.
 					 * @param \BulkWP\BulkDelete\Core\Base\BaseModule $module     Module.
 					 */
-					$pro_class = apply_filters( 'bd_pro_only_feature_class', $pro_class, $this->field_slug, $this )
+					$pro_class = apply_filters( 'bd_pro_only_feature_class', $pro_class, $this->field_slug, $this ); //phpcs:ignore
 					?>
 
 					<span class="<?php echo sanitize_html_class( $pro_class ); ?>" style="color:red">
-						<?php _e( 'Only available in Pro Addon', 'bulk-delete' ); ?> <a
-							href="<?php echo esc_url( $this->scheduler_url ); ?>" target="_blank">Buy now</a>
+						<?php echo '<span class="open-upsell pro-feature-inline">Available in PRO</span>'; ?> 
 					</span>
 				<?php endif; ?>
 			</td>
@@ -641,13 +640,9 @@ abstract class Renderer extends Fetcher {
 
 			<td scope="row" colspan="2">
 				<?php
-				_e( 'Enter time in <strong>Y-m-d H:i:s</strong> format or enter <strong>now</strong> to use current time.', 'bulk-delete' );
+				esc_html_e( 'Enter time in <strong>Y-m-d H:i:s</strong> format or enter <strong>now</strong> to use current time.', 'bulk-delete' );
 
-				$markup = __( 'Want to add new a Cron schedule?', 'bulk-delete' ) . '&nbsp' .
-					'<a href="https://bulkwp.com/docs/add-a-new-cron-schedule/?utm_campaign=Docs&utm_medium=wpadmin&utm_source=tooltip&utm_content=cron-schedule" target="_blank" rel="noopener">' . __( 'Find out how', 'bulk-delete' ) . '</a>';
-
-				$content = __( 'Learn how to add your desired Cron schedule.', 'bulk-delete' );
-				echo '&nbsp', bd_generate_help_tooltip( $markup, $content );
+                
 				?>
 			</td>
 		</tr>

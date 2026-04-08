@@ -51,8 +51,9 @@ class UpsellModule extends BaseModule {
 		?>
 
 		<p>
-			<?php echo $this->addon_upsell_info->get_upsell_message(); ?>
-			<a href="<?php echo esc_url( $this->addon_upsell_info->get_buy_url() ); ?>" target="_blank"><?php _e( 'Buy Now', 'bulk-delete' ); ?></a>
+			<?php bd_wp_kses_wf($this->addon_upsell_info->get_upsell_message()); ?>
+            <span class="open-upsell pro-feature-inline" data-pro-feature="<?php echo esc_html($this->addon_upsell_info->get_slug()); ?>">Available in PRO</span>
+
 		</p>
 
 		<?php

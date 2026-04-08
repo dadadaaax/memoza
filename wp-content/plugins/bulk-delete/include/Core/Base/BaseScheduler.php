@@ -107,7 +107,7 @@ abstract class BaseScheduler {
 		 *
 		 * @param string $label Cron Label.
 		 */
-		do_action( 'bd_before_scheduler', $this->module->get_cron_label() );
+		do_action( 'bd_before_scheduler', $this->module->get_cron_label() ); //phpcs:ignore
 
 		$items_deleted = $this->module->delete( $delete_options );
 
@@ -119,6 +119,6 @@ abstract class BaseScheduler {
 		 * @param string $label         Cron Label.
 		 * @param int    $items_deleted Number of items that were deleted.
 		 */
-		do_action( 'bd_after_scheduler', $this->module->get_cron_label(), $items_deleted );
+		do_action( 'bd_after_scheduler', $this->module->get_cron_label(), $items_deleted ); //phpcs:ignore
 	}
 }

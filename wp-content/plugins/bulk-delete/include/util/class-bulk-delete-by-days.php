@@ -42,7 +42,7 @@ class Bulk_Delete_By_Days {
 	 * @return string
 	 */
 	public function filter_where( $where = '' ) {
-		$where .= ' AND post_date ' . $this->op . " '" . date( 'y-m-d', strtotime( '-' . $this->days . ' days' ) ) . "'";
+		$where .= ' AND post_date ' . $this->op . " '" . gmdate( 'y-m-d', strtotime( '-' . $this->days . ' days' ) ) . "'";
 
 		return $where;
 	}

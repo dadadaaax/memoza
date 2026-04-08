@@ -18,7 +18,7 @@ class DeletePostsByStatusModule extends PostsModule {
 		$this->meta_box_slug = 'bd_posts_by_status';
 		$this->action        = 'delete_posts_by_status';
 		$this->cron_hook     = 'do-bulk-delete-post-status';
-		$this->scheduler_url = 'https://bulkwp.com/addons/scheduler-for-deleting-posts-by-status/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow&utm_content=bd-sps';
+		$this->scheduler_url = 1;
 		$this->messages      = array(
 			'box_label'         => __( 'By Post Status', 'bulk-delete' ),
 			'scheduled'         => __( 'The selected posts are scheduled for deletion', 'bulk-delete' ),
@@ -35,7 +35,7 @@ class DeletePostsByStatusModule extends PostsModule {
 
 	public function render() {
 		?>
-		<h4><?php _e( 'Select the post statuses from which you want to delete posts', 'bulk-delete' ); ?></h4>
+		<h4><?php esc_html_e( 'Select the post statuses from which you want to delete posts', 'bulk-delete' ); ?></h4>
 
 		<fieldset class="options">
 

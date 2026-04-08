@@ -16,7 +16,7 @@ class DeleteUserMetaModule extends MetasModule {
 		$this->meta_box_slug = 'bd-user-meta';
 		$this->action        = 'delete_user_meta';
 		$this->cron_hook     = 'do-bulk-delete-user-meta';
-		$this->scheduler_url = 'https://bulkwp.com/addons/bulk-delete-user-meta/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow&utm_content=bd-m-u';
+		$this->scheduler_url = 1;
 		$this->messages      = array(
 			'box_label'  => __( 'Bulk Delete User Meta', 'bulk-delete' ),
 			'scheduled'  => __( 'User meta fields from the users with the selected criteria are scheduled for deletion.', 'bulk-delete' ),
@@ -31,18 +31,18 @@ class DeleteUserMetaModule extends MetasModule {
 		?>
 		<!-- User Meta box start-->
 		<fieldset class="options">
-			<h4><?php _e( 'Select the user role whose user meta fields you want to delete', 'bulk-delete' ); ?></h4>
+			<h4><?php esc_html_e( 'Select the user role whose user meta fields you want to delete', 'bulk-delete' ); ?></h4>
 
 			<table class="optiontable">
 				<?php $this->render_user_role_dropdown(); ?>
 			</table>
 
-			<h4><?php _e( 'Choose your user meta field settings', 'bulk-delete' ); ?></h4>
+			<h4><?php esc_html_e( 'Choose your user meta field settings', 'bulk-delete' ); ?></h4>
 			<table class="optiontable">
 				<tr>
 					<td>
 						<input name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_use_value" value="false" type="radio" checked>
-						<label for="smbd_<?php echo esc_attr( $this->field_slug ); ?>_use_value"><?php echo __( 'Delete based on user meta key name only', 'bulk-delete' ); ?></label>
+						<label for="smbd_<?php echo esc_attr( $this->field_slug ); ?>_use_value"><?php echo esc_html__( 'Delete based on user meta key name only', 'bulk-delete' ); ?></label>
 					</td>
 				</tr>
 
@@ -50,18 +50,17 @@ class DeleteUserMetaModule extends MetasModule {
 					<td>
 						<input name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_use_value" id="smbd_<?php echo esc_attr( $this->field_slug ); ?>_use_value"
 								value="true" type="radio" disabled>
-						<label for="smbd_<?php echo esc_attr( $this->field_slug ); ?>_use_value"><?php echo __( 'Delete based on user meta key name and value', 'bulk-delete' ); ?></label>
+						<label for="smbd_<?php echo esc_attr( $this->field_slug ); ?>_use_value"><?php echo esc_html__( 'Delete based on user meta key name and value', 'bulk-delete' ); ?></label>
 						<span class="bd-um-pro" style="color:red; vertical-align: middle;">
-							<?php _e( 'Only available in Pro Addon', 'bulk-delete' ); ?>
-							<a href="https://bulkwp.com/addons/bulk-delete-user-meta/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow&utm_content=bd-m-u" target="_blank">Buy now</a>
+                            <span class="open-upsell pro-feature-inline" data-pro-feature="delete-post-meta">Available in PRO</span>
 						</span>
 					</td>
 				</tr>
 
 				<tr>
 					<td>
-						<label for="smbd_<?php echo esc_attr( $this->field_slug ); ?>_key"><?php _e( 'User Meta Key ', 'bulk-delete' ); ?></label>
-						<input name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_key" id="smbd_<?php echo esc_attr( $this->field_slug ); ?>_key" placeholder="<?php _e( 'Meta Key', 'bulk-delete' ); ?>">
+						<label for="smbd_<?php echo esc_attr( $this->field_slug ); ?>_key"><?php esc_html_e( 'User Meta Key ', 'bulk-delete' ); ?></label>
+						<input name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_key" id="smbd_<?php echo esc_attr( $this->field_slug ); ?>_key" placeholder="<?php esc_html_e( 'Meta Key', 'bulk-delete' ); ?>">
 					</td>
 				</tr>
 			</table>
@@ -72,12 +71,12 @@ class DeleteUserMetaModule extends MetasModule {
 		 *
 		 * @since 5.4
 		 */
-		do_action( 'bd_delete_user_meta_form' );
+		do_action( 'bd_delete_user_meta_form' ); //phpcs:ignore
 		?>
 			<table class="optiontable">
 				<tr>
 					<td colspan="2">
-						<h4><?php _e( 'Choose your deletion options', 'bulk-delete' ); ?></h4>
+						<h4><?php esc_html_e( 'Choose your deletion options', 'bulk-delete' ); ?></h4>
 					</td>
 				</tr>
 
@@ -104,7 +103,7 @@ class DeleteUserMetaModule extends MetasModule {
 		 *
 		 * @since 5.4
 		 */
-		return apply_filters( 'bd_delete_user_meta_options', $options, $request );
+		return apply_filters( 'bd_delete_user_meta_options', $options, $request ); //phpcs:ignore
 	}
 
 	protected function do_delete( $options ) {
@@ -122,7 +121,7 @@ class DeleteUserMetaModule extends MetasModule {
 		}
 
 		if ( $use_value ) {
-			$args['meta_query'] = apply_filters( 'bd_delete_user_meta_query', array(), $options );
+			$args['meta_query'] = apply_filters( 'bd_delete_user_meta_query', array(), $options ); //phpcs:ignore
 		} else {
 			$args['meta_key'] = $meta_key;
 		}

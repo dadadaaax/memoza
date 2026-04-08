@@ -23,7 +23,7 @@ defined( 'ABSPATH' ) || exit; // Exit if accessed directly
  *
  * @return array New options.
  */
-function bd_delete_options_compatibility( $options, $module = null ) {
+function bd_delete_options_compatibility( $options, $module = null ) { //phpcs:ignore
 	if ( $module instanceof BaseModule && 'delete_pages_by_status' === $module->get_action() ) {
 		return $options;
 	}
@@ -61,7 +61,7 @@ add_filter( 'bd_delete_options', 'bd_delete_options_compatibility', 10, 2 );
  *
  * @return array Processed delete options.
  */
-function bd_convert_old_options_for_delete_pages( $options, $module = null ) {
+function bd_convert_old_options_for_delete_pages( $options, $module = null ) { //phpcs:ignore
 	if ( $module instanceof BaseModule && 'delete_pages_by_status' !== $module->get_action() ) {
 		return $options;
 	}
@@ -110,7 +110,7 @@ add_filter( 'bd_delete_options', 'bd_convert_old_options_for_delete_pages', 10, 
  *
  * @return array Processed delete options.
  */
-function bd_convert_old_options_for_delete_posts_by_category( $options ) {
+function bd_convert_old_options_for_delete_posts_by_category( $options ) { //phpcs:ignore
 	if ( array_key_exists( 'cats_op', $options ) ) {
 		$options['date_op'] = $options['cats_op'];
 		$options['days']    = $options['cats_days'];
@@ -132,7 +132,7 @@ add_filter( 'bd_delete_options', 'bd_convert_old_options_for_delete_posts_by_cat
  *
  * @return array Processed delete options.
  */
-function bd_convert_old_options_for_delete_posts_by_tag( $options, $module = null ) {
+function bd_convert_old_options_for_delete_posts_by_tag( $options, $module = null ) { //phpcs:ignore
 	if ( $module instanceof BaseModule && 'delete_posts_by_tag' !== $module->get_action() ) {
 		return $options;
 	}
@@ -159,7 +159,7 @@ add_filter( 'bd_delete_options', 'bd_convert_old_options_for_delete_posts_by_tag
  *
  * @return array Processed delete options.
  */
-function bd_convert_old_options_for_delete_post_by_status( $delete_options, $module = null ) {
+function bd_convert_old_options_for_delete_post_by_status( $delete_options, $module = null ) { //phpcs:ignore
 	if ( $module instanceof BaseModule && 'delete_posts_by_status' !== $module->get_action() ) {
 		return $delete_options;
 	}
@@ -211,7 +211,7 @@ add_filter( 'bd_delete_options', 'bd_convert_old_options_for_delete_post_by_stat
  *
  * @return array Processed delete options.
  */
-function bd_convert_old_options_for_delete_post_by_taxonomy( $delete_options, $module = null ) {
+function bd_convert_old_options_for_delete_post_by_taxonomy( $delete_options, $module = null ) { //phpcs:ignore
 	if ( $module instanceof BaseModule && 'bd_delete_posts_by_taxonomy' !== $module->get_action() ) {
 		return $delete_options;
 	}
@@ -237,7 +237,7 @@ add_filter( 'bd_delete_options', 'bd_convert_old_options_for_delete_post_by_taxo
  *
  * @return array Processed delete options.
  */
-function bd_convert_old_options_for_delete_post_by_post_type( $delete_options, $module = null ) {
+function bd_convert_old_options_for_delete_post_by_post_type( $delete_options, $module = null ) { //phpcs:ignore
 	if ( $module instanceof BaseModule && 'delete_posts_by_post_type' !== $module->get_action() ) {
 		return $delete_options;
 	}
@@ -261,7 +261,7 @@ add_filter( 'bd_delete_options', 'bd_convert_old_options_for_delete_post_by_post
  *
  * @return array Modified JavaScript Array
  */
-function bd_enable_cron_for_old_addons( $js_array ) {
+function bd_enable_cron_for_old_addons( $js_array ) { //phpcs:ignore
 	if ( ! function_exists( 'is_plugin_active' ) ) {
 		require_once ABSPATH . 'wp-admin/includes/plugin.php';
 	}
@@ -284,7 +284,7 @@ if ( ! function_exists( 'array_get' ) ) {
 	 * @param mixed      $key
 	 * @param mixed|null $default
 	 */
-	function array_get( $array, $key, $default = null ) {
+	function array_get( $array, $key, $default = null ) { //phpcs:ignore
 		return bd_array_get( $array, $key, $default );
 	}
 }
@@ -297,7 +297,7 @@ if ( ! function_exists( 'array_get_bool' ) ) {
 	 * @param mixed $key
 	 * @param mixed $default
 	 */
-	function array_get_bool( $array, $key, $default = false ) {
+	function array_get_bool( $array, $key, $default = false ) { //phpcs:ignore
 		return bd_array_get_bool( $array, $key, $default );
 	}
 }

@@ -18,7 +18,7 @@ class DeletePostsByPostTypeModule extends PostsModule {
 		$this->meta_box_slug = 'bd_posts_by_types';
 		$this->action        = 'delete_posts_by_post_type';
 		$this->cron_hook     = 'do-bulk-delete-post-type';
-		$this->scheduler_url = 'https://bulkwp.com/addons/scheduler-for-deleting-posts-by-post-type/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow&utm_content=bd-spt';
+		$this->scheduler_url = 1;
 		$this->messages      = array(
 			'box_label'         => __( 'By Post Type', 'bulk-delete' ),
 			'scheduled'         => __( 'Posts from the selected post type and post status are scheduled for deletion', 'bulk-delete' ),
@@ -37,7 +37,7 @@ class DeletePostsByPostTypeModule extends PostsModule {
 		?>
 
 		<h4>
-			<?php _e( 'Select the post type and the status from which you want to delete posts', 'bulk-delete' ); ?>
+			<?php esc_html_e( 'Select the post type and the status from which you want to delete posts', 'bulk-delete' ); ?>
 		</h4>
 
 		<fieldset class="options">
@@ -81,7 +81,7 @@ class DeletePostsByPostTypeModule extends PostsModule {
 		 * @param array $options Delete options.
 		 * @param \BulkWP\BulkDelete\Core\Base\BaseModule Modules that is triggering deletion.
 		 */
-		$options = apply_filters( 'bd_delete_options', $options, $this );
+		$options = apply_filters( 'bd_delete_options', $options, $this ); //phpcs:ignore
 
 		$posts_deleted  = 0;
 		$selected_types = $options['selected_types'];

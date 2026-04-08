@@ -64,7 +64,7 @@ abstract class AbstractMonitoringMiddleware
      *
      * @param callable $handler
      * @param callable $credentialProvider
-     * @param array $options
+     * @param $options
      * @param $region
      * @param $service
      */
@@ -118,12 +118,12 @@ abstract class AbstractMonitoringMiddleware
                 }
             }
             if ($value instanceof \Exception || $value instanceof \Throwable) {
-                return Promise\rejection_for($value);
+                return Promise\Create::rejectionFor($value);
             }
             return $value;
         };
 
-        return Promise\promise_for($handler($cmd, $request))->then($g, $g);
+        return Promise\Create::promiseFor($handler($cmd, $request))->then($g, $g);
     }
 
     private function getClientId()
@@ -149,6 +149,11 @@ abstract class AbstractMonitoringMiddleware
             'Version' => 1
         ];
         return $event;
+    }
+
+    private function getHost()
+    {
+        return $this->unwrappedOptions()->getHost();
     }
 
     private function getPort()
@@ -219,6 +224,26 @@ abstract class AbstractMonitoringMiddleware
         return $event;
     }
 
+
+    /**
+     * Checks if the socket is created. If PHP version is greater or equals to 8 then,
+     * it will check if the var is instance of \Socket otherwise it will check if is
+     * a resource.
+     *
+     * @return bool Returns true if the socket is created, false otherwise.
+     */
+    private function isSocketCreated(): bool
+    {
+        // Before version 8, sockets are resources
+        // After version 8, sockets are instances of Socket
+        if (PHP_MAJOR_VERSION >= 8) {
+            $socketClass = '\Socket';
+            return self::$socket instanceof $socketClass;
+        } else {
+            return is_resource(self::$socket);
+        }
+    }
+
     /**
      * Creates a UDP socket resource and stores it with the class, or retrieves
      * it if already instantiated and connected. Handles error-checking and
@@ -230,13 +255,13 @@ abstract class AbstractMonitoringMiddleware
      */
     private function prepareSocket($forceNewConnection = false)
     {
-        if (!is_resource(self::$socket)
+        if (!$this->isSocketCreated()
             || $forceNewConnection
             || socket_last_error(self::$socket)
         ) {
             self::$socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
             socket_clear_error(self::$socket);
-            socket_connect(self::$socket, '127.0.0.1', $this->getPort());
+            socket_connect(self::$socket, $this->getHost(), $this->getPort());
         }
 
         return self::$socket;
@@ -268,7 +293,16 @@ abstract class AbstractMonitoringMiddleware
     private function unwrappedOptions()
     {
         if (!($this->options instanceof ConfigurationInterface)) {
-            $this->options = ConfigurationProvider::unwrap($this->options);
+            try {
+                $this->options = ConfigurationProvider::unwrap($this->options);
+            } catch (\Exception $e) {
+                // Errors unwrapping CSM config defaults to disabling it
+                $this->options = new Configuration(
+                    false,
+                    ConfigurationProvider::DEFAULT_HOST,
+                    ConfigurationProvider::DEFAULT_PORT
+                );
+            }
         }
         return $this->options;
     }

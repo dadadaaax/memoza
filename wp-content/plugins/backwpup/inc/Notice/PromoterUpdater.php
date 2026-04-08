@@ -1,8 +1,17 @@
-<?php # -*- coding: utf-8 -*-
+<?php
+/**
+ * Promoter notice updater.
+ */
 
 namespace Inpsyde\BackWPup\Notice;
 
 class PromoterUpdater {
 
-	public function update() {}
+	/**
+	 * Updates promoter notice data.
+	 *
+	 * @return void
+	 */
+	public function update() {
+	}
 }

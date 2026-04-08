@@ -15,7 +15,7 @@ defined( 'ABSPATH' ) || exit; // Exit if accessed directly.
  */
 class DeletePostsPage extends BaseDeletePage {
 	/**
-	 * Position in which the Bulk WP menu should appear.
+	 * Position in which the Bulk Delete menu should appear.
 	 */
 	const MENU_POSITION = '26';
 
@@ -32,16 +32,16 @@ class DeletePostsPage extends BaseDeletePage {
 		);
 
 		$this->messages = array(
-			'warning_message' => __( 'WARNING: Posts deleted once cannot be retrieved back. Use with caution.', 'bulk-delete' ),
+			'warning_message' => __( 'WARNING: There is no undo! Once deleted, posts are gone. Use with caution.', 'bulk-delete' ),
 		);
 
-		$this->show_link_in_plugin_list = true;
+		$this->show_link_in_plugin_list = 0;
 	}
 
 	public function register() {
 		add_menu_page(
-			__( 'Bulk WP', 'bulk-delete' ),
-			__( 'Bulk WP', 'bulk-delete' ),
+			__( 'Bulk Delete', 'bulk-delete' ),
+			__( 'Bulk Delete', 'bulk-delete' ),
 			$this->capability,
 			$this->page_slug,
 			array( $this, 'render_page' ),
@@ -59,13 +59,13 @@ class DeletePostsPage extends BaseDeletePage {
 	 */
 	protected function get_bulkwp_menu_position() {
 		/**
-		 * Bulk WP Menu position.
+		 * Bulk Delete Menu position.
 		 *
 		 * @since 6.0.0
 		 *
 		 * @param int Menu Position.
 		 */
-		return apply_filters( 'bd_bulkwp_menu_position', self::MENU_POSITION );
+		return apply_filters( 'bd_bulkwp_menu_position', self::MENU_POSITION ); //phpcs:ignore
 	}
 
 	/**

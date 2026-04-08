@@ -27,7 +27,7 @@ class DeletePagesPage extends BaseDeletePage {
 		);
 
 		$this->messages = array(
-			'warning_message' => __( 'WARNING: Pages deleted once cannot be retrieved back. Use with caution.', 'bulk-delete' ),
+			'warning_message' => __( 'WARNING: There is no undo! Once deleted, pages are gone. Use with caution.', 'bulk-delete' ),
 		);
 	}
 

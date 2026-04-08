@@ -8,7 +8,7 @@
  */
 defined( 'ABSPATH' ) || exit; // Exit if accessed directly
 
-class Cron_List_Table extends WP_List_Table {
+class Cron_List_Table extends WP_List_Table { //phpcs:ignore
 	/**
 	 * Constructor, we override the parent to pass our own arguments
 	 * We usually focus on three parameters: singular and plural labels, as well as whether the class supports AJAX.
@@ -30,11 +30,11 @@ class Cron_List_Table extends WP_List_Table {
 		if ( 'top' == $which ) {
 			//The code that goes before the table is here
 			echo '<p>';
-			_e( 'This is the list of jobs that are currently scheduled for auto deleting posts in Bulk Delete Plugin.', 'bulk-delete' );
+			esc_html_e( 'This is the list of jobs that are currently scheduled for auto deleting posts in Bulk Delete Plugin.', 'bulk-delete' );
 			echo ' <strong>';
-			_e( 'Note: ', 'bulk-delete' );
+			esc_html_e( 'Note: ', 'bulk-delete' );
 			echo '</strong>';
-			_e( 'Scheduling auto post or user deletion is available only when you buy pro addons.', 'bulk-delete' );
+			esc_html_e( 'Scheduling is available only in PRO version.', 'bulk-delete' );
 			echo '</p>';
 		}
 	}
@@ -104,9 +104,10 @@ class Cron_List_Table extends WP_List_Table {
 	 */
 	public function column_col_cron_due( $item ) {
 		//Build row actions
+        $page = sanitize_text_field(wp_unslash($_REQUEST['page'] ?? '')); //phpcs:ignore
 		$actions = array(
 			'delete'    => sprintf( '<a href="?page=%s&bd_action=%s&cron_id=%s&%s=%s">%s</a>',
-				$_REQUEST['page'],
+				$page,
 				'delete_cron',
 				$item['id'],
 				'bd-delete_cron-nonce',
@@ -129,7 +130,7 @@ class Cron_List_Table extends WP_List_Table {
 	 * @param array $item
 	 */
 	public function column_col_cron_schedule( $item ) {
-		echo $item['schedule'];
+		echo esc_html($item['schedule']);
 	}
 
 	/**
@@ -138,7 +139,7 @@ class Cron_List_Table extends WP_List_Table {
 	 * @param array $item
 	 */
 	public function column_col_cron_type( $item ) {
-		echo $item['type'];
+		echo esc_html($item['type']);
 	}
 
 	/**
@@ -148,10 +149,10 @@ class Cron_List_Table extends WP_List_Table {
 	 */
 	public function column_col_cron_options( $item ) {
 		// TODO: Make it pretty
-		print_r( $item['args'] );
+		print_r( $item['args'] ); //phpcs:ignore
 	}
 
 	public function no_items() {
-		_e( 'You have not scheduled any bulk delete jobs.', 'bulk-delete' );
+		esc_html_e( 'You have not scheduled any bulk delete jobs.', 'bulk-delete' );
 	}
 }

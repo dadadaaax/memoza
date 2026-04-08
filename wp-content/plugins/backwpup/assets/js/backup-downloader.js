@@ -40,7 +40,6 @@ window.BWU = window.BWU || {};
         if ( !el ) {
             return;
         }
-
         el.style.display = 'block';
     }
 
@@ -59,6 +58,11 @@ window.BWU = window.BWU || {};
         showSuccessMsg: function ()
         {
             showElement( this.successUi );
+        },
+
+        showErrorUi: function ()
+        {
+            showElement( this.errorUi );
         },
 
         hideWaitingMessage: function ()
@@ -81,12 +85,18 @@ window.BWU = window.BWU || {};
             hideElement( this.successUi );
         },
 
+        hideErrorUi: function ()
+        {
+            hideElement( this.errorUi );
+        },
+
         cleanUi: function ()
         {
             this.hideWaitingMessage();
             this.hideProgressUi();
             this.hideNotice();
             this.hideSuccessMsg();
+            this.hideErrorUi();
             this.decrypter && this.decrypter.hide();
         },
 
@@ -142,8 +152,9 @@ window.BWU = window.BWU || {};
                     this.decrypter && this.decrypter.needDecryption( data.status );
                     break;
                 default:
-                    BWU.Functions.printMessageError( data.message, this.containerUi );
-                    destruct.call( this );
+                    this.cleanUi();
+                    this.showErrorUi();
+                    this.errorUi.innerHTML = data.message;
                     break;
             }
 
@@ -179,12 +190,21 @@ window.BWU = window.BWU || {};
             this.eventSource = undefined;
         },
 
+        startDirectDownload: function ( evt )
+        {
+            const url = evt.currentTarget.getAttribute('data-href');
+            const anchor = document.createElement('a');
+            anchor.href = url;
+            document.body.appendChild(anchor);
+            anchor.click();
+            document.body.removeChild(anchor);
+        },
+
         startDownload: function ( evt )
         {
+            tb_show( 'Download Backup', evt.currentTarget.getAttribute('data-href'), false );
             evt.preventDefault();
-
-            this.currentTarget = evt.target;
-
+            this.currentTarget = evt.currentTarget;
             this.showWaitingMessage();
             this.initializeEventSource();
         },
@@ -223,24 +243,31 @@ window.BWU = window.BWU || {};
                 'decrypt',
                 'hideNotice',
                 'cleanUi',
-                'init'
+                'init',
+                'showErrorUi',
+                'hideErrorUi'
             );
 
             this.containerUi = containerUi;
             this.waitingUi = this.containerUi.querySelector( '#download-file-waiting' );
             this.progressUi = this.containerUi.querySelector( '.progressbar' );
+            this.errorUi = this.containerUi.querySelector( '#error-ui' );
             this.successUi = this.containerUi.querySelector( '#download-file-success' );
 
             this.currentTarget = undefined;
             this.eventSource = undefined;
             this.decrypter = decrypter;
-
             return this;
         },
 
         addListeners: function ()
         {
-            _.forEach( document.querySelectorAll( '#backup-download-link' ), function ( downloadLink )
+            _.forEach(document.querySelectorAll( '.js-backwpup-direct-download-backup' ), function ( downloadLink )
+            {
+                downloadLink.addEventListener( 'click', this.startDirectDownload );
+            }.bind( this ) );
+
+            _.forEach( document.querySelectorAll( '.js-backwpup-download-backup' ), function ( downloadLink )
             {
                 downloadLink.addEventListener( 'click', this.startDownload );
             }.bind( this ) );
@@ -279,7 +306,7 @@ window.BWU = window.BWU || {};
     }
 
     if ( downloader.construct( decrypter ) ) {
-        downloader.init();
+        window.BWU.downloader =  downloader.init();
     }
 
 }( window.jQuery, window._, window.BWU, window.ajaxurl, window.tb_remove ) );

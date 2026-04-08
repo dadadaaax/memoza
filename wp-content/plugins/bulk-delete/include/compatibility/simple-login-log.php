@@ -18,11 +18,11 @@ defined( 'ABSPATH' ) || exit; // Exit if accessed directly
  *
  * @return bool True if plugin is installed, False otherwise
  */
-function bd_is_simple_login_log_present() {
+function bd_is_simple_login_log_present() { //phpcs:ignore
 	global $wpdb;
 	$simple_login_log_table = 'simple_login_log';
 
-	return (bool) $wpdb->get_row( "SHOW TABLES LIKE '{$wpdb->prefix}{$simple_login_log_table}'" );
+	return (bool) $wpdb->get_row( "SHOW TABLES LIKE '{$wpdb->prefix}{$simple_login_log_table}'" ); //phpcs:ignore
 }
 
 /**
@@ -34,10 +34,10 @@ function bd_is_simple_login_log_present() {
  *
  * @return string
  */
-function bd_get_last_login( $user_id ) {
+function bd_get_last_login( $user_id ) { //phpcs:ignore
 	global $wpdb;
 
 	$simple_login_log_table = 'simple_login_log';
 
-	return $wpdb->get_var( $wpdb->prepare( "SELECT time FROM {$wpdb->prefix}{$simple_login_log_table} WHERE uid = %d ORDER BY time DESC LIMIT 1", $user_id ) );
+	return $wpdb->get_var( $wpdb->prepare( "SELECT time FROM {$wpdb->prefix}{$simple_login_log_table} WHERE uid = %d ORDER BY time DESC LIMIT 1", $user_id ) ); //phpcs:ignore
 }

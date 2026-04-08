@@ -15,11 +15,11 @@ defined( 'ABSPATH' ) || exit; // Exit if accessed directly
  *
  * @since 5.5
  */
-function bd_render_filtering_table_header() {
+function bd_render_filtering_table_header() {  //phpcs:ignore
 ?>
 	<tr>
 		<td colspan="2">
-			<h4><?php _e( 'Choose your filtering options', 'bulk-delete' ); ?></h4>
+			<h4><?php esc_html_e( 'Choose your filtering options', 'bulk-delete' ); ?></h4>
 		</td>
 	</tr>
 <?php
@@ -33,19 +33,22 @@ function bd_render_filtering_table_header() {
  * @param string $slug The slug to be used in field names.
  * @param string $item (optional) Item for which form is displayed. Default is 'posts'.
  */
-function bd_render_restrict_settings( $slug, $item = 'posts' ) {
+function bd_render_restrict_settings( $slug, $item = 'posts' ) {  //phpcs:ignore
 ?>
 	<tr>
 		<td scope="row">
-			<input name="smbd_<?php echo $slug; ?>_restrict" id="smbd_<?php echo $slug; ?>_restrict" value="true" type="checkbox">
+			<input name="smbd_<?php echo esc_html($slug); ?>_restrict" id="smbd_<?php echo esc_html($slug); ?>_restrict" value="true" type="checkbox">
 		</td>
 		<td>
-			<label for="smbd_<?php echo $slug; ?>_restrict"><?php printf( __( 'Only restrict to %s which are ', 'bulk-delete' ), $item ); ?></label>
-			<select name="smbd_<?php echo $slug; ?>_op" id="smbd_<?php echo $slug; ?>_op" disabled>
-				<option value="before"><?php _e( 'older than', 'bulk-delete' );?></option>
-				<option value="after"><?php _e( 'posted within last', 'bulk-delete' );?></option>
+			<label for="smbd_<?php echo esc_html($slug); ?>_restrict"><?php 
+			/* translators: %s is the post type */
+			bd_wp_kses_wf(sprintf( __( 'Only restrict to %s which are ', 'bulk-delete' ), $item )); 
+			?></label>
+			<select name="smbd_<?php echo esc_html($slug); ?>_op" id="smbd_<?php echo esc_html($slug); ?>_op" disabled>
+				<option value="before"><?php esc_html_e( 'older than', 'bulk-delete' );?></option>
+				<option value="after"><?php esc_html_e( 'posted within last', 'bulk-delete' );?></option>
 			</select>
-			<input type="number" name="smbd_<?php echo $slug; ?>_days" id="smbd_<?php echo $slug; ?>_days" class="screen-per-page" disabled value="0" min="0"><?php _e( 'days', 'bulk-delete' );?>
+			<input type="number" name="smbd_<?php echo esc_html($slug); ?>_days" id="smbd_<?php echo esc_html($slug); ?>_days" class="screen-per-page" disabled value="0" min="0"><?php esc_html_e( 'days', 'bulk-delete' );?>
 		</td>
 	</tr>
 <?php
@@ -58,12 +61,12 @@ function bd_render_restrict_settings( $slug, $item = 'posts' ) {
  *
  * @param string $slug The slug to be used in field names.
  */
-function bd_render_delete_settings( $slug ) {
+function bd_render_delete_settings( $slug ) {  //phpcs:ignore
 ?>
 	<tr>
 		<td scope="row" colspan="2">
-			<label><input name="smbd_<?php echo $slug; ?>_force_delete" value="false" type="radio" checked><?php _e( 'Move to Trash', 'bulk-delete' ); ?></label>
-			<label><input name="smbd_<?php echo $slug; ?>_force_delete" value="true" type="radio"><?php _e( 'Delete permanently', 'bulk-delete' ); ?></label>
+			<label><input name="smbd_<?php echo esc_html($slug); ?>_force_delete" value="false" type="radio" checked><?php esc_html_e( 'Move to Trash', 'bulk-delete' ); ?></label>
+			<label><input name="smbd_<?php echo esc_html($slug); ?>_force_delete" value="true" type="radio"><?php esc_html_e( 'Delete permanently', 'bulk-delete' ); ?></label>
 		</td>
 	</tr>
 <?php
@@ -76,12 +79,12 @@ function bd_render_delete_settings( $slug ) {
  *
  * @param string $slug The slug to be used in field names.
  */
-function bd_render_private_post_settings( $slug ) {
+function bd_render_private_post_settings( $slug ) {  //phpcs:ignore
 		?>
 	<tr>
 		<td scope="row" colspan="2">
-			<label><input name="smbd_<?php echo $slug; ?>_private" value="false" type="radio" checked> <?php _e( 'Public posts', 'bulk-delete' ); ?></label>
-			<label><input name="smbd_<?php echo $slug; ?>_private" value="true" type="radio"> <?php _e( 'Private Posts', 'bulk-delete' ); ?></label>
+			<label><input name="smbd_<?php echo esc_html($slug); ?>_private" value="false" type="radio" checked> <?php esc_html_e( 'Public posts', 'bulk-delete' ); ?></label>
+			<label><input name="smbd_<?php echo esc_html($slug); ?>_private" value="true" type="radio"> <?php esc_html_e( 'Private Posts', 'bulk-delete' ); ?></label>
 		</td>
 	</tr>
 		<?php
@@ -95,16 +98,19 @@ function bd_render_private_post_settings( $slug ) {
  * @param string $slug The slug to be used in field names.
  * @param string $item (Optional) Item type. Possible values are 'posts', 'pages', 'users'
  */
-function bd_render_limit_settings( $slug, $item = 'posts' ) {
+function bd_render_limit_settings( $slug, $item = 'posts' ) { //phpcs:ignore
 ?>
 	<tr>
 		<td scope="row">
-			<input name="smbd_<?php echo $slug; ?>_limit" id="smbd_<?php echo $slug; ?>_limit" value="true" type="checkbox">
+			<input name="smbd_<?php echo esc_html($slug); ?>_limit" id="smbd_<?php echo esc_html($slug); ?>_limit" value="true" type="checkbox">
 		</td>
 		<td>
-			<label for="smbd_<?php echo $slug; ?>_limit"><?php _e( 'Only delete first ', 'bulk-delete' ); ?></label>
-			<input type="number" name="smbd_<?php echo $slug; ?>_limit_to" id="smbd_<?php echo $slug; ?>_limit_to" class="screen-per-page" disabled value="0" min="0"> <?php echo $item;?>.
-			<?php printf( __( 'Use this option if there are more than 1000 %s and the script times out.', 'bulk-delete' ), $item ); ?>
+			<label for="smbd_<?php echo esc_html($slug); ?>_limit"><?php esc_html_e( 'Only delete first ', 'bulk-delete' ); ?></label>
+			<input type="number" name="smbd_<?php echo esc_html($slug); ?>_limit_to" id="smbd_<?php echo esc_html($slug); ?>_limit_to" class="screen-per-page" disabled value="0" min="0"> <?php echo esc_html($item);?>.
+			<?php 
+			/* translators: %s is the post type */
+			bd_wp_kses_wf(sprintf( __( 'Use this option if there are more than 1000 %s and the script times out.', 'bulk-delete' ), $item )); 
+			?>
 		</td>
 	</tr>
 <?php
@@ -118,30 +124,31 @@ function bd_render_limit_settings( $slug, $item = 'posts' ) {
  * @param string $slug      The slug to be used in field names.
  * @param string $addon_url Url for the pro addon.
  */
-function bd_render_cron_settings( $slug, $addon_url ) {
+function bd_render_cron_settings( $slug, $addon_url ) { //phpcs:ignore
 	$pro_class = 'bd-' . str_replace( '_', '-', $slug ) . '-pro';
 ?>
 	<tr>
 		<td scope="row" colspan="2">
-			<label><input name="smbd_<?php echo $slug; ?>_cron" value="false" type="radio" checked="checked"> <?php _e( 'Delete now', 'bulk-delete' ); ?></label>
-			<label><input name="smbd_<?php echo $slug; ?>_cron" value="true" type="radio" id="smbd_<?php echo $slug; ?>_cron" disabled > <?php _e( 'Schedule', 'bulk-delete' ); ?></label>
-			<input name="smbd_<?php echo $slug; ?>_cron_start" id="smbd_<?php echo $slug; ?>_cron_start" value="now" type="text" disabled autocomplete="off"><?php _e( 'repeat ', 'bulk-delete' );?>
-			<select name="smbd_<?php echo $slug; ?>_cron_freq" id="smbd_<?php echo $slug; ?>_cron_freq" disabled>
-				<option value="-1"><?php _e( "Don't repeat", 'bulk-delete' ); ?></option>
+			<label><input name="smbd_<?php echo esc_html($slug); ?>_cron" value="false" type="radio" checked="checked"> <?php esc_html_e( 'Delete now', 'bulk-delete' ); ?></label>
+			<label><input name="smbd_<?php echo esc_html($slug); ?>_cron" value="true" type="radio" id="smbd_<?php echo esc_html($slug); ?>_cron" disabled > <?php esc_html_e( 'Schedule', 'bulk-delete' ); ?></label>
+			<input name="smbd_<?php echo esc_html($slug); ?>_cron_start" id="smbd_<?php echo esc_html($slug); ?>_cron_start" value="now" type="text" disabled autocomplete="off"><?php esc_html_e( 'repeat ', 'bulk-delete' );?>
+			<select name="smbd_<?php echo esc_html($slug); ?>_cron_freq" id="smbd_<?php echo esc_html($slug); ?>_cron_freq" disabled>
+				<option value="-1"><?php esc_html_e( "Don't repeat", 'bulk-delete' ); ?></option>
 <?php
 	$schedules = wp_get_schedules();
 	foreach ( $schedules as $key => $value ) {
 ?>
-				<option value="<?php echo $key; ?>"><?php echo $value['display']; ?></option>
+				<option value="<?php echo esc_html($key); ?>"><?php echo esc_html($value['display']); ?></option>
 <?php } ?>
 			</select>
-			<span class="<?php echo sanitize_html_class( apply_filters( 'bd_pro_class', $pro_class, $slug ) ); ?>" style="color:red"><?php _e( 'Only available in Pro Addon', 'bulk-delete' ); ?> <a href="<?php echo $addon_url; ?>">Buy now</a></span>
+            <span class="open-upsell pro-feature-inline" data-pro-feature="<?php echo esc_html($slug); ?>">Available in PRO</span>
+        </span>
 		</td>
 	</tr>
 
 	<tr>
 		<td scope="row" colspan="2">
-			<?php _e( 'Enter time in <strong>Y-m-d H:i:s</strong> format or enter <strong>now</strong> to use current time', 'bulk-delete' );?>
+			<?php bd_wp_kses_wf(__( 'Enter time in <strong>Y-m-d H:i:s</strong> format or enter <strong>now</strong> to use current time', 'bulk-delete' ));?>
 		</td>
 	</tr>
 <?php
@@ -154,10 +161,10 @@ function bd_render_cron_settings( $slug, $addon_url ) {
  *
  * @param string $action The action attribute of the submit button.
  */
-function bd_render_submit_button( $action ) {
+function bd_render_submit_button( $action ) { //phpcs:ignore
 ?>
 	<p class="submit">
-		<button type="submit" name="bd_action" value="<?php echo esc_attr( $action ); ?>" class="button-primary"><?php _e( 'Bulk Delete ', 'bulk-delete' ); ?>&raquo;</button>
+		<button type="submit" name="bd_action" value="<?php echo esc_attr( $action ); ?>" class="button-primary"><?php esc_html_e( 'Bulk Delete ', 'bulk-delete' ); ?>&raquo;</button>
 	</p>
 <?php
 }
@@ -169,7 +176,7 @@ function bd_render_submit_button( $action ) {
  *
  * @return \WP_Post_Type[] List of post type objects.
  */
-function bd_get_post_types() {
+function bd_get_post_types() { //phpcs:ignore
 	$custom_types = bd_get_custom_post_types();
 
 	$builtin_types = bd_get_builtin_public_post_types();
@@ -184,7 +191,7 @@ function bd_get_post_types() {
  *
  * @return \WP_Post_Type[] List of public built-in post types.
  */
-function bd_get_builtin_public_post_types() {
+function bd_get_builtin_public_post_types() { //phpcs:ignore
 	$builtin_types = array(
 		'post' => get_post_type_object( 'post' ),
 		'page' => get_post_type_object( 'page' ),
@@ -200,7 +207,7 @@ function bd_get_builtin_public_post_types() {
  *
  * @return \WP_Post_Type[] List of custom post types.
  */
-function bd_get_custom_post_types() {
+function bd_get_custom_post_types() { //phpcs:ignore
 	$custom_types = get_post_types( array( '_builtin' => false ), 'objects' );
 
 	return $custom_types;
@@ -211,7 +218,7 @@ function bd_get_custom_post_types() {
  *
  * @param string $field_slug Field slug.
  */
-function bd_render_post_type_dropdown( $field_slug ) {
+function bd_render_post_type_dropdown( $field_slug ) { //phpcs:ignore
 	$builtin_post_types = bd_get_builtin_public_post_types();
 	$custom_post_types  = bd_get_custom_post_types();
 	?>
@@ -248,7 +255,7 @@ function bd_render_post_type_dropdown( $field_slug ) {
  * @param string $slug     The slug to be used in field names.
  * @param string $selected Default selected status.
  */
-function bd_render_post_status_filter( $slug, $selected = 'publish' ) {
+function bd_render_post_status_filter( $slug, $selected = 'publish' ) { //phpcs:ignore
 	$post_statuses = bd_get_post_statuses();
 
 	foreach ( $post_statuses as $key => $value ) {
@@ -259,7 +266,7 @@ function bd_render_post_status_filter( $slug, $selected = 'publish' ) {
 					<input name="smbd_<?php echo esc_attr( $slug ); ?>_post_status[]" type="checkbox"
 							value="<?php echo esc_attr( $key ); ?>" <?php checked( $key, $selected ); ?>>
 
-					<?php echo __( 'All', 'bulk-delete' ), ' ', esc_html( $value->label ), ' ', __( 'Posts', 'bulk-delete' ); ?>
+					<?php echo esc_html__( 'All', 'bulk-delete' ), ' ', esc_html( $value->label ), ' ', esc_html__( 'Posts', 'bulk-delete' ); ?>
 				</label>
 			</td>
 		</tr>
@@ -276,7 +283,7 @@ function bd_render_post_status_filter( $slug, $selected = 'publish' ) {
  *
  * @return array List of post status objects.
  */
-function bd_get_post_statuses() {
+function bd_get_post_statuses() { //phpcs:ignore
 	$post_statuses = get_post_stati( array(), 'object' );
 
 	$exclude_post_statuses = bd_get_excluded_post_statuses();
@@ -291,7 +298,7 @@ function bd_get_post_statuses() {
 	 *
 	 * @param array $post_statuses List of post statuses.
 	 */
-	return apply_filters( 'bd_post_statuses', $post_statuses );
+	return apply_filters( 'bd_post_statuses', $post_statuses ); //phpcs:ignore
 }
 
 /**
@@ -301,7 +308,7 @@ function bd_get_post_statuses() {
  *
  * @return array List of excluded post statuses.
  */
-function bd_get_excluded_post_statuses() {
+function bd_get_excluded_post_statuses() { //phpcs:ignore
 	/**
 	 * List of post statuses that should be excluded from post status filter.
 	 *
@@ -309,9 +316,7 @@ function bd_get_excluded_post_statuses() {
 	 *
 	 * @param array $post_statuses List of post statuses to exclude.
 	 */
-	return apply_filters(
-		'bd_excluded_post_statuses',
-		array(
+	return apply_filters('bd_excluded_post_statuses', array(  //phpcs:ignore
 			'inherit',
 			'trash',
 			'auto-draft',
@@ -331,7 +336,7 @@ function bd_get_excluded_post_statuses() {
  *
  * @return string Markup with tooltip markup appended to it.
  */
-function bd_generate_help_tooltip( $markup, $content ) {
+function bd_generate_help_tooltip( $markup, $content ) { //phpcs:ignore
 	if ( empty( $content ) ) {
 		return $markup;
 	}

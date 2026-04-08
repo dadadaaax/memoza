@@ -55,14 +55,14 @@ class DeleteFromTrashModule extends DeprecatedModule {
 			 *
 			 * @since 5.4
 			 */
-			do_action( 'bd_render_delete_posts_from_trash' );
+			do_action( 'bd_render_delete_posts_from_trash' );  //phpcs:ignore
 		} elseif ( 'pages' === $this->item_type ) {
 			/**
 			 * Render delete pages from trash box.
 			 *
 			 * @since 5.4
 			 */
-			do_action( 'bd_render_delete_pages_from_trash' );
+			do_action( 'bd_render_delete_pages_from_trash' ); //phpcs:ignore
 		}
 	}
 }

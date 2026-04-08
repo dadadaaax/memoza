@@ -17,6 +17,7 @@ class DeleteCommentMetaModule extends MetasModule {
 		$this->meta_box_slug = 'bd-comment-meta';
 		$this->action        = 'delete_comment_meta';
 		$this->cron_hook     = 'do-bulk-delete-comment-meta';
+        $this->scheduler_url = 1;
 		$this->messages      = array(
 			'box_label'  => __( 'Bulk Delete Comment Meta', 'bulk-delete' ),
 			'scheduled'  => __( 'Comment meta fields from the comments with the selected criteria are scheduled for deletion.', 'bulk-delete' ),
@@ -51,17 +52,17 @@ class DeleteCommentMetaModule extends MetasModule {
 		?>
 		<!-- Comment Meta box start-->
 		<fieldset class="options">
-			<h4><?php _e( 'Select the post type whose comment meta fields you want to delete', 'bulk-delete' ); ?></h4>
+			<h4><?php esc_html_e( 'Select the post type whose comment meta fields you want to delete', 'bulk-delete' ); ?></h4>
 			<table class="optiontable">
 				<?php $this->render_post_type_with_status( false ); ?>
 			</table>
 
-			<h4><?php _e( 'Choose your comment meta field settings', 'bulk-delete' ); ?></h4>
+			<h4><?php esc_html_e( 'Choose your comment meta field settings', 'bulk-delete' ); ?></h4>
 			<table class="optiontable">
 				<tr>
 					<td>
 						<input name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_use_value" value="false" type="radio" checked>
-						<label for="smbd_<?php echo esc_attr( $this->field_slug ); ?>_use_value"><?php echo __( 'Delete based on comment meta key name only', 'bulk-delete' ); ?></label>
+						<label for="smbd_<?php echo esc_attr( $this->field_slug ); ?>_use_value"><?php echo esc_html__( 'Delete based on comment meta key name only', 'bulk-delete' ); ?></label>
 					</td>
 				</tr>
 
@@ -69,14 +70,14 @@ class DeleteCommentMetaModule extends MetasModule {
 					<td>
 						<input type="radio" value="true" name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_use_value" id="smbd_<?php echo esc_attr( $this->field_slug ); ?>_use_value">
 
-						<label for="smbd_<?php echo esc_attr( $this->field_slug ); ?>_use_value"><?php echo __( 'Delete based on comment meta key name and value', 'bulk-delete' ); ?></label>
+						<label for="smbd_<?php echo esc_attr( $this->field_slug ); ?>_use_value"><?php echo esc_html__( 'Delete based on comment meta key name and value', 'bulk-delete' ); ?></label>
 					</td>
 				</tr>
 
 				<tr>
 					<td>
-						<label for="smbd_<?php echo esc_attr( $this->field_slug ); ?>_meta_key"><?php _e( 'Comment Meta Key ', 'bulk-delete' ); ?></label>
-						<input name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_meta_key" id="smbd_<?php echo esc_attr( $this->field_slug ); ?>_meta_key" placeholder="<?php _e( 'Meta Key', 'bulk-delete' ); ?>">
+						<label for="smbd_<?php echo esc_attr( $this->field_slug ); ?>_meta_key"><?php esc_html_e( 'Comment Meta Key ', 'bulk-delete' ); ?></label>
+						<input name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_meta_key" id="smbd_<?php echo esc_attr( $this->field_slug ); ?>_meta_key" placeholder="<?php esc_html_e( 'Meta Key', 'bulk-delete' ); ?>">
 					</td>
 				</tr>
 			</table>
@@ -88,12 +89,12 @@ class DeleteCommentMetaModule extends MetasModule {
 			 *
 			 * @since 5.4
 			 */
-			do_action( 'bd_delete_comment_meta_form' );
+			do_action( 'bd_delete_comment_meta_form' ); //phpcs:ignore
 			?>
 			<table class="optiontable">
 				<tr>
 					<td colspan="2">
-						<h4><?php _e( 'Choose your deletion options', 'bulk-delete' ); ?></h4>
+						<h4><?php esc_html_e( 'Choose your deletion options', 'bulk-delete' ); ?></h4>
 					</td>
 				</tr>
 
@@ -123,7 +124,7 @@ class DeleteCommentMetaModule extends MetasModule {
 		 *
 		 * @since 5.4
 		 */
-		return apply_filters( 'bd_delete_comment_meta_options', $options, $request );
+		return apply_filters( 'bd_delete_comment_meta_options', $options, $request ); //phpcs:ignore
 	}
 
 	protected function do_delete( $options ) {
@@ -143,7 +144,7 @@ class DeleteCommentMetaModule extends MetasModule {
 		}
 
 		if ( $options['use_value'] ) {
-			$args['meta_query'] = apply_filters( 'bd_delete_comment_meta_query', array(), $options );
+			$args['meta_query'] = apply_filters( 'bd_delete_comment_meta_query', array(), $options ); //phpcs:ignore
 		} else {
 			$args['meta_key'] = $options['meta_key'];
 		}
@@ -179,38 +180,38 @@ class DeleteCommentMetaModule extends MetasModule {
 	/**
 	 * Append filtering options to the delete comment meta form.
 	 *
-	 * This function was originally part of the Bulk Delete Comment Meta add-on.
+	 * This function was originally part of the Bulk Delete Comment Meta feature.
 	 *
-	 * @since 0.1 of Bulk Delete Comment Meta add-on
+	 * @since 0.1 of Bulk Delete Comment Meta feature
 	 */
 	public function add_filtering_options() {
 		?>
 		<table class="optiontable" id="smbd_<?php echo esc_attr( $this->field_slug ); ?>_filters" style="display:none;">
 			<tr>
 				<td>
-					<?php _e( 'Comment Meta Value ', 'bulk-delete' ); ?>
+					<?php esc_html_e( 'Comment Meta Value ', 'bulk-delete' ); ?>
 					<select name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_type" id="smbd_<?php echo esc_attr( $this->field_slug ); ?>_type">
-						<option value="CHAR"><?php _e( 'CHAR', 'bulk-delete' ); ?></option>
-						<option value="NUMERIC"><?php _e( 'NUMERIC', 'bulk-delete' ); ?></option>
-						<option value="DECIMAL"><?php _e( 'DECIMAL', 'bulk-delete' ); ?></option>
-						<option value="SIGNED"><?php _e( 'SIGNED', 'bulk-delete' ); ?></option>
-						<option value="UNSIGNED"><?php _e( 'UNSIGNED', 'bulk-delete' ); ?></option>
-						<option value="DATE"><?php _e( 'DATE', 'bulk-delete' ); ?></option>
-						<option value="TIME"><?php _e( 'TIME', 'bulk-delete' ); ?></option>
-						<option value="DATETIME"><?php _e( 'DATETIME', 'bulk-delete' ); ?></option>
-						<option value="BINARY"><?php _e( 'BINARY', 'bulk-delete' ); ?></option>
+						<option value="CHAR"><?php esc_html_e( 'CHAR', 'bulk-delete' ); ?></option>
+						<option value="NUMERIC"><?php esc_html_e( 'NUMERIC', 'bulk-delete' ); ?></option>
+						<option value="DECIMAL"><?php esc_html_e( 'DECIMAL', 'bulk-delete' ); ?></option>
+						<option value="SIGNED"><?php esc_html_e( 'SIGNED', 'bulk-delete' ); ?></option>
+						<option value="UNSIGNED"><?php esc_html_e( 'UNSIGNED', 'bulk-delete' ); ?></option>
+						<option value="DATE"><?php esc_html_e( 'DATE', 'bulk-delete' ); ?></option>
+						<option value="TIME"><?php esc_html_e( 'TIME', 'bulk-delete' ); ?></option>
+						<option value="DATETIME"><?php esc_html_e( 'DATETIME', 'bulk-delete' ); ?></option>
+						<option value="BINARY"><?php esc_html_e( 'BINARY', 'bulk-delete' ); ?></option>
 					</select>
 					<select name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_meta_op" id="smbd_<?php echo esc_attr( $this->field_slug ); ?>_meta_op">
-						<option value="="><?php _e( 'equal to', 'bulk-delete' ); ?></option>
-						<option value="!="><?php _e( 'not equal to', 'bulk-delete' ); ?></option>
-						<option value="<"><?php _e( 'less than', 'bulk-delete' ); ?></option>
-						<option value="<="><?php _e( 'less than or equal to', 'bulk-delete' ); ?></option>
-						<option value=">"><?php _e( 'greater than', 'bulk-delete' ); ?></option>
-						<option value=">="><?php _e( 'greater than or equal to', 'bulk-delete' ); ?></option>
-						<option value="LIKE"><?php _e( 'like', 'bulk-delete' ); ?></option>
-						<option value="NOT LIKE"><?php _e( 'not like', 'bulk-delete' ); ?></option>
+						<option value="="><?php esc_html_e( 'equal to', 'bulk-delete' ); ?></option>
+						<option value="!="><?php esc_html_e( 'not equal to', 'bulk-delete' ); ?></option>
+						<option value="<"><?php esc_html_e( 'less than', 'bulk-delete' ); ?></option>
+						<option value="<="><?php esc_html_e( 'less than or equal to', 'bulk-delete' ); ?></option>
+						<option value=">"><?php esc_html_e( 'greater than', 'bulk-delete' ); ?></option>
+						<option value=">="><?php esc_html_e( 'greater than or equal to', 'bulk-delete' ); ?></option>
+						<option value="LIKE"><?php esc_html_e( 'like', 'bulk-delete' ); ?></option>
+						<option value="NOT LIKE"><?php esc_html_e( 'not like', 'bulk-delete' ); ?></option>
 					</select>
-					<input type="text" placeholder="<?php _e( 'Meta Value', 'bulk-delete' ); ?>"
+					<input type="text" placeholder="<?php esc_html_e( 'Meta Value', 'bulk-delete' ); ?>"
 						name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_value"
 						id="smbd_<?php echo esc_attr( $this->field_slug ); ?>_value">
 				</td>
@@ -222,9 +223,9 @@ class DeleteCommentMetaModule extends MetasModule {
 	/**
 	 * Process additional delete options.
 	 *
-	 * This function was originally part of the Bulk Delete Comment Meta add-on.
+	 * This function was originally part of the Bulk Delete Comment Meta feature.
 	 *
-	 * @since 0.1 of Bulk Delete Comment Meta add-on
+	 * @since 0.1 of Bulk Delete Comment Meta feature
 	 *
 	 * @param array $delete_options Delete options array.
 	 * @param array $post           The POST array.
@@ -244,9 +245,9 @@ class DeleteCommentMetaModule extends MetasModule {
 	/**
 	 * Change the meta query.
 	 *
-	 * This function was originally part of the Bulk Delete Comment Meta add-on.
+	 * This function was originally part of the Bulk Delete Comment Meta feature.
 	 *
-	 * @since 0.1 of Bulk Delete Comment Meta add-on
+	 * @since 0.1 of Bulk Delete Comment Meta feature
 	 *
 	 * @param array $meta_query     Meta query.
 	 * @param array $delete_options List of options chosen by the user.
@@ -269,15 +270,15 @@ class DeleteCommentMetaModule extends MetasModule {
 	/**
 	 * Hook handler.
 	 *
-	 * This function was originally part of the Bulk Delete Comment Meta add-on.
+	 * This function was originally part of the Bulk Delete Comment Meta feature.
 	 *
-	 * @since 0.1 of Bulk Delete Comment Meta add-on
+	 * @since 0.1 of Bulk Delete Comment Meta feature
 	 *
 	 * @param array $delete_options Delete options array.
 	 */
 	public function do_delete_comment_meta( $delete_options ) {
-		do_action( 'bd_before_scheduler', $this->messages['cron_label'] );
+		do_action( 'bd_before_scheduler', $this->messages['cron_label'] ); //phpcs:ignore
 		$count = $this->delete( $delete_options );
-		do_action( 'bd_after_scheduler', $this->messages['cron_label'], $count );
+		do_action( 'bd_after_scheduler', $this->messages['cron_label'], $count ); //phpcs:ignore
 	}
 }

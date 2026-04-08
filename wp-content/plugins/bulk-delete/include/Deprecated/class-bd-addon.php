@@ -18,7 +18,7 @@ defined( 'ABSPATH' ) || exit; // Exit if accessed directly
  *
  * @since 5.5
  */
-abstract class BD_Addon {
+abstract class BD_Addon { //phpcs:ignore
 	/**
 	 * @var string Addon Name.
 	 */
@@ -50,11 +50,6 @@ abstract class BD_Addon {
 	protected $module;
 
 	/**
-	 * @var object License Handler.
-	 */
-	protected $license_handler;
-
-	/**
 	 * Initialize and setup variables.
 	 *
 	 * @since 5.5
@@ -84,7 +79,6 @@ abstract class BD_Addon {
 	 */
 	protected function setup() {
 		$this->initialize();
-		$this->setup_translation();
 		if ( $this->dependencies_met() ) {
 			$this->setup_hooks();
 		}
@@ -98,38 +92,6 @@ abstract class BD_Addon {
 	 */
 	protected function dependencies_met() {
 		return true;
-	}
-
-	/**
-	 * Setup translation.
-	 *
-	 * @access protected
-	 *
-	 * @since 5.5
-	 */
-	protected function setup_translation() {
-		$bd = BULK_DELETE();
-
-		// Load translation files from Bulk Delete language folder
-		load_plugin_textdomain( 'bulk-delete', false, $bd->translations );
-	}
-
-	/**
-	 * Setup license handler.
-	 *
-	 * @since 5.5
-	 *
-	 * @param string $plugin_file Addon file name relative to plugin directory.
-	 */
-	public function setup_license_handler( $plugin_file ) {
-		$this->addon_file      = $plugin_file;
-		$this->license_handler = new BD_License_Handler(
-			$this->addon_name,
-			$this->addon_code,
-			$this->addon_version,
-			$this->addon_file,
-			$this->addon_author
-		);
 	}
 
 	/**

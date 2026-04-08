@@ -1,129 +1,113 @@
-<?php # -*- coding: utf-8 -*-
+<?php
 
 namespace Inpsyde\BackWPup\Notice;
 
+use function backwpup_template;
+
 /**
- * Class NoticeView
+ * Notice view helpers.
+ *
+ * @method void success(NoticeMessage $message, string|null $dismiss_action_url)
+ * @method void error(NoticeMessage $message, string|null $dismiss_action_url)
+ * @method void warning(NoticeMessage $message, string|null $dismiss_action_url)
+ * @method void info(NoticeMessage $message, string|null $dismiss_action_url)
  */
-class NoticeView
-{
+final class NoticeView {
 
-    const SUCCESS = 'notice-success';
-    const ERROR = 'notice-error';
-    const WARNING = 'notice-warning';
-    const INFO = 'notice-info';
+	/**
+	 * Success notice class.
+	 *
+	 * @var string
+	 */
+	public const SUCCESS = 'notice-success';
+	/**
+	 * Error notice class.
+	 *
+	 * @var string
+	 */
+	public const ERROR = 'notice-error';
+	/**
+	 * Warning notice class.
+	 *
+	 * @var string
+	 */
+	public const WARNING = 'notice-warning';
+	/**
+	 * Info notice class.
+	 *
+	 * @var string
+	 */
+	public const INFO = 'notice-info';
 
-    /**
-     * @var string The ID of the notice
-     */
-    private $id;
+	/**
+	 * Notice identifier.
+	 *
+	 * @var string The ID of the notice.
+	 */
+	private $id;
 
-    /**
-     * NoticeView constructor
-     *
-     * @param string $id The ID of the notice
-     */
-    public function __construct($id)
-    {
-        $this->id = $id;
-    }
+	/**
+	 * Creates a notice view helper.
+	 *
+	 * @param string $id The ID of the notice.
+	 */
+	public function __construct( string $id ) {
+		$this->id = $id;
+	}
 
-    /**
-     * @param \Inpsyde\BackWPup\Notice\NoticeMessage $message The contents of the notice
-     * @param string $dismiss_action_url The URL for dismissing the notice
-     * @param string $type The type of notice: one of NoticeView::SUCCESS,
-     *                     NoticeView::ERROR, NoticeView::WARNING, or NoticeView::INFO
-     *
-     * @return false|string
-     */
-    public function notice(NoticeMessage $message, $dismiss_action_url, $type = null)
-    {
-        ?>
+	/**
+	 * Renders a notice.
+	 *
+	 * @param NoticeMessage $message            The contents of the notice.
+	 * @param string|null   $dismiss_action_url The URL for dismissing the notice.
+	 * @param string|null   $type               The type of notice: one of NoticeView::SUCCESS,
+	 *                                          NoticeView::ERROR, NoticeView::WARNING, or NoticeView::INFO.
+	 */
+	public function notice( NoticeMessage $message, ?string $dismiss_action_url = null, ?string $type = null ): void {
+		$message->id                 = $this->id;
+		$message->dismiss_action_url = $dismiss_action_url;
+		$message->type               = $type;
 
-        <div
-            class="notice<?php echo $type ? ' ' . esc_attr($type) : '' ?> notice-inpsyde"
-            id="<?php echo esc_attr($this->id) ?>_notice"
-            data-notice-id="<?php echo esc_attr($this->id) ?>"
-        >
-            <?php if (is_array($message->content())) { ?>
-                <div class="notice-inpsyde__content">
-                    <?php foreach ($message->content() as $paragraph) { ?>
-                        <p><?php echo wp_kses_post($paragraph) ?></p>
-                    <?php } ?>
-                </div>
-            <?php } else { ?>
-                <p class="notice-inpsyde__content">
-                    <?php echo wp_kses_post($message->content()) ?>
-                </p>
-            <?php } ?>
-            <p class="notice-inpsyde-actions">
-                <?php if (!empty($message->cta_url())) { ?>
-                    <a
-                        class="button button--inpsyde"
-                        href="<?php echo esc_url($message->cta_url()) ?>"
-                        target="_blank"
-                    >
-                        <?php echo esc_html($message->button_label()) ?>
-                    </a>
+		backwpup_template( $message, '/notice/notice.php' );
+	}
 
-                <?php } ?>
-                <a
-                    class="button dismiss-button"
-                    id="<?php echo esc_attr($this->id) ?>_dismiss"
-                    href="<?php echo esc_url($dismiss_action_url) ?>"
-                >
-                    <?php echo esc_html_e('Don\'t show again', 'backwpup') ?>
-                </a>
-            </p>
-        </div>
-        <?php
-    }
+	/**
+	 * Call notice() with the appropriate notice type.
+	 *
+	 * @param 'success'|'error'|'warning'|'info'       $name The notice type method name.
+	 * @param array{0: NoticeMessage, 1?: string|null} $args Notice arguments.
+	 *
+	 * @throws \BadMethodCallException When calling an unsupported notice type.
+	 */
+	public function __call( string $name, array $args ): void {
+		switch ( $name ) {
+			case 'success':
+				$args[] = self::SUCCESS;
+				break;
 
-    /**
-     * Call notice() with the appropriate notice type.
-     *
-     * @throws BadMethodCallException If 2 arguments not given, or called with invalid notice type
-     */
-    public function __call($name, $args)
-    {
-        if (count($args) !== 2) {
-            throw new \BadMethodCallException(
-                sprintf(
-                    __('Method %1$s::%2$s() requires 2 arguments; %3$d given', 'backwpup'),
-                    __CLASS__,
-                    $name,
-                    count($args)
-                )
-            );
-        }
+			case 'error':
+				$args[] = self::ERROR;
+				break;
 
-        switch ($name) {
-            case 'success':
-                $args[] = self::SUCCESS;
-                break;
+			case 'warning':
+				$args[] = self::WARNING;
+				break;
 
-            case 'error':
-                $args[] = self::ERROR;
-                break;
+			case 'info':
+				$args[] = self::INFO;
+				break;
 
-            case 'warning':
-                $args[] = self::WARNING;
-                break;
+			default:
+				throw new \BadMethodCallException(
+					sprintf(
+						// translators: %1$s: Class name, %2$s: Method name.
+						esc_html__( 'Call to undefined method %1$s::%2$s()', 'backwpup' ),
+						esc_html( self::class ),
+						esc_html( $name )
+					)
+				);
+		}
 
-            case 'info':
-                $args[] = self::INFO;
-                break;
-
-            default:
-                throw new \BadMethodCallException(
-                    sprintf(
-                        __('Call to undefined method %1$s::%2$s()', 'backwpup'),
-                        __CLASS__,
-                        $name
-                    )
-                );
-        }
-
-        $this->notice(...$args);
-    }
+		$this->notice( ...$args );
+	}
 }

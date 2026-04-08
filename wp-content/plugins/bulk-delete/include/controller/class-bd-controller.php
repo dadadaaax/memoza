@@ -15,7 +15,7 @@ defined( 'ABSPATH' ) || exit; // Exit if accessed directly
  *
  * @since 5.5.4
  */
-class BD_Controller {
+class BD_Controller { //phpcs:ignore
 	public function __construct() {
 		add_action( 'admin_init', array( $this, 'request_handler' ) );
 		add_action( 'bd_pre_bulk_action', array( $this, 'increase_timeout' ), 9 );
@@ -30,25 +30,22 @@ class BD_Controller {
 	 */
 	public function request_handler() {
 		if ( isset( $_POST['bd_action'] ) ) {
-			$bd_action   = sanitize_text_field( $_POST['bd_action'] );
+			$bd_action   = sanitize_text_field( wp_unslash($_POST['bd_action']) );
 			$nonce_valid = false;
 
-			if ( 'delete_pages_' === substr( $bd_action, 0, strlen( 'delete_pages_' ) )
-				&& check_admin_referer( 'sm-bulk-delete-pages', 'sm-bulk-delete-pages-nonce' ) ) {
+			if ( 'delete_pages_' === substr( $bd_action, 0, strlen( 'delete_pages_' ) )	&& check_admin_referer( 'sm-bulk-delete-pages', 'sm-bulk-delete-pages-nonce' ) ) {
 				$nonce_valid = true;
 			}
 
-			if ( 'delete_posts_' === substr( $bd_action, 0, strlen( 'delete_posts_' ) )
-				&& check_admin_referer( 'sm-bulk-delete-posts', 'sm-bulk-delete-posts-nonce' ) ) {
+			if ( 'delete_posts_' === substr( $bd_action, 0, strlen( 'delete_posts_' ) )	&& check_admin_referer( 'sm-bulk-delete-posts', 'sm-bulk-delete-posts-nonce' ) ) {
 				$nonce_valid = true;
 			}
 
-			if ( 'delete_meta_' === substr( $bd_action, 0, strlen( 'delete_meta_' ) )
-				&& check_admin_referer( 'sm-bulk-delete-meta', 'sm-bulk-delete-meta-nonce' ) ) {
+			if ( 'delete_meta_' === substr( $bd_action, 0, strlen( 'delete_meta_' ) ) && check_admin_referer( 'sm-bulk-delete-meta', 'sm-bulk-delete-meta-nonce' ) ) {
 				$nonce_valid = true;
 			}
 
-			if ( 'delete_jetpack_messages' === $bd_action && wp_verify_nonce( $_POST['sm-bulk-delete-misc-nonce'], 'sm-bulk-delete-misc' ) ) {
+			if ( 'delete_jetpack_messages' === $bd_action && wp_verify_nonce( sanitize_text_field(wp_unslash($_POST['sm-bulk-delete-misc-nonce'] ?? '')), 'sm-bulk-delete-misc' ) ) {
 				$nonce_valid = true;
 			}
 
@@ -57,7 +54,7 @@ class BD_Controller {
 			 *
 			 * @since 5.5
 			 */
-			if ( ! apply_filters( 'bd_action_nonce_check', $nonce_valid, $bd_action ) ) {
+			if ( ! apply_filters( 'bd_action_nonce_check', $nonce_valid, $bd_action ) ) { //phpcs:ignore
 				return;
 			}
 
@@ -67,7 +64,7 @@ class BD_Controller {
 			 *
 			 * @since 5.4
 			 */
-			do_action( 'bd_pre_bulk_action', $bd_action );
+			do_action( 'bd_pre_bulk_action', $bd_action ); //phpcs:ignore
 
 			/**
 			 * Perform the bulk operation.
@@ -75,11 +72,11 @@ class BD_Controller {
 			 *
 			 * @since 5.4
 			 */
-			do_action( 'bd_' . $bd_action, $_POST );
+			do_action( 'bd_' . $bd_action, $_POST ); //phpcs:ignore
 		}
 
 		if ( isset( $_GET['bd_action'] ) ) {
-			$bd_action   = sanitize_text_field( $_GET['bd_action'] );
+			$bd_action   = sanitize_text_field( wp_unslash($_GET['bd_action']) );
 			$nonce_valid = false;
 
 			/**
@@ -87,7 +84,7 @@ class BD_Controller {
 			 *
 			 * @since 5.5.4
 			 */
-			if ( ! apply_filters( 'bd_get_action_nonce_check', $nonce_valid, $bd_action ) ) {
+			if ( ! apply_filters( 'bd_get_action_nonce_check', $nonce_valid, $bd_action ) ) { //phpcs:ignore
 				return;
 			}
 
@@ -97,7 +94,7 @@ class BD_Controller {
 			 *
 			 * @since 5.5.4
 			 */
-			do_action( 'bd_' . $bd_action, $_GET );
+			do_action( 'bd_' . $bd_action, $_GET ); //phpcs:ignore
 		}
 	}
 
@@ -128,7 +125,7 @@ class BD_Controller {
 	 */
 	public function increase_timeout() {
 		if ( ! ini_get( 'safe_mode' ) ) {
-			@set_time_limit( 0 );
+			set_time_limit( 0 ); //phpcs:ignore
 		}
 	}
 }

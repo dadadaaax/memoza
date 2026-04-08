@@ -1,21 +1,19 @@
 <?php
 /**
- * Destination Connect Interface
+ * Destination Connect Interface.
  *
  * @since   3.5.0
- * @package Inpsyde\BackWPup
  */
 
 /**
- * Class BackWPup_Destination_Connect_Interface
+ * Class BackWPup_Destination_Connect_Interface.
  *
  * @since   3.5.0
- * @package Inpsyde\BackWPup
  */
 interface BackWPup_Destination_Connect_Interface {
 
 	/**
-	 * Connect
+	 * Connect.
 	 *
 	 * @since 3.5.0
 	 *
@@ -24,7 +22,7 @@ interface BackWPup_Destination_Connect_Interface {
 	public function connect();
 
 	/**
-	 * Retreive the Resource
+	 * Retreive the Resource.
 	 *
 	 * The resource is generally an instance of the class that manage the connection / stream to the resource.
 	 *

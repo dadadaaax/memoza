@@ -18,7 +18,7 @@ class DeletePostsByTaxonomyModule extends PostsModule {
 		$this->meta_box_slug = 'bd_posts_by_taxonomy';
 		$this->action        = 'bd_delete_posts_by_taxonomy';
 		$this->cron_hook     = 'do-bulk-delete-taxonomy';
-		$this->scheduler_url = 'https://bulkwp.com/addons/scheduler-for-deleting-posts-by-taxonomy/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=addonlist&utm_content=bd-stx';
+		$this->scheduler_url = 1;
 		$this->messages      = array(
 			'box_label'  => __( 'By Taxonomy', 'bulk-delete' ),
 			'scheduled'  => __( 'The selected posts are scheduled for deletion', 'bulk-delete' ),
@@ -42,7 +42,7 @@ class DeletePostsByTaxonomyModule extends PostsModule {
 
 		if ( count( $terms_array ) > 0 ) {
 			?>
-			<h4><?php _e( 'Select the post type from which you want to delete posts by taxonomy', 'bulk-delete' ); ?></h4>
+			<h4><?php esc_html_e( 'Select the post type from which you want to delete posts by taxonomy', 'bulk-delete' ); ?></h4>
 
 			<fieldset class="options">
 				<table class="optiontable">
@@ -50,7 +50,7 @@ class DeletePostsByTaxonomyModule extends PostsModule {
 				</table>
 
 				<h4>
-					<?php _e( 'Select the taxonomies from which you want to delete posts', 'bulk-delete' ); ?>
+					<?php esc_html_e( 'Select the taxonomies from which you want to delete posts', 'bulk-delete' ); ?>
 				</h4>
 
 				<table class="optiontable">
@@ -71,29 +71,29 @@ class DeletePostsByTaxonomyModule extends PostsModule {
 				</table>
 
 				<h4>
-					<?php _e( 'The selected taxonomy has the following terms. Select the terms from which you want to delete posts', 'bulk-delete' ); ?>
+					<?php esc_html_e( 'The selected taxonomy has the following terms. Select the terms from which you want to delete posts', 'bulk-delete' ); ?>
 				</h4>
 
 				<p>
-					<?php _e( 'Note: The post count below for each term is the total number of posts in that term, irrespective of post type', 'bulk-delete' ); ?>.
+					<?php esc_html_e( 'Note: The post count below for each term is the total number of posts in that term, irrespective of post type', 'bulk-delete' ); ?>.
 				</p>
 
 				<?php
 				foreach ( $terms_array as $tax => $terms ) {
 					?>
-					<table class="optiontable terms_<?php echo $tax; ?> terms">
+					<table class="optiontable terms_<?php echo esc_html($tax); ?> terms">
 						<?php
 						foreach ( $terms as $term ) {
 							?>
 							<tr>
 								<td scope="row">
-									<input name="smbd_taxs_terms[]" value="<?php echo $term->slug; ?>" type="checkbox"
+									<input name="smbd_taxs_terms[]" value="<?php echo esc_html($term->slug); ?>" type="checkbox"
 									       class="terms">
 								</td>
 								<td>
-									<label for="smbd_taxs_terms"><?php echo $term->name; ?>
-										(<?php echo $term->count . ' ';
-										_e( 'Posts', 'bulk-delete' ); ?>)</label>
+									<label for="smbd_taxs_terms"><?php echo esc_html($term->name); ?>
+										(<?php echo esc_html($term->count) . ' ';
+										esc_html_e( 'Posts', 'bulk-delete' ); ?>)</label>
 								</td>
 							</tr>
 							<?php
@@ -119,7 +119,7 @@ class DeletePostsByTaxonomyModule extends PostsModule {
 			$this->render_submit_button();
 		} else {
 			?>
-			<h4><?php _e( "This WordPress installation doesn't have any non-empty taxonomies defined", 'bulk-delete' ) ?></h4>
+			<h4><?php esc_html_e( "This WordPress installation doesn't have any non-empty taxonomies defined", 'bulk-delete' ) ?></h4>
 			<?php
 		}
 	}

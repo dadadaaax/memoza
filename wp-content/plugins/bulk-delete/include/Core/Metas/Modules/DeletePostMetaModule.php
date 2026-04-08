@@ -16,7 +16,7 @@ class DeletePostMetaModule extends MetasModule {
 		$this->meta_box_slug = 'bd-post-meta';
 		$this->action        = 'delete_post_meta';
 		$this->cron_hook     = 'do-bulk-delete-post-meta';
-		$this->scheduler_url = 'https://bulkwp.com/addons/bulk-delete-post-meta/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow&utm_content=bd-m-p';
+		$this->scheduler_url = 1;
 		$this->messages      = array(
 			'box_label'  => __( 'Bulk Delete Post Meta', 'bulk-delete' ),
 			'scheduled'  => __( 'Post meta fields from the posts with the selected criteria are scheduled for deletion.', 'bulk-delete' ),
@@ -33,27 +33,28 @@ class DeletePostMetaModule extends MetasModule {
 		?>
 		<!-- Post Meta box start-->
 		<fieldset class="options">
-			<h4><?php _e( 'Select the post type whose post meta fields you want to delete', 'bulk-delete' ); ?></h4>
+			<h4><?php esc_html_e( 'Select the post type whose post meta fields you want to delete', 'bulk-delete' ); ?></h4>
 
 			<table class="optiontable">
 				<?php $this->render_post_type_with_status( false ); ?>
 			</table>
 
-			<h4><?php _e( 'Choose your post meta field settings', 'bulk-delete' ); ?></h4>
+			<h4><?php esc_html_e( 'Choose your post meta field settings', 'bulk-delete' ); ?></h4>
 			<table class="optiontable">
 				<tr>
 					<td>
 						<input name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_use_value" value="use_key" type="radio" checked>
-						<label for="smbd_<?php echo esc_attr( $this->field_slug ); ?>_use_value"><?php echo __( 'Delete based on post meta key name only', 'bulk-delete' ); ?></label>
+						<label for="smbd_<?php echo esc_attr( $this->field_slug ); ?>_use_value"><?php echo esc_html__( 'Delete based on post meta key name only', 'bulk-delete' ); ?></label>
 					</td>
 				</tr>
 
 				<tr>
 					<td>
 						<input name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_use_value" id="smdb_<?php echo esc_attr( $this->field_slug ); ?>_use_key_compare" value="use_key_compare" type="radio" disabled>
-						<label for="smbd_<?php echo esc_attr( $this->field_slug ); ?>_use_value"><?php echo __( 'Delete based on post meta key name prefix or postfix', 'bulk-delete' ); ?></label>
+						<label for="smbd_<?php echo esc_attr( $this->field_slug ); ?>_use_value"><?php echo esc_html__( 'Delete based on post meta key name prefix or postfix', 'bulk-delete' ); ?></label>
 						<span class="bd-pm-pro" style="color:red; vertical-align: middle;">
-							<?php _e( 'Only available in Pro Addon', 'bulk-delete' ); ?> <a href = "https://bulkwp.com/addons/bulk-delete-post-meta/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow&utm_content=bd-m-p" target="_blank">Buy now</a>
+                            <span class="open-upsell pro-feature-inline" data-pro-feature="delete-post-meta">Available in PRO</span>
+                            
 						</span>
 					</td>
 				</tr>
@@ -61,22 +62,22 @@ class DeletePostMetaModule extends MetasModule {
 				<tr>
 					<td>
 						<input name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_use_value" id="smbd_<?php echo esc_attr( $this->field_slug ); ?>_use_value" value="use_value" type="radio" disabled>
-						<label for="smbd_<?php echo esc_attr( $this->field_slug ); ?>_use_value"><?php echo __( 'Delete based on post meta key name and value', 'bulk-delete' ); ?></label>
+						<label for="smbd_<?php echo esc_attr( $this->field_slug ); ?>_use_value"><?php echo esc_html__( 'Delete based on post meta key name and value', 'bulk-delete' ); ?></label>
 						<span class="bd-pm-pro" style="color:red; vertical-align: middle;">
-							<?php _e( 'Only available in Pro Addon', 'bulk-delete' ); ?> <a href = "https://bulkwp.com/addons/bulk-delete-post-meta/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow&utm_content=bd-m-p" target="_blank">Buy now</a>
+                            <span class="open-upsell pro-feature-inline" data-pro-feature="delete-post-meta">Available in PRO</span>
 						</span>
 					</td>
 				</tr>
 
 				<tr>
 					<td>
-						<label for="smbd_<?php echo esc_attr( $this->field_slug ); ?>_key"><?php _e( 'Post Meta Key ', 'bulk-delete' ); ?></label>
+						<label for="smbd_<?php echo esc_attr( $this->field_slug ); ?>_key"><?php esc_html_e( 'Post Meta Key ', 'bulk-delete' ); ?></label>
 						<select name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_key_prefix_postfix" id="smbd_<?php echo esc_attr( $this->field_slug ); ?>_key_prefix_postfix" style="display: none;">
 							<option value="starts_with">starts with</option>
 							<option value="contains">contains</option>
 							<option value="ends_with">ends with</option>
 						</select>
-						<input name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_key" id="smbd_<?php echo esc_attr( $this->field_slug ); ?>_key" placeholder="<?php _e( 'Meta Key', 'bulk-delete' ); ?>">
+						<input name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_key" id="smbd_<?php echo esc_attr( $this->field_slug ); ?>_key" placeholder="<?php esc_html_e( 'Meta Key', 'bulk-delete' ); ?>">
 					</td>
 				</tr>
 			</table>
@@ -88,13 +89,13 @@ class DeletePostMetaModule extends MetasModule {
 			 *
 			 * @since 5.4
 			 */
-			do_action( 'bd_delete_post_meta_form' );
+			do_action( 'bd_delete_post_meta_form' ); //phpcs:ignore
 		?>
 
 			<table class="optiontable">
 				<tr>
 					<td colspan="2">
-						<h4><?php _e( 'Choose your deletion options', 'bulk-delete' ); ?></h4>
+						<h4><?php esc_html_e( 'Choose your deletion options', 'bulk-delete' ); ?></h4>
 					</td>
 				</tr>
 
@@ -124,7 +125,7 @@ class DeletePostMetaModule extends MetasModule {
 		 *
 		 * @since 5.4
 		 */
-		return apply_filters( 'bd_delete_post_meta_options', $options, $request );
+		return apply_filters( 'bd_delete_post_meta_options', $options, $request ); //phpcs:ignore
 	}
 
 	protected function do_delete( $options ) {
@@ -148,7 +149,7 @@ class DeletePostMetaModule extends MetasModule {
 		if ( 'use_key' === $options['use_value'] ) {
 			$options['meta_key'] = $options['meta_key'];
 		} else {
-			$options['meta_query'] = apply_filters( 'bd_delete_post_meta_query', array(), $options );
+			$options['meta_query'] = apply_filters( 'bd_delete_post_meta_query', array(), $options ); //phpcs:ignore
 		}
 
 		$metas_deleted = 0;

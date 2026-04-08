@@ -1,149 +1,141 @@
 <?php
 /**
- * BackWPup_Destination_Ftp_Downloader
+ * BackWPup_Destination_Ftp_Downloader.
  *
  * @since   3.5.0
- * @package Inpsyde\BackWPup
  */
 
 /**
- * Class BackWPup_Destination_Ftp_Downloader
+ * Class BackWPup_Destination_Ftp_Downloader.
  *
  * @since   3.5.0
- * @package Inpsyde\BackWPup
  */
-final class BackWPup_Destination_Ftp_Downloader implements BackWPup_Destination_Downloader_Interface {
+class BackWPup_Destination_Ftp_Downloader implements BackWPup_Destination_Downloader_Interface {
 
 	/**
+	 * Connection data.
+	 *
 	 * @var \BackWpUp_Destination_Downloader_Data
 	 */
 	private $data;
 
 	/**
-	 * @var resource
-	 */
-	private $source_file_handler;
-
-	/**
+	 * Local file handler.
+	 *
 	 * @var resource
 	 */
 	private $local_file_handler;
 
 	/**
-	 * @var BackWPup_Destination_Ftp_Connect
+	 * FTP connection.
+	 *
+	 * @var BackWPup_Destination_Ftp_Type
 	 */
-	private $ftp_resource;
+	private $ftp;
 
 	/**
-	 * BackWPup_Destination_Ftp_Downloader constructor
+	 * Remote file size.
+	 *
+	 * @var int
+	 */
+	private $remote_file_size = 0;
+
+	/**
+	 * BackWPup_Destination_Ftp_Downloader constructor.
+	 *
+	 * @param BackWpUp_Destination_Downloader_Data $data Download data.
 	 */
 	public function __construct( BackWpUp_Destination_Downloader_Data $data ) {
-
 		$this->data = $data;
-
-		$this->ftp_resource();
 	}
 
 	/**
-	 * Clean up things
+	 * Clean up things.
 	 */
 	public function __destruct() {
-
-		fclose( $this->source_file_handler );
-		fclose( $this->local_file_handler );
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function download_chunk( $start_byte, $end_byte ) {
-
-		$this->source_file_handler( $start_byte );
-		$this->local_file_handler( $start_byte );
-
-		$bytes = (int) stream_copy_to_stream(
-			$this->source_file_handler,
-			$this->local_file_handler,
-			$end_byte - $start_byte + 1,
-			0
-		);
-
-		if ( $bytes === 0 ) {
-			throw new \RuntimeException( __( 'Could not write data to file.', 'backwpup' ) );
+		if ( is_resource( $this->local_file_handler ) ) {
+			fclose( $this->local_file_handler ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 		}
 	}
 
 	/**
-	 * @inheritdoc
-	 */
-	public function calculate_size() {
-
-		$resource = $this->ftp_resource
-			->connect()
-			->resource();
-
-		$size = ftp_size( $resource, $this->data->source_file_path() );
-		ftp_close( $resource );
-
-		return $size;
-	}
-
-	/**
-	 * Set the source file handler
+	 * {@inheritdoc}
 	 *
-	 * @param int $start_byte
+	 * @param int $start_byte Start byte offset.
+	 * @param int $end_byte   End byte offset.
+	 *
+	 * @return void
+	 * @throws RuntimeException If downloaded file size does not match expected size.
 	 */
-	private function source_file_handler( $start_byte ) {
+	public function download_chunk( $start_byte, $end_byte ): void {
+		$this->ftp_resource();
+		$this->local_file_handler();
 
-		if ( is_resource( $this->source_file_handler ) ) {
-			return;
-		}
+		$this->ftp->download( $this->data->source_file_path(), $this->local_file_handler, $start_byte, $end_byte - $start_byte + 1 );
 
-		$ctx = stream_context_create( array( 'ftp' => array( 'resume_pos' => $start_byte ) ) );
-		$url = $this->ftp_resource->getURL( $this->data->source_file_path(), false, $ctx );
-
-		$this->source_file_handler = fopen( $url, 'r' );
-
-		if ( ! is_resource( $this->source_file_handler ) ) {
-			throw new \RuntimeException( __( 'Cannot open FTP file for download.', 'backwpup' ) );
+		$local_file_size = ftell( $this->local_file_handler );
+		if ( $end_byte + 1 >= $this->calculate_size() && $this->calculate_size() !== $local_file_size ) {
+			throw new RuntimeException( 'Downloaded file size does not match expected size.' );
 		}
 	}
 
 	/**
-	 * Set the local file handler
-	 *
-	 * @param int $start_byte
+	 * {@inheritdoc}
 	 */
-	private function local_file_handler( $start_byte ) {
+	public function calculate_size(): int {
+		$this->ftp_resource();
 
+		if ( ! $this->remote_file_size ) {
+			$this->remote_file_size = $this->ftp->size( $this->data->source_file_path() );
+		}
+
+		return $this->remote_file_size;
+	}
+
+	/**
+	 * Set the local file handler.
+	 *
+	 * @throws \RuntimeException On file open error.
+	 */
+	private function local_file_handler() {
 		if ( is_resource( $this->local_file_handler ) ) {
 			return;
 		}
 
-		$this->local_file_handler = fopen( $this->data->local_file_path(), $start_byte === 0 ? 'wb' : 'ab' );
+		$this->local_file_handler = fopen( $this->data->local_file_path(), 'wb' ); //phpcs:ignore
 
 		if ( ! is_resource( $this->local_file_handler ) ) {
-			throw new \RuntimeException( __( 'File could not be opened for writing.', 'backwpup' ) );
+			throw new \RuntimeException( esc_html__( 'File could not be opened for writing.', 'backwpup' ) );
 		}
 	}
 
 	/**
-	 * Set the Ftp resource
-	 *
-	 * @return void
+	 * Set the Ftp resource.
 	 */
-	private function ftp_resource() {
+	private function ftp_resource(): void {
+		if ( $this->ftp ) {
+			return;
+		}
 
 		$opts = (object) BackWPup_Option::get_job( $this->data->job_id() );
 
-		$this->ftp_resource = new BackWPup_Destination_Ftp_Connect(
-			$opts->ftphost,
+		if ( ! empty( $opts->ftpssh ) && BackWPup::is_pro() ) {
+			$this->ftp = new BackWPup_Pro_Destination_Ftp_Type_Sftp();
+		} else {
+			$this->ftp = new BackWPup_Destination_Ftp_Type_Ftp();
+		}
+
+		$this->ftp->connect(
 			$opts->ftpuser,
 			BackWPup_Encryption::decrypt( $opts->ftppass ),
-			$opts->ftphostport,
-			$opts->ftptimeout,
-			$opts->ftpssl,
-			$opts->ftppasv
+			$opts->ftphost,
+			[
+				'port'    => $opts->ftphostport,
+				'timeout' => $opts->ftptimeout,
+				'ssl'     => ! empty( $opts->ftpssl ),
+				'pasv'    => ! empty( $opts->ftppasv ),
+				'privkey' => ! empty( $opts->ftpsshprivkey ) ? BackWPup_Encryption::decrypt( $opts->ftpsshprivkey ) : '',
+			]
 		);
 	}
 }

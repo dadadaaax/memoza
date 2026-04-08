@@ -17,7 +17,7 @@ defined( 'ABSPATH' ) || exit; // Exit if accessed directly
  *
  * @since 5.5
  */
-abstract class BD_Base_Addon extends BD_Addon {
+abstract class BD_Base_Addon extends BD_Addon { //phpcs:ignore
 	/**
 	 * Use `factory()` method to create instance of this class.
 	 * Don't create instances directly.

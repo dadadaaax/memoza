@@ -217,6 +217,6 @@ abstract class Fetcher {
 		 *
 		 * @param int Threshold.
 		 */
-		return apply_filters( 'bd_enhanced_select_threshold', 1000 );
+		return apply_filters( 'bd_enhanced_select_threshold', 1000 ); //phpcs:ignore
 	}
 }

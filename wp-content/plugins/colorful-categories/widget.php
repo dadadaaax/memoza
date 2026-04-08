@@ -35,37 +35,37 @@ class ColorfulCategoriesWidget extends WP_Widget
     public function form($instance)
     {
         $instance = wp_parse_args((array) $instance, array('title' => '', 'taxonomy' => ''));
-        $title = esc_attr($instance['title']);
+        $title = $instance['title'];
         $empty = isset($instance['empty']) && $instance['empty'];
         $count = isset($instance['count']) ? (bool) $instance['count'] : false;
         $excluded = isset($instance['excluded']) ? trim($instance['excluded']) : '';
-        $limit = isset($instance['limit']) ? (int) $instance['limit'] : '';
+        $limit = isset($instance['limit']) ? $instance['limit'] : '';
         ?>
-        <p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:', 'colorful-categories'); ?></label>
-            <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo $title; ?>"/></p>
+        <p><label for="<?php echo esc_attr($this->get_field_id('title')); ?>"><?php _e('Title:', 'colorful-categories'); ?></label>
+            <input class="widefat" id="<?php echo esc_attr($this->get_field_id('title')); ?>" name="<?php echo esc_attr($this->get_field_name('title')); ?>" type="text" value="<?php echo esc_html($title); ?>"/></p>
 
         <p>
-            <label for="<?php echo $this->get_field_id('taxonomy'); ?>"><?php _e('Taxonomy:', 'colorful-categories'); ?></label><br/>
-            <select id="<?php echo $this->get_field_id('taxonomy'); ?>" name="<?php echo $this->get_field_name('taxonomy'); ?>">
+            <label for="<?php echo esc_attr($this->get_field_id('taxonomy')); ?>"><?php _e('Taxonomy:', 'colorful-categories'); ?></label><br/>
+            <select id="<?php echo esc_attr($this->get_field_id('taxonomy')); ?>" name="<?php echo esc_attr($this->get_field_name('taxonomy')); ?>">
                 <?php
                 $taxonomies = ColorfulCategories::getTaxonomies();
                 foreach ($taxonomies as $taxonomy) {
                     $tax = get_taxonomy($taxonomy);
-                    echo '<option value="' . $taxonomy . '" ' . selected($taxonomy, $instance['taxonomy']) . '>' . esc_html($tax->label) . ' [' . $taxonomy . ']</option>';
+                    echo '<option value="' . esc_attr($taxonomy) . '" ' . selected($taxonomy, $instance['taxonomy']) . '>' . esc_html($tax->label) . ' [' . esc_attr($taxonomy) . ']</option>';
                 }
                 ?>
             </select>
         </p>
 
-        <input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id('empty'); ?>" name="<?php echo $this->get_field_name('empty'); ?>"<?php checked($empty); ?> />
-        <label for="<?php echo $this->get_field_id('empty'); ?>"><?php _e('Show empty categories', 'colorful-categories'); ?></label><br/>
+        <input type="checkbox" class="checkbox" id="<?php echo esc_attr($this->get_field_id('empty')); ?>" name="<?php echo esc_attr($this->get_field_name('empty')); ?>"<?php checked($empty); ?> />
+        <label for="<?php echo esc_attr($this->get_field_id('empty')); ?>"><?php _e('Show empty categories', 'colorful-categories'); ?></label><br/>
 
-        <input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id('count'); ?>" name="<?php echo $this->get_field_name('count'); ?>"<?php checked($count); ?> />
-        <label for="<?php echo $this->get_field_id('count'); ?>"><?php _e('Show post counts', 'colorful-categories'); ?></label><br/>
+        <input type="checkbox" class="checkbox" id="<?php echo esc_attr($this->get_field_id('count')); ?>" name="<?php echo esc_attr($this->get_field_name('count')); ?>"<?php checked($count); ?> />
+        <label for="<?php echo esc_attr($this->get_field_id('count')); ?>"><?php _e('Show post counts', 'colorful-categories'); ?></label><br/>
 
         <p>
-            <label for="<?php echo $this->get_field_id('theme'); ?>"><?php _e('Theme', 'colorful-categories'); ?></label><br/>
-            <select id="<?php echo $this->get_field_id('theme'); ?>" name="<?php echo $this->get_field_name('theme'); ?>">
+            <label for="<?php echo esc_attr($this->get_field_id('theme')); ?>"><?php _e('Theme', 'colorful-categories'); ?></label><br/>
+            <select id="<?php echo esc_attr($this->get_field_id('theme')); ?>" name="<?php echo esc_attr($this->get_field_name('theme')); ?>">
                 <?php
                 $default = isset($instance['theme']) ? $instance['theme'] : '';
                 foreach ($this->getThemes() as $slug => $name) {
@@ -75,13 +75,13 @@ class ColorfulCategoriesWidget extends WP_Widget
             </select>
         </p>
 
-        <p><label for="<?php echo $this->get_field_id('limit'); ?>"><?php _e('Limit items (0 means no limit):', 'colorful-categories'); ?></label>
-            <input class="widefat" id="<?php echo $this->get_field_id('limit'); ?>" name="<?php echo $this->get_field_name('limit'); ?>" type="text" maxlength="3" value="<?php echo $limit; ?>"/></p>
+        <p><label for="<?php echo esc_attr($this->get_field_id('limit')); ?>"><?php _e('Limit items (0 means no limit):', 'colorful-categories'); ?></label>
+            <input class="widefat" id="<?php echo esc_attr($this->get_field_id('limit')); ?>" name="<?php echo esc_attr($this->get_field_name('limit')); ?>" type="text" maxlength="3" value="<?php echo (int) $limit; ?>"/></p>
 
         <p>
-            <label for="<?php echo $this->get_field_id('excluded'); ?>"><?php _e('Excluded categories IDs (comma separated):', 'colorful-categories'); ?></label>
+            <label for="<?php echo esc_attr($this->get_field_id('excluded')); ?>"><?php _e('Excluded categories IDs (comma separated):', 'colorful-categories'); ?></label>
             <br/>
-            <textarea id="<?php echo $this->get_field_id('excluded'); ?>" name="<?php echo $this->get_field_name('excluded'); ?>" style="width: 100%;"><?=esc_textarea($excluded)?></textarea>
+            <textarea id="<?php echo esc_attr($this->get_field_id('excluded')); ?>" name="<?php echo esc_attr($this->get_field_name('excluded')); ?>" style="width: 100%;"><?php echo esc_textarea($excluded); ?></textarea>
         </p>
 
         <?php
@@ -121,8 +121,9 @@ class ColorfulCategoriesWidget extends WP_Widget
         $l = $instance['limit'] > 0 ? $instance['limit'] : '';
 
         echo $args['before_widget'];
+
         if ($title) {
-            echo $args['before_title'] . $title . $args['after_title'];
+            echo $args['before_title'] . esc_html($title) . $args['after_title'];
         }
 
         if ($theme === 'bubble') {
@@ -227,19 +228,19 @@ class ColorfulCategoriesWidget extends WP_Widget
             echo '<p class="colorful-categories-not-found">' . apply_filters('colorful-categories-not-found', __('List is empty', 'colorful-categories'), $t) . '</p>';
         } else {
             ?>
-        <ul class="colorful-categories<?=empty($theme) ? '' : ' ' . esc_attr($theme)?>">
+        <ul class="colorful-categories<?php echo empty($theme) ? '' : ' ' . esc_attr($theme); ?>">
             <?php
             /** @var WP_Term $term */
             foreach ($terms as $term) {
 
-                $text = stripslashes($term->name);
+                $html = esc_html($term->name);
+
                 if ($c) {
-                    $text .= ' <sup>' . $term->count . '</sup>';
+                    $html .= ' <sup>' . $term->count . '</sup>';
                 }
 
                 $isCurrent = false;
 
-                /** @var WP_Term $category */
                 foreach (get_the_category() as $category) {
                     if ($category->term_id === $term->term_id) {
                         $isCurrent = true;
@@ -249,9 +250,9 @@ class ColorfulCategoriesWidget extends WP_Widget
 
                 $color = ColorfulCategories::getColorForTerm($term->term_id, true);
 
-                $text = apply_filters('colorful_categories_term_text', $text, $term, $color, $isCurrent);
+                $html = apply_filters('colorful_categories_term_text', $html, $term, $color, $isCurrent);
 
-                echo '<li class="' . esc_attr($term->slug) . ($isCurrent ? ' current' : '') . '"><a href="' . esc_url(get_term_link($term)) . '" style="background-color: ' . $color . ';">' . $text . '</a></li>';
+                echo '<li class="' . esc_attr($term->slug) . ($isCurrent ? ' current' : '') . '"><a href="' . esc_url(get_term_link($term)) . '" style="background-color: ' . esc_attr($color) . ';">' . $html . '</a></li>';
             }
 
             echo '</ul>';

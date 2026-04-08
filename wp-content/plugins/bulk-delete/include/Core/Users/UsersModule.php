@@ -100,7 +100,7 @@ abstract class UsersModule extends BaseModule {
 			 * @param array                                   $options Delete options.
 			 * @param \BulkWP\BulkDelete\Core\Base\BaseModule $this    Module that is triggering deletion.
 			 */
-			if ( ! apply_filters( 'bd_can_delete_user', true, $user, $options, $this ) ) {
+			if ( ! apply_filters( 'bd_can_delete_user', true, $user, $options, $this ) ) { //phpcs:ignore
 				continue;
 			}
 
@@ -141,7 +141,7 @@ abstract class UsersModule extends BaseModule {
 		 *
 		 * @param \WP_User_Query $wp_user_query Query object.
 		 */
-		do_action( 'bd_before_query', $wp_user_query );
+		do_action( 'bd_before_query', $wp_user_query ); //phpcs:ignore
 
 		$users = (array) $wp_user_query->get_results();
 
@@ -152,7 +152,7 @@ abstract class UsersModule extends BaseModule {
 		 *
 		 * @param \WP_User_Query $wp_user_query Query object.
 		 */
-		do_action( 'bd_after_query', $wp_user_query );
+		do_action( 'bd_after_query', $wp_user_query ); //phpcs:ignore
 
 		return $users;
 	}
@@ -260,13 +260,13 @@ abstract class UsersModule extends BaseModule {
 			<td scope="row" colspan="2">
 				<label for="smbd_<?php echo esc_attr( $this->field_slug ); ?>_registered_restrict">
 					<input name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_registered_restrict" id="smbd_<?php echo esc_attr( $this->field_slug ); ?>_registered_restrict" value="true" type="checkbox">
-					<?php _e( 'Restrict to users who are registered in the site ', 'bulk-delete' ); ?>
+					<?php esc_html_e( 'Restrict to users who are registered in the site ', 'bulk-delete' ); ?>
 				</label>
 				<select name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_op" id="smbd_<?php echo esc_attr( $this->field_slug ); ?>_op" disabled>
-					<option value="before"><?php _e( 'for at least', 'bulk-delete' ); ?></option>
-					<option value="after"><?php _e( 'in the last', 'bulk-delete' ); ?></option>
+					<option value="before"><?php esc_html_e( 'for at least', 'bulk-delete' ); ?></option>
+					<option value="after"><?php esc_html_e( 'in the last', 'bulk-delete' ); ?></option>
 				</select>
-				<input type="number" name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_registered_days" id="smbd_<?php echo esc_attr( $this->field_slug ); ?>_registered_days" class="screen-per-page" disabled value="0" min="0"><?php _e( ' days.', 'bulk-delete' ); ?>
+				<input type="number" name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_registered_days" id="smbd_<?php echo esc_attr( $this->field_slug ); ?>_registered_days" class="screen-per-page" disabled value="0" min="0"><?php esc_html_e( ' days.', 'bulk-delete' ); ?>
 			</td>
 		</tr>
 		<tr>
@@ -274,13 +274,13 @@ abstract class UsersModule extends BaseModule {
 				<label>
 					<input name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_login_restrict" id="smbd_<?php echo esc_attr( $this->field_slug ); ?>_login_restrict"
 							value="true" type="checkbox" <?php disabled( false, bd_is_simple_login_log_present() ); ?>>
-					<?php _e( 'Restrict to users who have not logged in the last ', 'bulk-delete' ); ?>
+					<?php esc_html_e( 'Restrict to users who have not logged in the last ', 'bulk-delete' ); ?>
 				</label>
-				<input type="number" name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_login_days" id="smbd_<?php echo esc_attr( $this->field_slug ); ?>_login_days" class="screen-per-page" value="0" min="0" disabled> <?php _e( 'days', 'bulk-delete' ); ?>.
+				<input type="number" name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_login_days" id="smbd_<?php echo esc_attr( $this->field_slug ); ?>_login_days" class="screen-per-page" value="0" min="0" disabled> <?php esc_html_e( 'days', 'bulk-delete' ); ?>.
 
 				<?php if ( ! bd_is_simple_login_log_present() ) : ?>
 					<span style = "color:red">
-						<?php _e( 'Need the free "Simple Login Log" Plugin', 'bulk-delete' ); ?> <a href = "https://wordpress.org/plugins/simple-login-log/">Install now</a>
+						<?php esc_html_e( 'Need the free "Simple Login Log" Plugin', 'bulk-delete' ); ?> <a href = "https://wordpress.org/plugins/simple-login-log/">Install now</a>
 					</span>
 				<?php endif; ?>
 			</td>
@@ -289,7 +289,7 @@ abstract class UsersModule extends BaseModule {
 		<?php if ( bd_is_simple_login_log_present() ) : ?>
 			<tr>
 				<td scope="row" colspan="2">
-					<?php _e( 'Enter "0 days" to delete users who have never logged in after the "Simple Login Log" plugin has been installed.', 'bulk-delete' ); ?>
+					<?php esc_html_e( 'Enter "0 days" to delete users who have never logged in after the "Simple Login Log" plugin has been installed.', 'bulk-delete' ); ?>
 			</tr>
 		<?php endif; ?>
 <?php
@@ -308,7 +308,7 @@ abstract class UsersModule extends BaseModule {
 						name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_no_posts"
 						id="smbd_<?php echo esc_attr( $this->field_slug ); ?>_no_posts" class="user_restrict_to_no_posts_filter">
 				<label for="smbd_<?php echo esc_attr( $this->field_slug ); ?>_no_posts">
-					<?php _e( "Restrict to users who don't have any posts.", 'bulk-delete' ); ?>
+					<?php esc_html_e( "Restrict to users who don't have any posts.", 'bulk-delete' ); ?>
 				</label>
 			</td>
 		</tr>
@@ -318,7 +318,7 @@ abstract class UsersModule extends BaseModule {
 				<table class="filter-items">
 					<tr>
 						<td scope="row">
-							<?php _e( 'Select the post types. By default all post types are considered.', 'bulk-delete' ); ?>
+							<?php esc_html_e( 'Select the post types. By default all post types are considered.', 'bulk-delete' ); ?>
 						</td>
 					</tr>
 
@@ -340,7 +340,7 @@ abstract class UsersModule extends BaseModule {
 	protected function get_unique_user_meta_keys() {
 		global $wpdb;
 
-		return $wpdb->get_col( "SELECT DISTINCT(meta_key) FROM {$wpdb->prefix}usermeta ORDER BY meta_key" );
+		return $wpdb->get_col( "SELECT DISTINCT(meta_key) FROM {$wpdb->prefix}usermeta ORDER BY meta_key" ); //phpcs:ignore
 	}
 
 	/**
@@ -383,7 +383,7 @@ abstract class UsersModule extends BaseModule {
 		 *
 		 * @param array $excluded_ids User IDs to be excluded during deletion.
 		 */
-		$excluded_user_ids = apply_filters( 'bd_excluded_user_ids', array() );
+		$excluded_user_ids = apply_filters( 'bd_excluded_user_ids', array() ); //phpcs:ignore
 
 		if ( is_array( $excluded_user_ids ) && ! empty( $excluded_user_ids ) ) {
 			if ( isset( $query['exclude'] ) ) {

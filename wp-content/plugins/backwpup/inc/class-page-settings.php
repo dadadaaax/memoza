@@ -1,80 +1,89 @@
 <?php
 
 use Inpsyde\BackWPup\Settings;
+use Inpsyde\BackWPup\Settings\SettingUpdatable;
+use WPMedia\BackWPup\License\Infrastructure\LicenseOptions;
+use WPMedia\BackWPup\License\Infrastructure\WpOptionsLicenseRepository;
 
-/**
- * Class BackWPup_Page_Settings
- */
-class BackWPup_Page_Settings
-{
-    const LICENSE_INSTANCE_KEY = 'license_instance_key';
-    const LICENSE_API_KEY = 'license_api_key';
-    const LICENSE_PRODUCT_ID = 'license_product_id';
-    const LICENSE_STATUS = 'license_status';
+class BackWPup_Page_Settings {
+
+		/**
+		 * Settings views collection.
+		 *
+		 * @var Settings\SettingTab
+		 */
+		private $settings_views;
+
+		/**
+		 * Settings updaters collection.
+		 *
+		 * @var SettingUpdatable[]
+		 */
+		private $settings_updaters;
+
+		/**
+		 * License options repository.
+		 *
+		 * @var WpOptionsLicenseRepository
+		 */
+		private $license_repository;
+
+		/**
+		 * Construct the settings page handler.
+		 *
+		 * @param Settings\SettingTab[]           $settings_views
+		 * @param SettingUpdatable[]              $settings_updaters
+		 * @param WpOptionsLicenseRepository|null $license_repository
+		 */
+	public function __construct(
+		array $settings_views,
+		array $settings_updaters,
+		?WpOptionsLicenseRepository $license_repository = null
+	) {
+		$this->settings_views     = array_filter(
+			$settings_views,
+			function ( $setting ) {
+				return $setting instanceof Settings\SettingTab;
+			}
+		);
+		$this->settings_updaters  = array_filter(
+			$settings_updaters,
+			function ( $setting ) {
+				return $setting instanceof SettingUpdatable;
+			}
+		);
+		$this->license_repository = $license_repository instanceof WpOptionsLicenseRepository ? new WpOptionsLicenseRepository( new LicenseOptions() ) : null;
+	}
 
 	/**
-	 * @var array
-	 */
-	private $settings_views;
-
-	/**
-	 * @var array
-	 */
-	private $settings_updaters;
-
-    /**
-     * @param array $settings_views
-     * @param array $settings_updaters
-     */
-    public function __construct(
-        array $settings_views,
-        array $settings_updaters
-    ) {
-
-        $this->settings_views = array_filter(
-            $settings_views,
-            function ($setting) {
-
-                return $setting instanceof Settings\SettingTab;
-            }
-        );
-        $this->settings_updaters = array_filter(
-            $settings_updaters,
-            function ($setting) {
-
-                return $setting instanceof Settings\SettingUpdatable;
-            }
-        );
-    }
-
-	/**
+	 * Get system information for the settings page.
+	 *
 	 * @return array
 	 */
 	public static function get_information() {
-
 		global $wpdb;
 
-		$information = array();
+		$information = [];
 
-		// Wordpress version
+		// WordPress version.
 		$information['wpversion']['label'] = __( 'WordPress version', 'backwpup' );
 		$information['wpversion']['value'] = BackWPup::get_plugin_data( 'wp_version' );
 
-		// BackWPup version
+		// BackWPup version.
 		if ( ! BackWPup::is_pro() ) {
 			$information['bwuversion']['label'] = esc_html__( 'BackWPup version', 'backwpup' );
 			$information['bwuversion']['value'] = BackWPup::get_plugin_data( 'Version' );
-			$information['bwuversion']['html'] = BackWPup::get_plugin_data( 'Version' ) .
-			                                     ' <a href="' . __( 'http://backwpup.com', 'backwpup' ) . '">' .
-			                                     esc_html__( 'Get pro.', 'backwpup' ) . '</a>';
+			$information['bwuversion']['html']  = BackWPup::get_plugin_data( 'Version' ) .
+												' <a href="' . __( 'http://backwpup.com', 'backwpup' ) . '">' .
+												esc_html__( 'Get pro.', 'backwpup' ) . '</a>';
 		} else {
 			$information['bwuversion']['label'] = __( 'BackWPup Pro version', 'backwpup' );
 			$information['bwuversion']['value'] = BackWPup::get_plugin_data( 'Version' );
 		}
 
-		// PHP version
+		// PHP version.
 		$information['phpversion']['label'] = esc_html__( 'PHP version', 'backwpup' );
-		$bit = '';
+		$bit                                = '';
 		if ( PHP_INT_SIZE === 4 ) {
 			$bit = ' (32bit)';
 		} elseif ( PHP_INT_SIZE === 8 ) {
@@ -82,62 +91,78 @@ class BackWPup_Page_Settings
 		}
 		$information['phpversion']['value'] = PHP_VERSION . ' ' . $bit;
 
-		// MySQL version
+		// MySQL version.
 		$information['mysqlversion']['label'] = esc_html__( 'MySQL version', 'backwpup' );
-		$information['mysqlversion']['value'] = $wpdb->get_var( "SELECT VERSION() AS version" );
+		$information['mysqlversion']['value'] = $wpdb->db_version();
 
-		// Curl version
+		// Curl version.
 		$information['curlversion']['label'] = esc_html__( 'cURL version', 'backwpup' );
 		if ( function_exists( 'curl_version' ) ) {
-			$curl_version = curl_version();
-			$information['curlversion']['value'] = $curl_version['version'];
+			$curl_version                           = curl_version();
+			$information['curlversion']['value']    = $curl_version['version'];
 			$information['curlsslversion']['label'] = __( 'cURL SSL version', 'backwpup' );
 			$information['curlsslversion']['value'] = $curl_version['ssl_version'];
 		} else {
 			$information['curlversion']['value'] = esc_html__( 'unavailable', 'backwpup' );
 		}
 
-		// WP cron URL
+		// WP cron URL.
 		$information['wpcronurl']['label'] = esc_html__( 'WP-Cron url', 'backwpup' );
 		$information['wpcronurl']['value'] = site_url( 'wp-cron.php' );
 
-		// Response test
+		// Response test.
+		$server_connect          = [];
 		$server_connect['label'] = __( 'Server self connect', 'backwpup' );
 
-		$raw_response = BackWPup_Job::get_jobrun_url( 'test' );
+		$raw_response  = BackWPup_Job::get_jobrun_url( 'test' );
 		$response_code = wp_remote_retrieve_response_code( $raw_response );
 		$response_body = wp_remote_retrieve_body( $raw_response );
 		if ( strstr( $response_body, 'BackWPup test request' ) === false ) {
 			$server_connect['value'] = esc_html__( 'Not expected HTTP response:', 'backwpup' ) . "\n";
-			$server_connect['html'] = wp_kses( __( '<strong>Not expected HTTP response:</strong><br>', 'backwpup' ),
-				array( 'strong' => array() ) );
+			$server_connect['html']  = wp_kses(
+				__( '<strong>Not expected HTTP response:</strong><br>', 'backwpup' ),
+				[ 'strong' => [] ]
+			);
 			if ( ! $response_code ) {
-				$server_connect['value'] .= sprintf( wp_kses_post(
-						__( 'WP Http Error: %s', 'backwpup' ),
-						$raw_response->get_error_message()
-					) ) . "\n";
+				$server_connect['value'] .= sprintf(
+					/* translators: %s: HTTP error message. */
+					wp_kses_post( __( 'WP Http Error: %s', 'backwpup' ) ),
+					$raw_response->get_error_message()
+				) . "\n";
 				$server_connect['html'] = sprintf(
-					                          __( 'WP Http Error: <code>%s</code>', 'backwpup' ),
-					                          esc_html( $raw_response->get_error_message() )
-				                          ) . '<br>';
+					/* translators: %s: HTTP error message. */
+					__( 'WP Http Error: <code>%s</code>', 'backwpup' ),
+					esc_html( $raw_response->get_error_message() )
+				) . '<br>';
 			} else {
-				$server_connect['value'] .= sprintf( __( 'Status-Code: %d', 'backwpup' ), $response_code ) . "\n";
+				$server_connect['value'] .= sprintf(
+					/* translators: %d: HTTP status code. */
+					__( 'Status-Code: %d', 'backwpup' ),
+					$response_code
+				) . "\n";
 				$server_connect['html'] .= sprintf(
-					                           __( 'Status-Code: <code>%d</code>', 'backwpup' ),
-					                           esc_html( $response_code )
-				                           ) . '<br>';
+					/* translators: %d: HTTP status code. */
+					__( 'Status-Code: <code>%d</code>', 'backwpup' ),
+					esc_html( $response_code )
+				) . '<br>';
 			}
 			$response_headers = wp_remote_retrieve_headers( $raw_response );
+
 			foreach ( $response_headers as $key => $value ) {
-				$server_connect['value'] .= ucfirst( $key ) . ": $value\n";
-				$server_connect['html'] .= esc_html( ucfirst( $key ) ) . ': <code>' . esc_html(
-						$value
-					) . '</code><br>';
+				$server_connect['value'] .= ucfirst( $key ) . ": {$value}\n";
+				$server_connect['html']  .= esc_html( ucfirst( $key ) ) . ': <code>' . esc_html(
+					$value
+				) . '</code><br>';
 			}
 			$content = wp_remote_retrieve_body( $raw_response );
 			if ( $content ) {
-				$server_connect['value'] .= sprintf( __( 'Content: %s', 'backwpup' ), $content );
+				$server_connect['value'] .= sprintf(
+					/* translators: %s: response content. */
+					__( 'Content: %s', 'backwpup' ),
+					$content
+				);
 				$server_connect['html'] .= sprintf(
+					/* translators: %s: response content. */
 					__( 'Content: <code>%s</code>', 'backwpup' ),
 					esc_html( $content )
 				);
@@ -147,19 +172,22 @@ class BackWPup_Page_Settings
 		}
 		$information['serverconnect'] = $server_connect;
 
-		// Document root
+		// Document root.
 		$information['docroot']['label'] = 'Document root';
-		$information['docroot']['value'] = $_SERVER['DOCUMENT_ROOT'];
+		$document_root                   = isset( $_SERVER['DOCUMENT_ROOT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['DOCUMENT_ROOT'] ) ) : '';
+		$information['docroot']['value'] = $document_root;
 
-		// Temp folder
+		// Temp folder.
 		$information['tmpfolder']['label'] = esc_html__( 'Temp folder', 'backwpup' );
 		if ( ! is_dir( BackWPup::get_plugin_data( 'TEMP' ) ) ) {
 			$information['tmpfolder']['value'] = sprintf(
+				/* translators: %s: temporary folder path. */
 				esc_html__( 'Temp folder %s doesn\'t exist.', 'backwpup' ),
 				BackWPup::get_plugin_data( 'TEMP' )
 			);
-		} elseif ( ! is_writable( BackWPup::get_plugin_data( 'TEMP' ) ) ) {
+		} elseif ( ! is_writable( BackWPup::get_plugin_data( 'TEMP' ) ) ) { // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_is_writable
 			$information['tmpfolder']['value'] = sprintf(
+				/* translators: %s: temporary folder path. */
 				esc_html__( 'Temporary folder %s is not writable.', 'backwpup' ),
 				BackWPup::get_plugin_data( 'TEMP' )
 			);
@@ -167,18 +195,20 @@ class BackWPup_Page_Settings
 			$information['tmpfolder']['value'] = BackWPup::get_plugin_data( 'TEMP' );
 		}
 
-		// Log folder
+		// Log folder.
 		$information['logfolder']['label'] = esc_html__( 'Log folder', 'backwpup' );
-		$log_folder = BackWPup_File::get_absolute_path(
+		$log_folder                        = BackWPup_File::get_absolute_path(
 			get_site_option( 'backwpup_cfg_logfolder' )
 		);
 		if ( ! is_dir( $log_folder ) ) {
 			$information['logfolder']['value'] = sprintf(
+				/* translators: %s: log folder path. */
 				esc_html__( 'Log folder %s does not exist.', 'backwpup' ),
 				$log_folder
 			);
-		} elseif ( ! is_writable( $log_folder ) ) {
+		} elseif ( ! is_writable( $log_folder ) ) { // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_is_writable
 			$information['logfolder']['value'] = sprintf(
+				/* translators: %s: log folder path. */
 				esc_html__( 'Log folder %s is not writable.', 'backwpup' ),
 				$log_folder
 			);
@@ -186,19 +216,20 @@ class BackWPup_Page_Settings
 			$information['logfolder']['value'] = $log_folder;
 		}
 
-		// Server
+		// Server.
 		$information['server']['label'] = esc_html__( 'Server', 'backwpup' );
-		$information['server']['value'] = $_SERVER['SERVER_SOFTWARE'];
+		$server_software                = isset( $_SERVER['SERVER_SOFTWARE'] ) ? sanitize_text_field( wp_unslash( $_SERVER['SERVER_SOFTWARE'] ) ) : '';
+		$information['server']['value'] = $server_software;
 
-		// OS
+		// OS.
 		$information['os']['label'] = esc_html__( 'Operating System', 'backwpup' );
 		$information['os']['value'] = PHP_OS;
 
-		// PHP SAPI
+		// PHP SAPI.
 		$information['phpsapi']['label'] = esc_html__( 'PHP SAPI', 'backwpup' );
 		$information['phpsapi']['value'] = PHP_SAPI;
 
-		// PHP user
+		// PHP user.
 		$information['phpuser']['label'] = esc_html__( 'Current PHP user', 'backwpup' );
 		if ( function_exists( 'get_current_user' ) ) {
 			$information['phpuser']['value'] = get_current_user();
@@ -206,22 +237,26 @@ class BackWPup_Page_Settings
 			$information['phpuser']['value'] = esc_html__( 'Function Disabled', 'backwpup' );
 		}
 
-		// Maximum execution time
+		// Maximum execution time.
 		$information['maxexectime']['label'] = esc_html__( 'Maximum execution time', 'backwpup' );
 		$information['maxexectime']['value'] = sprintf(
+			/* translators: %d: time in seconds. */
 			__( '%d seconds', 'backwpup' ),
 			ini_get( 'max_execution_time' )
 		);
 
-		// BackWPup Maximum script execution time
-		$information['jobmaxexecutiontime']['label'] = esc_html__( 'BackWPup maximum script execution time',
-			'backwpup' );
+		// BackWPup Maximum script execution time.
+		$information['jobmaxexecutiontime']['label'] = esc_html__(
+			'BackWPup maximum script execution time',
+			'backwpup'
+		);
 		$information['jobmaxexecutiontime']['value'] = sprintf(
+			/* translators: %d: time in seconds. */
 			__( '%d seconds', 'backwpup' ),
 			absint( get_site_option( 'backwpup_cfg_jobmaxexecutiontime' ) )
 		);
 
-		// Alternate WP cron
+		// Alternate WP cron.
 		$information['altwpcron']['label'] = esc_html__( 'Alternative WP Cron', 'backwpup' );
 		if ( defined( 'ALTERNATE_WP_CRON' ) && ALTERNATE_WP_CRON ) {
 			$information['altwpcron']['value'] = esc_html__( 'On', 'backwpup' );
@@ -229,7 +264,7 @@ class BackWPup_Page_Settings
 			$information['altwpcron']['value'] = esc_html__( 'Off', 'backwpup' );
 		}
 
-		// Disable WP cron
+		// Disable WP cron.
 		$information['disablewpcron']['label'] = esc_html__( 'Disabled WP Cron', 'backwpup' );
 		if ( defined( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON ) {
 			$information['disablewpcron']['value'] = esc_html__( 'On', 'backwpup' );
@@ -237,7 +272,16 @@ class BackWPup_Page_Settings
 			$information['disablewpcron']['value'] = esc_html__( 'Off', 'backwpup' );
 		}
 
-		// CHMOD dir
+		$current_time    = time() - HOUR_IN_SECONDS;
+		$next_cron_times = array_keys( _get_cron_array() );
+		sort( $next_cron_times );
+		$information['cronworking']['label'] = esc_html__( 'WP Cron is working', 'backwpup' );
+		$information['cronworking']['value'] = esc_html__( 'Yes', 'backwpup' );
+		if ( isset( $next_cron_times[0] ) && $next_cron_times[0] < $current_time ) {
+			$information['cronworking']['value'] = esc_html__( 'No', 'backwpup' );
+		}
+
+		// CHMOD dir.
 		$information['chmoddir']['label'] = esc_html__( 'CHMOD Dir', 'backwpup' );
 		if ( defined( 'FS_CHMOD_DIR' ) ) {
 			$information['chmoddir']['value'] = FS_CHMOD_DIR;
@@ -245,108 +289,114 @@ class BackWPup_Page_Settings
 			$information['chmoddir']['value'] = '0755';
 		}
 
-		// Server time
+		// Server time.
 		$information['servertime']['label'] = esc_html__( 'Server Time', 'backwpup' );
-		$now = localtime( time(), true );
+		$now                                = localtime( time(), true );
 		$information['servertime']['value'] = $now['tm_hour'] . ':' . $now['tm_min'];
 
-		// Blog time
+		// Blog time.
 		$information['blogtime']['label'] = esc_html__( 'Blog Time', 'backwpup' );
-		$information['blogtime']['value'] = date( 'H:i', current_time( 'timestamp' ) );
+		$information['blogtime']['value'] = wp_date( 'H:i', time() );
 
-		// Blog timezone
+		// Blog timezone.
 		$information['blogtz']['label'] = esc_html__( 'Blog Timezone', 'backwpup' );
 		$information['blogtz']['value'] = get_option( 'timezone_string' );
 
-		// Blog time offset
+		// Blog time offset.
 		$information['blogoffset']['label'] = esc_html__( 'Blog Time offset', 'backwpup' );
 		$information['blogoffset']['value'] = sprintf(
+			/* translators: %s: hours offset. */
 			esc_html__( '%s hours', 'backwpup' ),
 			(int) get_option( 'gmt_offset' )
 		);
 
-		// Blog language
+		// Blog language.
 		$information['bloglang']['label'] = esc_html__( 'Blog language', 'backwpup' );
 		$information['bloglang']['value'] = get_bloginfo( 'language' );
 
-		// MySQL encoding
+		// MySQL encoding.
 		$information['mysqlencoding']['label'] = esc_html__( 'MySQL Client encoding', 'backwpup' );
 		$information['mysqlencoding']['value'] = defined( 'DB_CHARSET' ) ? DB_CHARSET : '';
 
-		// PHP memory limitesc_html__
+		// PHP memory limit.
 		$information['phpmemlimit']['label'] = esc_html__( 'PHP Memory limit', 'backwpup' );
 		$information['phpmemlimit']['value'] = ini_get( 'memory_limit' );
 
-		// WP memory limit
+		// WP memory limit.
 		$information['wpmemlimit']['label'] = esc_html__( 'WP memory limit', 'backwpup' );
 		$information['wpmemlimit']['value'] = WP_MEMORY_LIMIT;
 
-		// WP maximum memory limit
+		// WP maximum memory limit.
 		$information['wpmaxmemlimit']['label'] = esc_html__( 'WP maximum memory limit', 'backwpup' );
 		$information['wpmaxmemlimit']['value'] = WP_MAX_MEMORY_LIMIT;
 
-		// Memory in use
+		// Memory in use.
 		$information['memusage']['label'] = esc_html__( 'Memory in use', 'backwpup' );
-		$information['memusage']['value'] = size_format( @memory_get_usage( true ), 2 );
+		$memory_usage                     = function_exists( 'memory_get_usage' ) ? memory_get_usage( true ) : 0;
+		$information['memusage']['value'] = size_format( $memory_usage, 2 );
 
-		// Disabled PHP functions
+		// Disabled PHP functions.
 		$disabled = esc_html( ini_get( 'disable_functions' ) );
 		if ( ! empty( $disabled ) ) {
 			$information['disabledfunctions']['label'] = esc_html__( 'Disabled PHP Functions:', 'backwpup' );
 			$information['disabledfunctions']['value'] = implode( ', ', explode( ',', $disabled ) );
 		}
 
-		// Loaded PHP extensions
+		// Loaded PHP extensions.
 		$information['loadedextensions']['label'] = esc_html__( 'Loaded PHP Extensions:', 'backwpup' );
-		$extensions = get_loaded_extensions();
+		$extensions                               = get_loaded_extensions();
 		sort( $extensions );
 		$information['loadedextensions']['value'] = implode( ', ', $extensions );
 
 		return $information;
 	}
 
+	/**
+	 * Enqueue settings page scripts.
+	 *
+	 * @return void
+	 */
 	public function admin_print_scripts() {
-
 		$suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
 
 		wp_enqueue_script(
 			'backwpuppagesettings',
 			untrailingslashit( BackWPup::get_plugin_data( 'URL' ) ) . "/assets/js/page_settings{$suffix}.js",
-			array(
+			[
 				'jquery',
 				'backwpupgeneral',
 				'backwpup_clipboard',
-			),
-			filemtime( untrailingslashit( BackWPup::get_plugin_data( 'plugindir' ) ) . "/assets/js/page_settings{$suffix}.js" ),
+			],
+			BackWPup::get_plugin_data( 'Version' ),
 			true
 		);
 
 		if ( \BackWPup::is_pro() ) {
 			wp_enqueue_script(
 				'backwpuppagesettings-encryption',
-				untrailingslashit( BackWPup::get_plugin_data( 'URL' ) ) . "/assets/js/pro/settings-encryption{$suffix}.js",
-				array(
+				untrailingslashit( BackWPup::get_plugin_data( 'URL' ) ) . "/assets/js/settings-encryption{$suffix}.js",
+				[
 					'underscore',
 					'jquery',
 					'backwpuppagesettings',
 					'thickbox',
-				),
-				filemtime( untrailingslashit( BackWPup::get_plugin_data( 'plugindir' ) ) . "/assets/js/pro/settings-encryption{$suffix}.js" ),
+				],
+				BackWPup::get_plugin_data( 'Version' ),
 				true
 			);
 
 			wp_localize_script(
 				'backwpuppagesettings-encryption',
 				'settingsEncryptionVariables',
-				array(
-					'validPublicKey' => esc_html__( 'Public key is valid.', 'backwpup' ),
-					'invalidPublicKey' => esc_html__( 'Public key is invalid.', 'backwpup' ),
-					'privateKeyMissed' => esc_html__( 'Please enter your private key.', 'backwpup' ),
-					'publicKeyMissed' => esc_html__(
+				[
+					'validPublicKey'           => esc_html__( 'Public key is valid.', 'backwpup' ),
+					'invalidPublicKey'         => esc_html__( 'Public key is invalid.', 'backwpup' ),
+					'privateKeyMissed'         => esc_html__( 'Please enter your private key.', 'backwpup' ),
+					'publicKeyMissed'          => esc_html__(
 						'Please enter a public key first, or generate a key pair.',
 						'backwpup'
 					),
-					'mustDownloadPrivateKey' => esc_html__(
+					'mustDownloadPrivateKey'   => esc_html__(
 						'Please download the private key before continuing. If you do not save it locally, you cannot decrypt your backups later.',
 						'backwpup'
 					),
@@ -354,19 +404,24 @@ class BackWPup_Page_Settings
 						'Please download the key before continuing. If you do not save it locally, you cannot decrypt your backups later.',
 						'backwpup'
 					),
-				)
+				]
 			);
 		}
 	}
 
+	/**
+	 * Save settings from post form.
+	 *
+	 * @return void
+	 */
 	public function save_post_form() {
-
+        // phpcs:disable WordPress.Security.NonceVerification.Missing
 		if ( ! current_user_can( 'backwpup_settings' ) ) {
 			return;
 		}
 
 		// Set default options if button clicked.
-		if ( isset( $_POST['default_settings'] ) && $_POST['default_settings'] ) { // phpcs:ignore
+        if (isset($_POST['default_settings']) && $_POST['default_settings']) { // phpcs:ignore
 			delete_site_option( 'backwpup_cfg_showadminbar' );
 			delete_site_option( 'backwpup_cfg_showfoldersize' );
 			delete_site_option( 'backwpup_cfg_jobstepretry' );
@@ -378,7 +433,6 @@ class BackWPup_Page_Settings
 			delete_site_option( 'backwpup_cfg_windows' );
 			delete_site_option( 'backwpup_cfg_maxlogs' );
 			delete_site_option( 'backwpup_cfg_gzlogs' );
-			delete_site_option( 'backwpup_cfg_protectfolders' );
 			delete_site_option( 'backwpup_cfg_authentication' );
 			delete_site_option( 'backwpup_cfg_logfolder' );
 			delete_site_option( 'backwpup_cfg_dropboxappkey' );
@@ -389,16 +443,16 @@ class BackWPup_Page_Settings
 			delete_site_option( 'backwpup_cfg_sugarsyncsecret' );
 			delete_site_option( 'backwpup_cfg_sugarsyncappid' );
 			delete_site_option( 'backwpup_cfg_hash' );
-            delete_site_option('backwpup_cfg_keepplugindata');
+			delete_site_option( 'backwpup_cfg_keepplugindata' );
 
 			foreach ( $this->settings_updaters as $setting ) {
 				$setting->reset();
 			}
 
-            delete_site_option(self::LICENSE_INSTANCE_KEY);
-            delete_site_option(self::LICENSE_API_KEY);
-            delete_site_option(self::LICENSE_PRODUCT_ID);
-            delete_site_option(self::LICENSE_STATUS);
+			$this->license_repository->delete_instance_key();
+			$this->license_repository->delete_api_key();
+			$this->license_repository->delete_product_id();
+			$this->license_repository->delete_status();
 
 			BackWPup_Option::default_site_options();
 			BackWPup_Admin::message( __( 'Settings reset to default', 'backwpup' ) );
@@ -409,239 +463,179 @@ class BackWPup_Page_Settings
 		foreach ( $this->settings_updaters as $setting ) {
 			$setting->update();
 		}
+		// Load current settings.
+		$current_options = [
+			'backwpup_cfg_jobstepretry'         => get_site_option( 'backwpup_cfg_jobstepretry' ),
+			'backwpup_cfg_jobmaxexecutiontime'  => get_site_option( 'backwpup_cfg_jobmaxexecutiontime' ),
+			'backwpup_cfg_loglevel'             => get_site_option( 'backwpup_cfg_loglevel' ),
+			'backwpup_cfg_jobwaittimems'        => get_site_option( 'backwpup_cfg_jobwaittimems' ),
+			'backwpup_cfg_jobdooutput'          => get_site_option( 'backwpup_cfg_jobdooutput' ),
+			'backwpup_cfg_windows'              => get_site_option( 'backwpup_cfg_windows' ),
+			'backwpup_cfg_maxlogs'              => get_site_option( 'backwpup_cfg_maxlogs' ),
+			'backwpup_cfg_gzlogs'               => get_site_option( 'backwpup_cfg_gzlogs' ),
+			'backwpup_cfg_jobrunauthkey'        => get_site_option( 'backwpup_cfg_jobrunauthkey' ),
+			'backwpup_cfg_logfolder'            => get_site_option( 'backwpup_cfg_logfolder' ),
+			'backwpup_cfg_authentication'       => get_site_option( 'backwpup_cfg_authentication' ),
+			'backwpup_cfg_keepplugindata'       => get_site_option( 'backwpup_cfg_keepplugindata' ),
+			'backwpup_cfg_mailaddresslog'       => get_site_option( 'backwpup_cfg_mailaddresslog' ),
+			'backwpup_cfg_mailaddresssenderlog' => get_site_option( 'backwpup_cfg_mailaddresssenderlog' ),
+			'backwpup_cfg_mailerroronly'        => get_site_option( 'backwpup_cfg_mailerroronly' ),
+		];
 
-		update_site_option( 'backwpup_cfg_showadminbar', ! empty( $_POST['showadminbarmenu'] ) );
-		update_site_option( 'backwpup_cfg_showfoldersize', ! empty( $_POST['showfoldersize'] ) );
+		// Validate and add new options values.
+		$new_options = [];
 
-		if ( empty( $_POST['jobstepretry'] ) || 100 < $_POST['jobstepretry'] || 1 > $_POST['jobstepretry'] ) {
-			$_POST['jobstepretry'] = 3;
+		if ( isset( $_POST['jobstepretry'] ) && is_numeric( $_POST['jobstepretry'] ) && $_POST['jobstepretry'] >= 1 && $_POST['jobstepretry'] <= 100 ) {
+			$new_options['backwpup_cfg_jobstepretry'] = absint( $_POST['jobstepretry'] );
 		}
 
-		update_site_option( 'backwpup_cfg_jobstepretry', absint( $_POST['jobstepretry'] ) );
-
-		if ( (int) $_POST['jobmaxexecutiontime'] > 300 ) {
-			$_POST['jobmaxexecutiontime'] = 300;
+		if ( isset( $_POST['jobmaxexecutiontime'] ) && is_numeric( $_POST['jobmaxexecutiontime'] ) && $_POST['jobmaxexecutiontime'] <= 300 ) {
+			$new_options['backwpup_cfg_jobmaxexecutiontime'] = absint( $_POST['jobmaxexecutiontime'] );
 		}
 
-		update_site_option( 'backwpup_cfg_jobmaxexecutiontime', absint( $_POST['jobmaxexecutiontime'] ) );
-		update_site_option(
-			'backwpup_cfg_loglevel',
-			in_array(
-				$_POST['loglevel'],
-				array( 'normal_translated', 'normal', 'debug_translated', 'debug' ),
-				true
-			) ? $_POST['loglevel'] : 'normal_translated'
-		);
-		update_site_option( 'backwpup_cfg_jobwaittimems', absint( $_POST['jobwaittimems'] ) );
-		update_site_option( 'backwpup_cfg_jobdooutput', ! empty( $_POST['jobdooutput'] ) );
-		update_site_option( 'backwpup_cfg_windows', ! empty( $_POST['windows'] ) );
-
-		update_site_option( 'backwpup_cfg_maxlogs', absint( $_POST['maxlogs'] ) );
-		update_site_option( 'backwpup_cfg_gzlogs', ! empty( $_POST['gzlogs'] ) );
-		update_site_option( 'backwpup_cfg_protectfolders', ! empty( $_POST['protectfolders'] ) );
-
-		$_POST['jobrunauthkey'] = preg_replace( '/[^a-zA-Z0-9]/', '', trim( $_POST['jobrunauthkey'] ) );
-
-		update_site_option( 'backwpup_cfg_jobrunauthkey', $_POST['jobrunauthkey'] );
-
-		$_POST['logfolder'] = trailingslashit(
-			str_replace( '\\', '/', trim( stripslashes( sanitize_text_field( $_POST['logfolder'] ) ) ) )
-		);
-
-		//set def. folders
-		if ( empty( $_POST['logfolder'] ) || $_POST['logfolder'] === '/' ) {
-			delete_site_option( 'backwpup_cfg_logfolder' );
-			BackWPup_Option::default_site_options();
-		} else {
-			update_site_option( 'backwpup_cfg_logfolder', $_POST['logfolder'] );
+		if ( isset( $_POST['loglevel'] ) && in_array( $_POST['loglevel'], [ 'normal_translated', 'normal', 'debug_translated', 'debug' ], true ) ) {
+			$new_options['backwpup_cfg_loglevel'] = sanitize_text_field( wp_unslash( $_POST['loglevel'] ) );
 		}
 
-		$authentication = get_site_option(
-			'backwpup_cfg_authentication',
-			array(
-				'method' => '',
-				'basic_user' => '',
-				'basic_password' => '',
-				'user_id' => 0,
-				'query_arg' => '',
-			)
-		);
-		$authentication['method'] = ( in_array(
-			$_POST['authentication_method'],
-			array( 'user', 'basic', 'query_arg' ),
-			true
-		) ) ? $_POST['authentication_method'] : '';
-		$authentication['basic_user'] = sanitize_text_field( $_POST['authentication_basic_user'] );
-		$authentication['basic_password'] = BackWPup_Encryption::encrypt(
-			(string) $_POST['authentication_basic_password']
-		);
-		$authentication['query_arg'] = sanitize_text_field( $_POST['authentication_query_arg'] );
-		$authentication['user_id'] = absint( $_POST['authentication_user_id'] );
-		update_site_option( 'backwpup_cfg_authentication', $authentication );
-		delete_site_transient( 'backwpup_cookies' );
+		if ( isset( $_POST['jobwaittimems'] ) && is_numeric( $_POST['jobwaittimems'] ) ) {
+			$new_options['backwpup_cfg_jobwaittimems'] = absint( $_POST['jobwaittimems'] );
+		}
 
-        update_site_option('backwpup_cfg_keepplugindata', !empty($_POST['keepplugindata']));
+		// As jobdooutput and windows are checkbox, check another field to know if they are checked.
+		if ( isset( $_POST['jobwaittimems'] ) ) {
+			$new_options['backwpup_cfg_jobdooutput'] = ! empty( $_POST['jobdooutput'] );
+			$new_options['backwpup_cfg_windows']     = ! empty( $_POST['windows'] );
+		}
 
-        do_action('backwpup_page_settings_save');
+		if ( isset( $_POST['maxlogs'] ) && is_numeric( $_POST['maxlogs'] ) ) {
+			$new_options['backwpup_cfg_maxlogs'] = absint( $_POST['maxlogs'] );
+		}
 
-        BackWPup_Admin::message(__('Settings saved', 'backwpup'));
-    }
+		$new_options['backwpup_cfg_gzlogs'] = ! empty( $_POST['gzlogs'] );
 
+		if ( isset( $_POST['jobrunauthkey'] ) ) {
+			$new_options['backwpup_cfg_jobrunauthkey'] = preg_replace( '/[^a-zA-Z0-9]/', '', trim( (string) sanitize_text_field( wp_unslash( $_POST['jobrunauthkey'] ) ) ) );
+		}
+
+		if ( isset( $_POST['logfolder'] ) ) {
+			try {
+				$new_options['backwpup_cfg_logfolder'] = trailingslashit(
+					BackWPup_File::normalize_path( BackWPup_Path_Fixer::slashify( sanitize_text_field( wp_unslash( $_POST['logfolder'] ) ) ) )
+				);
+			} catch ( InvalidArgumentException $e ) {
+				delete_site_option( 'backwpup_cfg_logfolder' );
+				BackWPup_Option::default_site_options();
+			}
+		}
+
+		if ( isset( $_POST['authentication_method'] ) && in_array( $_POST['authentication_method'], [ '', 'user', 'basic', 'query_arg' ], true ) ) {
+			$authentication                             = get_site_option(
+				'backwpup_cfg_authentication',
+				[
+					'method'         => '',
+					'basic_user'     => '',
+					'basic_password' => '',
+					'user_id'        => 0,
+					'query_arg'      => '',
+				]
+			);
+			$authentication['method']                   = sanitize_text_field( wp_unslash( $_POST['authentication_method'] ) );
+			$authentication['basic_user']               = isset( $_POST['authentication_basic_user'] ) ? sanitize_text_field( wp_unslash( $_POST['authentication_basic_user'] ) ) : '';
+			$authentication['basic_password']           = isset( $_POST['authentication_basic_password'] ) ? BackWPup_Encryption::encrypt( (string) sanitize_text_field( wp_unslash( $_POST['authentication_basic_password'] ) ) ) : '';
+			$authentication['query_arg']                = isset( $_POST['authentication_query_arg'] ) ? sanitize_text_field( wp_unslash( $_POST['authentication_query_arg'] ) ) : '';
+			$authentication['user_id']                  = isset( $_POST['authentication_user_id'] ) ? absint( sanitize_text_field( wp_unslash( $_POST['authentication_user_id'] ) ) ) : 0;
+			$new_options['backwpup_cfg_authentication'] = $authentication;
+		}
+
+		$new_options['backwpup_cfg_keepplugindata'] = ! empty( $_POST['keepplugindata'] );
+
+		if ( isset( $_POST['mailaddresslog'] ) ) {
+			$emails = explode( ',', sanitize_text_field( wp_unslash( $_POST['mailaddresslog'] ) ) );
+			foreach ( $emails as $key => $email ) {
+				$emails[ $key ] = sanitize_email( trim( $email ) );
+				if ( ! is_email( $emails[ $key ] ) ) {
+					unset( $emails[ $key ] );
+				}
+			}
+			$new_options['backwpup_cfg_mailaddresslog'] = implode( ', ', $emails );
+		}
+
+		if ( isset( $_POST['mailaddresssenderlog'] ) ) {
+			$new_options['backwpup_cfg_mailaddresssenderlog'] = sanitize_email( wp_unslash( $_POST['mailaddresssenderlog'] ) );
+		}
+
+		// As mailerroronly is a checkbox, check another field to know if it is checked.
+		if ( isset( $_POST['loglevel'] ) ) {
+			$new_options['backwpup_cfg_mailerroronly'] = ! empty( $_POST['mailerroronly'] );
+		}
+
+		// Merge actual options with new ones.
+		$merged_options = array_merge( $current_options, $new_options );
+
+		// Update options.
+		foreach ( $merged_options as $option_name => $option_value ) {
+			update_site_option( $option_name, $option_value );
+		}
+
+		BackWPup_Admin::message( esc_html__( 'Settings saved', 'backwpup' ) );
+        // phpcs:enable
+	}
+
+	/**
+	 * Render the settings page.
+	 *
+	 * @return void
+	 */
 	public function page() {
-
 		?>
 		<div class="wrap" id="backwpup-page">
-			<h1>
-				<?php printf(
+				<h1>
+					<?php
+					printf(
+					// translators: %s: plugin name.
 					esc_html__( '%s &rsaquo; Settings', 'backwpup' ),
-					BackWPup::get_plugin_data( 'name' )
-				); ?>
+					esc_html( BackWPup::get_plugin_data( 'name' ) )
+					);
+					?>
 			</h1>
 			<?php
-			$tabs = array();
-			$tabs['general'] = esc_html__( 'General', 'backwpup' );
+			$tabs        = [];
 			$tabs['job'] = esc_html__( 'Jobs', 'backwpup' );
 			if ( BackWPup::is_pro() ) {
 				$tabs['encryption'] = esc_html__( 'Encryption', 'backwpup' );
 			}
-			$tabs['log'] = esc_html__( 'Logs', 'backwpup' );
-			$tabs['net'] = esc_html__( 'Network', 'backwpup' );
-			$tabs['apikey'] = esc_html__( 'API Keys', 'backwpup' );
+			$tabs['log']         = esc_html__( 'Logs', 'backwpup' );
+			$tabs['net']         = esc_html__( 'Network', 'backwpup' );
+			$tabs['apikey']      = esc_html__( 'API Keys', 'backwpup' );
 			$tabs['information'] = esc_html__( 'Information', 'backwpup' );
-            if (BackWPup::is_pro()) {
-                $tabs['license'] = esc_html__('License', 'backwpup');
-            }
-			$tabs = apply_filters( 'backwpup_page_settings_tab', $tabs );
+			if ( BackWPup::is_pro() ) {
+				$tabs['license'] = esc_html__( 'License', 'backwpup' );
+			}
+			$tabs = wpm_apply_filters_typed( 'array', 'backwpup_page_settings_tab', $tabs );
 			echo '<h2 class="nav-tab-wrapper">';
+
 			foreach ( $tabs as $id => $name ) {
-				echo '<a href="#backwpup-tab-' . esc_attr( $id ) . '" class="nav-tab">' . esc_attr( $name ) . '</a>';
+				echo '<a href="#backwpup-tab-' . esc_attr( $id ) . '" class="nav-tab">' . esc_html( $name ) . '</a>';
 			}
 			echo '</h2>';
 			BackWPup_Admin::display_messages();
 			?>
 
-			<form id="settingsform" action="<?php echo admin_url( 'admin-post.php' ); ?>" method="post">
+			<form id="settingsform" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post">
 				<?php wp_nonce_field( 'backwpupsettings_page' ); ?>
-				<?php wp_nonce_field( 'backwpup_ajax_nonce', 'backwpupajaxnonce', false ) ?>
+				<?php wp_nonce_field( 'backwpup_ajax_nonce', 'backwpupajaxnonce', false ); ?>
 				<input type="hidden" name="page" value="backwpupsettings"/>
 				<input type="hidden" name="action" value="backwpup"/>
-				<input type="hidden" name="anchor" value="#backwpup-tab-general"/>
-
-				<div class="table ui-tabs-hide" id="backwpup-tab-general">
-
-					<h3 class="title"><?php esc_html_e( 'Display Settings', 'backwpup' ); ?></h3>
-					<p><?php _e( 'Do you want to see BackWPup in the WordPress admin bar?', 'backwpup' ); ?></p>
-					<table class="form-table">
-						<tr>
-							<th scope="row"><?php esc_html_e( 'Admin bar', 'backwpup' ); ?></th>
-							<td>
-								<fieldset>
-									<legend class="screen-reader-text">
-										<span>
-											<?php esc_html_e( 'Admin Bar', 'backwpup' ); ?>
-										</span>
-									</legend>
-									<label for="showadminbarmenu">
-										<input name="showadminbarmenu" type="checkbox" id="showadminbarmenu"
-										       value="1" <?php checked(
-											get_site_option( 'backwpup_cfg_showadminbar' ),
-											true
-										); ?> />
-										<?php esc_html_e( 'Show BackWPup links in admin bar.', 'backwpup' ); ?>
-									</label>
-								</fieldset>
-							</td>
-						</tr>
-						<tr>
-							<th scope="row"><?php esc_html_e( 'Folder sizes', 'backwpup' ); ?></th>
-							<td>
-								<fieldset>
-									<legend class="screen-reader-text">
-										<span>
-											<?php esc_html_e( 'Folder sizes', 'backwpup' ); ?>
-										</span>
-									</legend>
-									<label for="showfoldersize">
-										<input name="showfoldersize" type="checkbox" id="showfoldersize"
-										       value="1" <?php checked(
-											get_site_option( 'backwpup_cfg_showfoldersize' ),
-											true
-										); ?> />
-										<?php esc_html_e(
-											'Display folder sizes in the files tab when editing a job. (Might increase loading time of files tab.)',
-											'backwpup'
-										); ?>
-									</label>
-								</fieldset>
-							</td>
-						</tr>
-					</table>
-					<h3 class="title"><?php esc_html_e( 'Security', 'backwpup' ); ?></h3>
-					<p><?php _e( 'Security option for BackWPup', 'backwpup' ); ?></p>
-					<table class="form-table">
-						<tr>
-							<th scope="row"><?php esc_html_e( 'Protect folders', 'backwpup' ); ?></th>
-							<td>
-								<fieldset>
-									<legend class="screen-reader-text">
-										<span>
-											<?php esc_html_e( 'Protect folders', 'backwpup' ); ?>
-										</span>
-									</legend>
-									<label for="protectfolders">
-										<input name="protectfolders" type="checkbox" id="protectfolders"
-										       value="1" <?php checked(
-											get_site_option( 'backwpup_cfg_protectfolders' ),
-											true
-										); ?> />
-										<?php echo wp_kses(
-											__(
-												'Protect BackWPup folders ( Temp, Log and Backups ) with <code>.htaccess</code> and <code>index.php</code>',
-												'backwpup'
-											),
-											array( 'code' => array() )
-										); ?>
-									</label>
-								</fieldset>
-							</td>
-						</tr>
-					</table>
-
-                    <table class="form-table">
-                        <tr>
-                            <th scope="row"><?php esc_html_e('Plugin data', 'backwpup'); ?></th>
-                            <td>
-                                <fieldset>
-                                    <legend class="screen-reader-text">
-											<span>
-												<?php esc_html_e('Keep plugin data', 'backwpup'); ?>
-											</span>
-                                    </legend>
-                                    <label for="keepplugindata">
-                                        <input name="keepplugindata" type="checkbox"
-                                               id="keepplugindata"
-                                               value="1" <?php checked(
-                                            get_site_option('backwpup_cfg_keepplugindata'),
-                                            true
-                                        ); ?> />
-                                        <?php esc_html_e(
-                                            'Keep BackWPup data stored in the database after uninstall',
-                                            'backwpup'
-                                        ); ?>
-                                    </label>
-                                </fieldset>
-                            </td>
-                        </tr>
-                    </table>
-					<?php do_action( 'backwpup_page_settings_tab_generel' ); ?>
-				</div>
+				<input type="hidden" name="anchor" value="#backwpup-tab-job"/>
 
 				<div class="table ui-tabs-hide" id="backwpup-tab-log">
 					<p>
-						<?php esc_html_e(
-							'Every time BackWPup runs a backup job, a log file is being generated. Choose where to store your log files and how many of them.',
-							'backwpup'
-						); ?>
+						<?php
+						esc_html_e(
+						'Every time BackWPup runs a backup job, a log file is being generated. Choose where to store your log files and how many of them.',
+						'backwpup'
+						);
+						?>
 					</p>
 					<table class="form-table">
 						<tr>
@@ -651,22 +645,31 @@ class BackWPup_Page_Settings
 								</label>
 							</th>
 							<td>
-								<input name="logfolder" type="text" id="logfolder" value="<?php echo esc_attr(
-									get_site_option( 'backwpup_cfg_logfolder' )
-								); ?>" class="regular-text code"/>
+								<input name="logfolder" type="text" id="logfolder" value="
+								<?php
+								echo esc_attr(
+								get_site_option( 'backwpup_cfg_logfolder' )
+																							);
+								?>
+		" class="regular-text code"/>
 								<p class="description">
-									<?php printf(
-										wp_kses(
-											__(
-												'You can use absolute or relative path! Relative path is relative to %s.',
-												'backwpup'
-											),
-											array( 'code' => array() )
-										),
-										'<code>' . trailingslashit(
-											str_replace( '\\', '/', WP_CONTENT_DIR )
+									<?php
+									printf(
+									wp_kses(
+									/* translators: %s: WordPress content directory path. */
+									__(
+									'You can use absolute or relative path! Relative path is relative to %s.',
+									'backwpup'
+									),
+									[ 'code' => [] ]
+									),
+										'<code>' . esc_html(
+											trailingslashit(
+												str_replace( '\\', '/', (string) WP_CONTENT_DIR )
+											)
 										) . '</code>'
-									); ?>
+									);
+									?>
 								</p>
 							</td>
 						</tr>
@@ -678,30 +681,14 @@ class BackWPup_Page_Settings
 							</th>
 							<td>
 								<input name="maxlogs" type="number" min="0" step="1" id="maxlogs"
-								       value="<?php echo absint(
-									       get_site_option( 'backwpup_cfg_maxlogs' )
-								       ); ?>" class="small-text"/>
+										value="
+										<?php
+										echo absint(
+										get_site_option( 'backwpup_cfg_maxlogs' )
+												);
+										?>
+		" class="small-text"/>
 								<?php esc_html_e( 'Maximum log files in folder.', 'backwpup' ); ?>
-							</td>
-						</tr>
-						<tr>
-							<th scope="row"><?php esc_html_e( 'Compression', 'backwpup' ); ?></th>
-							<td>
-								<fieldset>
-									<legend class="screen-reader-text"><span><?php _e(
-												'Compression',
-												'backwpup'
-											); ?></span></legend>
-									<label for="gzlogs">
-										<input name="gzlogs" type="checkbox" id="gzlogs" value="1" <?php checked(
-											get_site_option( 'backwpup_cfg_gzlogs' ),
-											true
-										); ?><?php if ( ! function_exists( 'gzopen' ) ) {
-											echo ' disabled="disabled"';
-										} ?> />
-										<?php esc_html_e( 'Compress log files with GZip.', 'backwpup' ); ?>
-									</label>
-								</fieldset>
 							</td>
 						</tr>
 						<tr>
@@ -715,29 +702,47 @@ class BackWPup_Page_Settings
 									</legend>
 									<label for="loglevel">
 										<select name="loglevel" size="1">
-											<option value="normal_translated" <?php selected(
-												get_site_option( 'backwpup_cfg_loglevel', 'normal_translated' ),
-												'normal_translated'
-											); ?>><?php esc_html_e( 'Normal (translated)', 'backwpup' ); ?></option>
-											<option value="normal" <?php selected(
-												get_site_option( 'backwpup_cfg_loglevel' ),
-												'normal'
-											); ?>><?php esc_html_e( 'Normal (not translated)', 'backwpup' ); ?></option>
-											<option value="debug_translated" <?php selected(
-												get_site_option( 'backwpup_cfg_loglevel' ),
-												'debug_translated'
-											); ?>><?php _e( 'Debug (translated)', 'backwpup' ); ?></option>
-											<option value="debug" <?php selected(
-												get_site_option( 'backwpup_cfg_loglevel' ),
-												'debug'
-											); ?>><?php esc_html_e( 'Debug (not translated)', 'backwpup' ); ?></option>
+											<option value="normal_translated"
+											<?php
+											selected(
+											get_site_option( 'backwpup_cfg_loglevel', 'normal_translated' ),
+											'normal_translated'
+																				);
+											?>
+		><?php esc_html_e( 'Normal (translated)', 'backwpup' ); ?></option>
+											<option value="normal"
+											<?php
+											selected(
+											get_site_option( 'backwpup_cfg_loglevel' ),
+											'normal'
+																	);
+											?>
+		><?php esc_html_e( 'Normal (not translated)', 'backwpup' ); ?></option>
+											<option value="debug_translated"
+											<?php
+											selected(
+											get_site_option( 'backwpup_cfg_loglevel' ),
+											'debug_translated'
+																			);
+											?>
+		><?php esc_html_e( 'Debug (translated)', 'backwpup' ); ?></option>
+											<option value="debug"
+											<?php
+											selected(
+											get_site_option( 'backwpup_cfg_loglevel' ),
+											'debug'
+											);
+											?>
+		><?php esc_html_e( 'Debug (not translated)', 'backwpup' ); ?></option>
 										</select>
 									</label>
 									<p class="description">
-										<?php esc_html_e(
-											'Debug log has much more information than normal logs. It is for support and should be handled carefully. For support is the best to use a not translated log file. Usage of not translated logs can reduce the PHP memory usage too.',
-											'backwpup'
-										); ?>
+										<?php
+										esc_html_e(
+										'Debug log has much more information than normal logs. It is for support and should be handled carefully. For support is the best to use a not translated log file. Usage of not translated logs can reduce the PHP memory usage too.',
+										'backwpup'
+										);
+										?>
 									</p>
 								</fieldset>
 							</td>
@@ -747,25 +752,24 @@ class BackWPup_Page_Settings
 				</div>
 				<div class="table ui-tabs-hide" id="backwpup-tab-job">
 
-					<p><?php _e(
-							'There are a couple of general options for backup jobs. Set them here.',
-							'backwpup'
-						); ?></p>
+					<p>
+					<?php
+					esc_html_e(
+					'There are a couple of general options for backup jobs. Set them here.',
+					'backwpup'
+					);
+					?>
+		</p>
 					<table class="form-table">
 						<tr>
 							<th scope="row">
 								<label for="jobstepretry">
-									<?php esc_html_e(
-										"Maximum number of retries for job steps",
-										'backwpup'
-									); ?>
+									<?php esc_html_e( 'Maximum number of retries for job steps', 'backwpup' ); ?>
 								</label>
 							</th>
 							<td>
 								<input name="jobstepretry" type="number" min="1" step="1" max="99" id="jobstepretry"
-								       value="<?php echo absint(
-									       get_site_option( 'backwpup_cfg_jobstepretry' )
-								       ); ?>" class="small-text"/>
+										value="<?php echo absint( get_site_option( 'backwpup_cfg_jobstepretry' ) ); ?>" class="small-text"/>
 							</td>
 						</tr>
 						<tr>
@@ -779,16 +783,18 @@ class BackWPup_Page_Settings
 									</legend>
 									<label for="jobmaxexecutiontime">
 										<input name="jobmaxexecutiontime" type="number" min="0" step="1" max="300"
-										       id="jobmaxexecutiontime" value="<?php echo absint(
-											get_site_option( 'backwpup_cfg_jobmaxexecutiontime' )
-										); ?>" class="small-text"/>
-										<?php _e( 'seconds.', 'backwpup' ); ?>
+												id="jobmaxexecutiontime" value="<?php echo absint( get_site_option( 'backwpup_cfg_jobmaxexecutiontime' ) ); ?>" class="small-text"/>
+										<?php esc_html_e( 'seconds.', 'backwpup' ); ?>
 										<p class="description">
-											<?php echo wp_kses( __(
-												'Job will restart before hitting maximum execution time. Restarts will be disabled on CLI usage. If <code>ALTERNATE_WP_CRON</code> has been defined, WordPress Cron will be used for restarts, so it can take a while. 0 means no maximum.',
-												'backwpup'
+											<?php
+											echo wp_kses(
+											__(
+											'Job will restart before hitting maximum execution time. Restarts will be disabled on CLI usage. If <code>ALTERNATE_WP_CRON</code> has been defined, WordPress Cron will be used for restarts, so it can take a while. 0 means no maximum.',
+											'backwpup'
 											),
-												array( 'code' => array() ) ); ?>
+											[ 'code' => [] ]
+											);
+											?>
 										</p>
 									</label>
 								</fieldset>
@@ -801,14 +807,20 @@ class BackWPup_Page_Settings
 								</label>
 							</th>
 							<td>
-								<input name="jobrunauthkey" type="text" id="jobrunauthkey" value="<?php echo esc_attr(
-									get_site_option( 'backwpup_cfg_jobrunauthkey' )
-								); ?>" class="text code"/>
+								<input name="jobrunauthkey" type="text" id="jobrunauthkey" value="
+								<?php
+								echo esc_attr(
+								get_site_option( 'backwpup_cfg_jobrunauthkey' )
+																									);
+								?>
+		" class="text code"/>
 								<p class="description">
-									<?php esc_html_e(
-										'Will be used to protect job starts from unauthorized person.',
-										'backwpup'
-									); ?>
+									<?php
+									esc_html_e(
+									'Will be used to protect job starts from unauthorized person.',
+									'backwpup'
+									);
+									?>
 								</p>
 							</td>
 						</tr>
@@ -818,34 +830,52 @@ class BackWPup_Page_Settings
 								<fieldset>
 									<legend class="screen-reader-text">
 										<span>
-											<?php _e( 'Reduce server load', 'backwpup' ); ?>
+											<?php esc_html_e( 'Reduce server load', 'backwpup' ); ?>
 										</span>
 									</legend>
 									<label for="jobwaittimems">
 										<select name="jobwaittimems" size="1">
-											<option value="0" <?php selected(
-												get_site_option( 'backwpup_cfg_jobwaittimems' ),
-												0
-											); ?>><?php esc_html_e( 'disabled', 'backwpup' ); ?></option>
-											<option value="10000" <?php selected(
-												get_site_option( 'backwpup_cfg_jobwaittimems' ),
-												10000
-											); ?>><?php esc_html_e( 'minimum', 'backwpup' ); ?></option>
-											<option value="30000" <?php selected(
-												get_site_option( 'backwpup_cfg_jobwaittimems' ),
-												30000
-											); ?>><?php esc_html_e( 'medium', 'backwpup' ); ?></option>
-											<option value="90000" <?php selected(
-												get_site_option( 'backwpup_cfg_jobwaittimems' ),
-												90000
-											); ?>><?php esc_html_e( 'maximum', 'backwpup' ); ?></option>
+											<option value="0" 
+											<?php
+											selected(
+											get_site_option( 'backwpup_cfg_jobwaittimems' ),
+											0
+																);
+											?>
+		><?php esc_html_e( 'disabled', 'backwpup' ); ?></option>
+											<option value="10000" 
+											<?php
+											selected(
+											get_site_option( 'backwpup_cfg_jobwaittimems' ),
+											10000
+																	);
+											?>
+		><?php esc_html_e( 'minimum', 'backwpup' ); ?></option>
+											<option value="30000" 
+											<?php
+											selected(
+											get_site_option( 'backwpup_cfg_jobwaittimems' ),
+											30000
+																	);
+											?>
+		><?php esc_html_e( 'medium', 'backwpup' ); ?></option>
+											<option value="90000" 
+											<?php
+											selected(
+											get_site_option( 'backwpup_cfg_jobwaittimems' ),
+											90000
+																	);
+											?>
+		><?php esc_html_e( 'maximum', 'backwpup' ); ?></option>
 										</select>
 									</label>
 									<p class="description">
-										<?php esc_html_e(
-											'This adds short pauses to the process. Can be used to reduce the CPU load.',
-											'backwpup'
-										); ?>
+										<?php
+										esc_html_e(
+										'This adds short pauses to the process. Can be used to reduce the CPU load.',
+										'backwpup'
+										);
+										?>
 									</p>
 								</fieldset>
 							</td>
@@ -856,25 +886,33 @@ class BackWPup_Page_Settings
 								<fieldset>
 									<legend class="screen-reader-text">
 										<span>
-											<?php esc_html_e(
-												'Enable an empty Output on backup working.',
-												'backwpup'
-											); ?>
+											<?php
+											esc_html_e(
+											'Enable an empty Output on backup working.',
+											'backwpup'
+											);
+											?>
 										</span>
 									</legend>
 									<label for="jobdooutput">
 										<input name="jobdooutput" type="checkbox" id="jobdooutput"
-										       value="1" <?php checked(
-											get_site_option( 'backwpup_cfg_jobdooutput' ),
-											true
-										); ?> />
+												value="1" 
+												<?php
+												checked(
+												get_site_option( 'backwpup_cfg_jobdooutput' ),
+												true
+														);
+												?>
+		/>
 										<?php esc_html_e( 'Enable an empty Output on backup working.', 'backwpup' ); ?>
 									</label>
 									<p class="description">
-										<?php esc_html_e(
-											'This do an empty output on job working. This can help in some situations or can break the working. You must test it.',
-											'backwpup'
-										); ?>
+										<?php
+										esc_html_e(
+										'This do an empty output on job working. This can help in some situations or can break the working. You must test it.',
+										'backwpup'
+										);
+										?>
 									</p>
 								</fieldset>
 							</td>
@@ -885,25 +923,35 @@ class BackWPup_Page_Settings
 								<fieldset>
 									<legend class="screen-reader-text">
 										<span>
-											<?php esc_html_e(
-												'Enable compatibility with IIS on Windows.',
-												'backwpup'
-											); ?>
+											<?php
+											esc_html_e(
+											'Enable compatibility with IIS on Windows.',
+											'backwpup'
+											);
+											?>
 										</span>
 									</legend>
 									<label for="windows">
-										<input name="windows" type="checkbox" id="windows" value="1"<?php checked(
-											get_site_option( 'backwpup_cfg_windows' ),
-											true
-										) ?> />
+										<input name="windows" type="checkbox" id="windows" value="1"
+										<?php
+										checked(
+										get_site_option( 'backwpup_cfg_windows' ),
+										true
+																									);
+										?>
+		/>
 										<?php esc_html_e( 'Enable compatibility with IIS on Windows.', 'backwpup' ); ?>
 									</label>
 									<p class="description">
-										<?php echo wp_kses( __(
-											'There is a PHP bug (<a href="https://bugs.php.net/43817">bug #43817</a>), which is triggered on some versions of Windows and IIS. Checking this box will enable a workaround for that bug. Only enable if you are getting errors about &ldquo;Permission denied&rdquo; in your logs.',
-											'backwpup'
+										<?php
+										echo wp_kses(
+										__(
+										'There is a PHP bug (<a href="https://bugs.php.net/43817">bug #43817</a>), which is triggered on some versions of Windows and IIS. Checking this box will enable a workaround for that bug. Only enable if you are getting errors about &ldquo;Permission denied&rdquo; in your logs.',
+										'backwpup'
 										),
-											array( 'a' => array() ) ) ?>
+										[ 'a' => [] ]
+										);
+										?>
 									</p>
 								</fieldset>
 							</td>
@@ -913,7 +961,6 @@ class BackWPup_Page_Settings
 				</div>
 
 				<?php
-				/** @var SettingTab $setting */
 				foreach ( $this->settings_views as $setting ) {
 					$setting->tab();
 				}
@@ -922,29 +969,36 @@ class BackWPup_Page_Settings
 				<div class="table ui-tabs-hide" id="backwpup-tab-net">
 
 					<h3>
-						<?php printf(
-							wp_kses(
-								__( 'Authentication for <code>%s</code>', 'backwpup' ),
-								array( 'code' => array() )
-							),
-							site_url( 'wp-cron.php' )
-						); ?>
+						<?php
+						printf(
+						wp_kses(
+						/* translators: %s: wp-cron.php URL. */
+						__( 'Authentication for <code>%s</code>', 'backwpup' ),
+						[ 'code' => [] ]
+						),
+							esc_url( site_url( 'wp-cron.php' ) )
+						);
+						?>
 					</h3>
 					<p>
-						<?php esc_html_e(
-							'If you protected your blog with HTTP basic authentication (.htaccess), or you use a Plugin to secure wp-cron.php, then use the authentication methods below.',
-							'backwpup'
-						); ?>
+						<?php
+						esc_html_e(
+						'If you protected your blog with HTTP basic authentication (.htaccess), or you use a Plugin to secure wp-cron.php, then use the authentication methods below.',
+						'backwpup'
+						);
+						?>
 					</p>
 					<?php
-					$authentication = get_site_option( 'backwpup_cfg_authentication',
-						array(
-							'method' => '',
-							'basic_user' => '',
-							'basic_password' => '',
-							'user_id' => 0,
-							'query_arg' => '',
-						) );
+					$authentication = get_site_option(
+					'backwpup_cfg_authentication',
+					[
+						'method'         => '',
+						'basic_user'     => '',
+						'basic_password' => '',
+						'user_id'        => 0,
+						'query_arg'      => '',
+					]
+					);
 					?>
 					<table class="form-table">
 						<tr>
@@ -958,89 +1012,134 @@ class BackWPup_Page_Settings
 									</legend>
 									<label for="authentication_method">
 										<select name="authentication_method" id="authentication_method" size="1">
-											<option value="" <?php selected(
-												$authentication['method'],
-												''
-											); ?>><?php esc_html_e( 'none', 'backwpup' ); ?></option>
-											<option value="basic" <?php selected(
-												$authentication['method'],
-												'basic'
-											); ?>><?php esc_html_e( 'Basic auth', 'backwpup' ); ?></option>
-											<option value="user" <?php selected(
-												$authentication['method'],
-												'user'
-											); ?>><?php esc_html_e( 'WordPress User', 'backwpup' ); ?></option>
-											<option value="query_arg" <?php selected(
-												$authentication['method'],
-												'query_arg'
-											); ?>><?php esc_html_e( 'Query argument', 'backwpup' ); ?></option>
+											<option value="" 
+											<?php
+											selected(
+											$authentication['method'],
+											''
+															);
+											?>
+				><?php esc_html_e( 'none', 'backwpup' ); ?></option>
+											<option value="basic" 
+											<?php
+											selected(
+											$authentication['method'],
+											'basic'
+																	);
+											?>
+				><?php esc_html_e( 'Basic auth', 'backwpup' ); ?></option>
+											<option value="user" 
+											<?php
+											selected(
+											$authentication['method'],
+											'user'
+																);
+											?>
+				><?php esc_html_e( 'WordPress User', 'backwpup' ); ?></option>
+											<option value="query_arg" 
+											<?php
+											selected(
+											$authentication['method'],
+											'query_arg'
+																		);
+											?>
+				><?php esc_html_e( 'Query argument', 'backwpup' ); ?></option>
 										</select>
 									</label>
 								</fieldset>
 							</td>
 						</tr>
-						<tr class="authentication_basic" <?php if ( $authentication['method'] !== 'basic' ) {
-							echo 'style="display:none"';
-						} ?>>
+						<tr class="authentication_basic"
+						<?php
+						if ( 'basic' !== $authentication['method'] ) {
+							echo 'style="' . esc_attr( 'display:none' ) . '"';
+						}
+						?>
+				>
 							<th scope="row">
 								<label for="authentication_basic_user">
-									<?php esc_html_e(
-										'Basic Auth Username:',
-										'backwpup'
-									); ?>
+									<?php
+									esc_html_e(
+									'Basic Auth Username:',
+									'backwpup'
+									);
+									?>
 								</label>
 							</th>
 							<td>
 								<input name="authentication_basic_user" type="text" id="authentication_basic_user"
-								       value="<?php echo esc_attr(
-									       $authentication['basic_user']
-								       ); ?>" class="regular-text" autocomplete="off"/>
+										value="
+										<?php
+										echo esc_attr(
+										$authentication['basic_user']
+												);
+										?>
+				" class="regular-text" autocomplete="off"/>
 							</td>
 						</tr>
-						<tr class="authentication_basic" <?php if ( $authentication['method'] !== 'basic' ) {
-							echo 'style="display:none"';
-						} ?>>
+						<tr class="authentication_basic"
+						<?php
+						if ( 'basic' !== $authentication['method'] ) {
+							echo 'style="' . esc_attr( 'display:none' ) . '"';
+						}
+						?>
+				>
 							<th scope="row">
 								<label for="authentication_basic_password">
-									<?php esc_html_e(
-										'Basic Auth Password:',
-										'backwpup'
-									); ?>
+									<?php
+									esc_html_e(
+									'Basic Auth Password:',
+									'backwpup'
+									);
+									?>
 								</label>
 							</th>
 							<td>
 								<input name="authentication_basic_password" type="password"
-								       id="authentication_basic_password" value="<?php echo esc_attr(
-									BackWPup_Encryption::decrypt( $authentication['basic_password'] )
-								); ?>" class="regular-text" autocomplete="off"/>
+										id="authentication_basic_password" value="
+										<?php
+										echo esc_attr(
+										BackWPup_Encryption::decrypt( $authentication['basic_password'] )
+																				);
+										?>
+				" class="regular-text" autocomplete="off"/>
 						</tr>
-						<tr class="authentication_user" <?php if ( $authentication['method'] !== 'user' ) {
-							echo 'style="display:none"';
-						} ?>>
-							<th scope="row"><?php _e( 'Select WordPress User', 'backwpup' ); ?></th>
+						<tr class="authentication_user"
+						<?php
+						if ( 'user' !== $authentication['method'] ) {
+							echo 'style="' . esc_attr( 'display:none' ) . '"';
+						}
+						?>
+				>
+							<th scope="row"><?php esc_html_e( 'Select WordPress User', 'backwpup' ); ?></th>
 							<td>
 								<fieldset>
-									<legend class="screen-reader-text"><span><?php esc_html_e(
-												'Select WordPress User',
-												'backwpup'
-											); ?></span>
+									<legend class="screen-reader-text"><span>
+									<?php
+									esc_html_e(
+									'Select WordPress User',
+									'backwpup'
+																			);
+									?>
+				</span>
 									</legend>
 									<label for="authentication_user_id">
 										<select name="authentication_user_id" size="1">
 											<?php
 											$users = get_users(
-												array(
-													'role' => 'administrator',
-													'number' => 99,
-													'orderby' => 'display_name',
-												)
+											[
+												'role'    => 'administrator',
+												'number'  => 99,
+												'orderby' => 'display_name',
+											]
 											);
+
 											foreach ( $users as $user ) {
-												echo '<option value="' . $user->ID . '" ' . selected(
-														$authentication['user_id'],
-														$user->ID,
-														false
-													) . '>' . esc_attr( $user->display_name ) . '</option>';
+												echo '<option value="' . esc_attr( $user->ID ) . '" ' . selected(
+													$authentication['user_id'],
+													$user->ID,
+													false
+																					) . '>' . esc_html( $user->display_name ) . '</option>';
 											}
 											?>
 										</select>
@@ -1048,22 +1147,32 @@ class BackWPup_Page_Settings
 								</fieldset>
 							</td>
 						</tr>
-						<tr class="authentication_query_arg" <?php if ( $authentication['method'] != 'query_arg' ) {
-							echo 'style="display:none"';
-						} ?>>
+						<tr class="authentication_query_arg"
+						<?php
+						if ( 'query_arg' !== $authentication['method'] ) {
+							echo 'style="' . esc_attr( 'display:none' ) . '"';
+						}
+						?>
+		>
 							<th scope="row">
 								<label for="authentication_query_arg">
-									<?php esc_html_e(
-										'Query arg key=value:',
-										'backwpup'
-									); ?>
+									<?php
+									esc_html_e(
+									'Query arg key=value:',
+									'backwpup'
+									);
+									?>
 								</label>
 							</th>
 							<td>
 								?<input name="authentication_query_arg" type="text" id="authentication_query_arg"
-								        value="<?php echo esc_attr(
-									        $authentication['query_arg']
-								        ); ?>" class="regular-text"/>
+										value="
+										<?php
+										echo esc_attr(
+										$authentication['query_arg']
+												);
+										?>
+		" class="regular-text"/>
 							</td>
 						</tr>
 					</table>
@@ -1081,162 +1190,184 @@ class BackWPup_Page_Settings
 					<p>
 						<?php
 						esc_html_e(
-							'Experiencing an issue and need to contact BackWPup support? Click the link below to get debug information you can send to us.',
-							'backwpup'
-						)
+						'Experiencing an issue and need to contact BackWPup support? Click the link below to get debug information you can send to us.',
+						'backwpup'
+						);
 						?>
 					</p>
 					<p>
 						<a href="#TB_inline?height=440&width=630&inlineId=tb-debug-info" id="debug-button"
-						   class="thickbox button button-primary" title="<?php esc_html_e(
-							"Debug Info",
-							"backwpup"
-						); ?>">
-							<?php _e( 'Get Debug Info', 'backwpup' ) ?>
+							class="thickbox button button-primary" title="
+							<?php
+							esc_html_e(
+							'Debug Info',
+							'backwpup'
+																			);
+							?>
+		">
+							<?php esc_html_e( 'Get Debug Info', 'backwpup' ); ?>
 						</a>
 					</p>
 
 					<div id="tb-debug-info" tabindex="-1" style="display: none;">
 						<?php ob_start(); ?>
 						<p>
-							<?php esc_html_e(
-								'You will find debug information below. Click the button to copy the debug info to send to support.',
-								'backwpup'
-							) ?>
+							<?php
+							esc_html_e(
+							'You will find debug information below. Click the button to copy the debug info to send to support.',
+							'backwpup'
+							);
+							?>
 						</p>
 						<p>
 							<?php
 							echo wp_kses(
 								__(
-									'<strong>Note</strong>: ' .
-									'Would you like faster, more streamlined support? Pro users can contact BackWPup from right within the plugin.',
+									'<strong>Note</strong>: Would you like faster, more streamlined support? Pro users can contact BackWPup from right within the plugin.',
 									'backwpup'
 								),
-								array( 'strong' => array() )
-							) ?>
-							<a href="<?php _e( 'https://backwpup.com', 'backwpup' ) ?>">
-								<?php _e( 'Get Pro', 'backwpup' ) ?>
+								[ 'strong' => [] ]
+							);
+							?>
+							<a href="<?php echo esc_url( __( 'https://backwpup.com', 'backwpup' ) ); ?>">
+								<?php esc_html_e( 'Get Pro', 'backwpup' ); ?>
 							</a>
 						</p>
 
 						<?php
 						$html = ob_get_clean();
-						echo apply_filters( 'backwpup_get_debug_info_text', $html );
+						// @todo: Find solution to avoid ignoring phpcs error here.
+						echo wp_kses_post( wpm_apply_filters_typed( 'string', 'backwpup_get_debug_info_text', $html ) );
 						?>
 
 						<p>
 							<a href="#" id="backwpup-copy-debug-info" data-clipboard-target="#backwpup-debug-info"
-							   class="button button-primary">
-								<?php _e( 'Copy Debug Info', 'backwpup' ) ?>
+								class="button button-primary">
+								<?php esc_html_e( 'Copy Debug Info', 'backwpup' ); ?>
 							</a>
 						</p>
 
 						<div class="inline" id="backwpup-copy-debug-info-success" style="display:none;">
-							<p><span class="dashicons dashicons-yes"></span><?php esc_html_e(
-									'Debug info copied to clipboard.',
-									'backwpup'
-								) ?></p>
+							<p><span class="dashicons dashicons-yes"></span>
+							<?php
+							esc_html_e(
+							'Debug info copied to clipboard.',
+							'backwpup'
+																			);
+							?>
+		</p>
 						</div>
 						<div class="inline" id="backwpup-copy-debug-info-error" style="display:none;">
 							<p>
 								<span class="dashicons dashicons-no"></span>
-								<?php esc_html_e(
-									'Could not copy debug info. You can simply press ctrl+C to copy it.',
-									'backwpup'
-								) ?>
+								<?php
+								esc_html_e(
+								'Could not copy debug info. You can simply press ctrl+C to copy it.',
+								'backwpup'
+								);
+								?>
 							</p>
 						</div>
 
 						<textarea id="backwpup-debug-info" readonly="readonly"
-						          style="width: 100%;height: 100%;overflow: scroll;"><?php
-							foreach ( $information as $item ) {
-								echo esc_html( $item['label'] ) . ': ' . esc_html( $item['value'] ) . "\n";
-							}
-							?></textarea>
+									style="width: 100%;height: 100%;overflow: scroll;">
+									<?php
+									foreach ( $information as $item ) {
+										echo esc_html( $item['label'] ) . ': ' . esc_html( $item['value'] ) . "\n";
+									}
+									?>
+							</textarea>
 					</div>
 
 					<script type="text/javascript">
-                        jQuery( document ).ready( function ( $ )
-                        {
-                            clipboard = new Clipboard( '#backwpup-copy-debug-info' );
+						jQuery( document ).ready( function ( $ )
+						{
+							clipboard = new Clipboard( '#backwpup-copy-debug-info' );
 
-                            clipboard.on( 'success', function ( e )
-                            {
-                                setTimeout(
-                                    function ()
-                                    {
-                                        $( '#backwpup-copy-debug-info-success' )
-                                            .attr( 'style', 'display:inline-block !important;color:green' );
-                                    },
-                                    300
-                                );
+							clipboard.on( 'success', function ( e )
+							{
+								setTimeout(
+									function ()
+									{
+										$( '#backwpup-copy-debug-info-success' )
+											.attr( 'style', 'display:inline-block !important;color:green' );
+									},
+									300
+								);
 
-                                setTimeout(
-                                    function ()
-                                    {
-                                        $( '#backwpup-copy-debug-info-success' )
-                                            .attr( 'style', 'display:none !important;' );
-                                    },
-                                    5000
-                                );
-                                e.clearSelection();
-                            } );
+								setTimeout(
+									function ()
+									{
+										$( '#backwpup-copy-debug-info-success' )
+											.attr( 'style', 'display:none !important;' );
+									},
+									5000
+								);
+								e.clearSelection();
+							} );
 
-                            clipboard.on( 'error', function ( e )
-                            {
-                                $( 'backwpup-copy-debug-info-error' )
-                                    .attr( 'style', 'display:inline-block !important;color:red' );
-                            } );
+							clipboard.on( 'error', function ( e )
+							{
+								$( 'backwpup-copy-debug-info-error' )
+									.attr( 'style', 'display:inline-block !important;color:red' );
+							} );
 
-                            $( '#debug-button' ).on( 'click', function ()
-                            {
-                                $( '#tb-debug-info' ).focus();
-                                //  $("#TB_ajaxWindowTitle").text("<?php _e( "Debug Info" );?>");
-                                $( '#TB_ajaxWindowTitle' ).text( 'WTF' );
-                            } );
-                        } );
+							$( '#debug-button' ).on( 'click', function ()
+							{
+								$( '#tb-debug-info' ).focus();
+								//  $("#TB_ajaxWindowTitle").text("<?php esc_html_e( 'Debug Info', 'backwpup' ); ?>");
+								$( '#TB_ajaxWindowTitle' ).text( 'WTF' );
+							} );
+						} );
 					</script>
 
 					<?php
 
 					echo '<table class="wp-list-table widefat fixed" cellspacing="0" style="width:100%;margin-left:auto;margin-right:auto;">';
-					echo '<thead><tr><th width="35%">' . __( 'Setting', 'backwpup' ) . '</th><th>' . __(
-							'Value',
-							'backwpup'
-						) . '</th></tr></thead>';
-					echo '<tfoot><tr><th>' . __( 'Setting', 'backwpup' ) . '</th><th>' . __(
-							'Value',
-							'backwpup'
-						) . '</th></tr></tfoot>';
+					echo '<thead><tr><th width="35%">' . esc_html__( 'Setting', 'backwpup' ) . '</th><th>' . esc_html__(
+					'Value',
+					'backwpup'
+					) . '</th></tr></thead>';
+					echo '<tfoot><tr><th>' . esc_html__( 'Setting', 'backwpup' ) . '</th><th>' . esc_html__(
+					'Value',
+					'backwpup'
+					) . '</th></tr></tfoot>';
+
 					foreach ( $information as $item ) {
 						echo "<tr>\n" .
-						     "<td>" . $item['label'] . "</td>\n" .
-						     "<td>" .
-						     ( isset( $item['html'] ) ? $item['html'] : esc_html( $item['value'] ) ) .
-						     "</td>\n" .
-						     "</tr>\n";
+							'<td>' . esc_html( $item['label'] ) . "</td>\n" .
+							'<td>' . ( isset( $item['html'] ) ? wp_kses_post( $item['html'] ) : esc_html( $item['value'] ) ) . "</td>\n" .
+							"</tr>\n";
 					}
-					echo '</table>'
+					echo '</table>';
 					?>
 				</div>
 
 				<?php do_action( 'backwpup_page_settings_tab_content' ); ?>
 
 				<p class="submit">
-					<input type="submit" name="submit" id="submit" class="button-primary" value="<?php esc_attr_e(
-						'Save Changes',
-						'backwpup'
-					); ?>"/>
+					<input type="submit" name="submit" id="submit" class="button-primary" value="
+					<?php
+					esc_attr_e(
+					'Save Changes',
+					'backwpup'
+																								);
+					?>
+		"/>
 					&nbsp;
 					<input type="submit" name="default_settings" id="default_settings" class="button-secondary"
-					       value="<?php esc_attr_e(
-						       'Reset all settings to default',
-						       'backwpup'
-					       ); ?>"/>
+							value="
+							<?php
+							esc_attr_e(
+							'Reset all settings to default',
+							'backwpup'
+									);
+							?>
+		"/>
 				</p>
 			</form>
 		</div>
 
-        <?php
-    }
+		<?php
+	}
 }

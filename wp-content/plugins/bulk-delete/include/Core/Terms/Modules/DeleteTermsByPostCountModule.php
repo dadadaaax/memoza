@@ -27,19 +27,18 @@ class DeleteTermsByPostCountModule extends TermsModule {
 		?>
 
 		<fieldset class="options">
-			<h4><?php _e( 'Select the taxonomy from which you want to delete terms', 'bulk-delete' ); ?></h4>
+			<h4><?php esc_html_e( 'Select the taxonomy from which you want to delete terms', 'bulk-delete' ); ?></h4>
 
 			<?php $this->render_taxonomy_dropdown(); ?>
 
-			<h4><?php _e( 'Choose your filtering options', 'bulk-delete' ); ?></h4>
+			<h4><?php esc_html_e( 'Choose your filtering options', 'bulk-delete' ); ?></h4>
 
-			<?php _e( 'Delete Terms if the post count is ', 'bulk-delete' ); ?>
+			<?php esc_html_e( 'Delete Terms if the post count is ', 'bulk-delete' ); ?>
 			<?php $this->render_number_comparison_operators(); ?>
 			<input type="number" name="smbd_<?php echo esc_attr( $this->field_slug ); ?>" placeholder="Post count" min="0">
 			<?php
-			$markup  = '';
-			$content = __( 'Post count is the number of posts that are assigned to a term.', 'bulk-delete' );
-			echo '&nbsp' . bd_generate_help_tooltip( $markup, $content );
+			echo '<p>' . esc_html__( 'Post count is the number of posts that are assigned to a term.', 'bulk-delete' ) . '</p>';
+			
 			?>
 		</fieldset>
 

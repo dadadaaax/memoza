@@ -28,6 +28,7 @@ class GuzzleHandler
     private static $validOptions = [
         'proxy'             => true,
         'expect'            => true,
+        'cert'              => true,
         'verify'            => true,
         'timeout'           => true,
         'debug'             => true,
@@ -43,16 +44,16 @@ class GuzzleHandler
     /**
      * @param ClientInterface $client
      */
-    public function __construct(ClientInterface $client = null)
+    public function __construct(?ClientInterface $client = null)
     {
         $this->client = $client ?: new Client();
     }
 
     /**
      * @param Psr7Request $request
-     * @param array       $options
-     *
-     * @return Promise\Promise
+     * @param array $options
+     * @return Promise\Promise|Promise\PromiseInterface
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function __invoke(Psr7Request $request, array $options = [])
     {

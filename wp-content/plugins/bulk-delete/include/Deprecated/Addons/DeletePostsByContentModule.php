@@ -21,7 +21,7 @@ class DeletePostsByContentModule extends DeprecatedModule {
 		$this->meta_box_slug = 'bd-posts-by-content';
 		$this->action        = 'bd_delete_posts_by_content';
 		$this->cron_hook     = '';
-		$this->scheduler_url = '';
+		$this->scheduler_url = 1;
 		$this->messages      = array(
 			'box_label'  => __( 'Delete Posts By Content', 'bulk-delete' ),
 			'scheduled'  => '',

@@ -13,20 +13,27 @@
  */
 class BackWPup_Encryption_Fallback {
 
-	const PREFIX = 'ENC1$';
+	public const PREFIX = 'ENC1$';
 
 	/**
-	 * @return bool
+	 * Encryption key.
+	 *
+	 * @var string
 	 */
-	public static function supported() {
-
-		/** @TODO: Should we inform the user about the security risk? and how? */
-		return true;
-	}
+	private $key;
 
 	/**
-	 * @param string $enc_key
-	 * @param string $key_type
+	 * Encryption key type.
+	 *
+	 * @var string
+	 */
+	private $key_type;
+
+	/**
+	 * Initialize the fallback encryptor.
+	 *
+	 * @param string $enc_key  Encryption key.
+	 * @param string $key_type Key type identifier.
 	 */
 	public function __construct( $enc_key, $key_type ) {
 		$this->key      = md5( (string) $enc_key );
@@ -34,58 +41,69 @@ class BackWPup_Encryption_Fallback {
 	}
 
 	/**
+	 * Check whether fallback encryption is supported.
 	 *
-	 * Encrypt a string (Passwords)
-	 *
-	 * @param string $string value to encrypt
-	 *
-	 * @return string encrypted string
+	 * @return bool
 	 */
-	public function encrypt( $string ) {
-
-		$result = '';
-		for ( $i = 0; $i < strlen( $string ); $i ++ ) {
-			$char     = substr( $string, $i, 1 );
-			$key_char = substr( $this->key, ( $i % strlen( $this->key ) ) - 1, 1 );
-			$char     = chr( ord( $char ) + ord( $key_char ) );
-			$result .= $char;
-		}
-
-		return BackWPup_Encryption::PREFIX . self::PREFIX . $this->key_type . base64_encode( $result );
-
+	public static function supported() {
+		// TODO: Decide whether and how to warn about the security risk.
+		return true;
 	}
 
 	/**
+	 * Encrypt a string (Passwords).
 	 *
-	 * Decrypt a string (Passwords)
+	 * @param string $value Value to encrypt.
 	 *
-	 * @param string $string value to decrypt
-	 *
-	 * @return string decrypted string
+	 * @return string Encrypted string.
 	 */
-	public function decrypt( $string ) {
+	public function encrypt( $value ) {
+		$result       = '';
+		$value_length = strlen( $value );
+		$key_length   = strlen( $this->key );
 
+		for ( $i = 0; $i < $value_length; ++$i ) {
+			$char     = substr( $value, $i, 1 );
+			$key_char = substr( $this->key, ( $i % $key_length ) - 1, 1 );
+			$char     = chr( ord( $char ) + ord( $key_char ) );
+			$result  .= $char;
+		}
+
+		return BackWPup_Encryption::PREFIX . self::PREFIX . $this->key_type . base64_encode( $result ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- Binary-safe encoding.
+	}
+
+	/**
+	 * Decrypt a string (Passwords).
+	 *
+	 * @param string $value Value to decrypt.
+	 *
+	 * @return string Decrypted string.
+	 */
+	public function decrypt( $value ) {
 		if (
-			! is_string( $string )
-			|| ! $string
-			|| strpos( $string, BackWPup_Encryption::PREFIX . self::PREFIX . $this->key_type ) !== 0
+			! is_string( $value )
+			|| ! $value
+			|| 0 !== strpos( $value, BackWPup_Encryption::PREFIX . self::PREFIX . $this->key_type )
 		) {
 			return '';
 		}
 
-		$no_prefix = substr( $string, strlen( BackWPup_Encryption::PREFIX . self::PREFIX . $this->key_type ) );
+		$no_prefix = substr( $value, strlen( BackWPup_Encryption::PREFIX . self::PREFIX . $this->key_type ) );
 
-		$encrypted = base64_decode( $no_prefix, true );
-		if ( $encrypted === false ) {
+		$encrypted = base64_decode( $no_prefix, true ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode -- Binary-safe decoding.
+		if ( false === $encrypted ) {
 			return '';
 		}
 
-		$result = '';
-		for ( $i = 0; $i < strlen( $encrypted ); $i ++ ) {
+		$result           = '';
+		$encrypted_length = strlen( $encrypted );
+		$key_length       = strlen( $this->key );
+
+		for ( $i = 0; $i < $encrypted_length; ++$i ) {
 			$char     = substr( $encrypted, $i, 1 );
-			$key_char = substr( $this->key, ( $i % strlen( $this->key ) ) - 1, 1 );
+			$key_char = substr( $this->key, ( $i % $key_length ) - 1, 1 );
 			$char     = chr( ord( $char ) - ord( $key_char ) );
-			$result .= $char;
+			$result  .= $char;
 		}
 
 		return $result;

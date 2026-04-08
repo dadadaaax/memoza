@@ -17,7 +17,7 @@ defined( 'ABSPATH' ) || exit; // Exit if accessed directly
  *
  * @since 5.5
  */
-abstract class BD_Page extends BD_Base_Page {
+abstract class BD_Page extends BD_Base_Page { //phpcs:ignore
 	/**
 	 * @var string Item Type. Possible values 'posts', 'pages', 'users' etc.
 	 */
@@ -75,15 +75,8 @@ abstract class BD_Page extends BD_Base_Page {
 	 * @since 5.5
 	 */
 	public function add_settings_panel() {
-		/**
-		 * Add contextual help for admin screens.
-		 *
-		 * @since 5.1
-		 */
-		do_action( 'bd_add_contextual_help', $this->screen );
-
 		// Trigger the add_meta_boxes hooks to allow meta boxes to be added
-		do_action( 'add_meta_boxes_' . $this->screen, null );
+		do_action( 'add_meta_boxes_' . $this->screen, null ); //phpcs:ignore
 
 		// Enqueue WordPress' script for handling the meta boxes
 		wp_enqueue_script( 'postbox' );
@@ -101,7 +94,7 @@ abstract class BD_Page extends BD_Base_Page {
 		 *
 		 * @since 5.3
 		 */
-		do_action( "bd_add_meta_box_for_{$this->item_type}", $this->screen, $this->page_slug  );
+		do_action( "bd_add_meta_box_for_{$this->item_type}", $this->screen, $this->page_slug  ); //phpcs:ignore
 	}
 
 	/**
@@ -141,6 +134,6 @@ abstract class BD_Page extends BD_Base_Page {
 		 *
 		 * @since 5.5.4
 		 */
-		do_action( "bd_admin_footer_for_{$this->item_type}" );
+		do_action( "bd_admin_footer_for_{$this->item_type}" ); //phpcs:ignore
 	}
 }

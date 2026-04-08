@@ -1,82 +1,92 @@
 <?php
 /**
- * Class for methods for file/folder related things
+ * Class for methods for file/folder related things.
  *
  * @todo Please split this logic into two separated classes. One for File and another for dir.
  */
 class BackWPup_File {
 
 	/**
-	 *
-	 * Get the folder for blog uploads
+	 * Get the folder for blog uploads.
 	 *
 	 * @return string
 	 */
 	public static function get_upload_dir() {
-
 		if ( is_multisite() ) {
-			if ( defined( 'UPLOADBLOGSDIR' ) )
-				return trailingslashit( str_replace( '\\', '/',ABSPATH . UPLOADBLOGSDIR ) );
-			elseif ( is_dir( trailingslashit( WP_CONTENT_DIR ) . 'uploads/sites') )
+			if ( defined( 'UPLOADBLOGSDIR' ) ) {
+				return trailingslashit( str_replace( '\\', '/', ABSPATH . UPLOADBLOGSDIR ) );
+			}
+			if ( is_dir( trailingslashit( WP_CONTENT_DIR ) . 'uploads/sites' ) ) {
 				return str_replace( '\\', '/', trailingslashit( WP_CONTENT_DIR ) . 'uploads/sites/' );
-			elseif ( is_dir( trailingslashit( WP_CONTENT_DIR ) . 'uploads' ) )
+			}
+			if ( is_dir( trailingslashit( WP_CONTENT_DIR ) . 'uploads' ) ) {
 				return str_replace( '\\', '/', trailingslashit( WP_CONTENT_DIR ) . 'uploads/' );
-			else
-				return trailingslashit( str_replace( '\\', '/', WP_CONTENT_DIR ) );
-		} else {
-			$upload_dir = wp_upload_dir( null, false, true );
-			return trailingslashit( str_replace( '\\', '/', $upload_dir[ 'basedir' ] ) );
-		}
+			}
 
+			return trailingslashit( str_replace( '\\', '/', (string) WP_CONTENT_DIR ) );
+		}
+		$upload_dir = wp_upload_dir( null, false, true );
+
+		return trailingslashit( str_replace( '\\', '/', $upload_dir['basedir'] ) );
 	}
 
 	/**
+	 * Check if path is in open basedir.
 	 *
-	 * check if path in open basedir
+	 * @param string $file The file path to check.
 	 *
-	 * @param string $file the file path to check
-	 *
-	 * @return bool is it in open basedir
+	 * @return bool Whether it is in open basedir.
 	 */
 	public static function is_in_open_basedir( $file ) {
-
 		$ini_open_basedir = ini_get( 'open_basedir' );
 
 		if ( empty( $ini_open_basedir ) ) {
-			return TRUE;
+			return true;
 		}
 
 		$open_base_dirs = explode( PATH_SEPARATOR, $ini_open_basedir );
-		$file           = trailingslashit( strtolower( str_replace( '\\', '/', $file ) ) );
+		$file           = trailingslashit( strtolower( BackWPup_Path_Fixer::slashify( $file ) ) );
 
 		foreach ( $open_base_dirs as $open_base_dir ) {
 			if ( empty( $open_base_dir ) || ! realpath( $open_base_dir ) ) {
 				continue;
 			}
+
 			$open_base_dir = realpath( $open_base_dir );
-			$open_base_dir = strtolower( str_replace( '\\', '/', $open_base_dir ) );
-			$part = substr( $file, 0, strlen( $open_base_dir ) );
+			$open_base_dir = strtolower( BackWPup_Path_Fixer::slashify( $open_base_dir ) );
+			$part          = substr( $file, 0, strlen( $open_base_dir ) );
 			if ( $part === $open_base_dir ) {
-				return TRUE;
+				return true;
 			}
 		}
 
-		return FALSE;
+		return false;
 	}
 
 	/**
+	 * Get size of files in folder if enabled.
 	 *
-	 * get size of files in folder
+	 * @param string $folder The folder to calculate.
 	 *
-	 * @param string $folder the folder to calculate
-	 * @param bool $deep went thrue suborders
-	 * @return int folder size in byte
+	 * @return string Folder size formatted in human readable format.
 	 */
 	public static function get_folder_size( $folder ) {
+
+		/**
+		 * Filter whether BackWPup will show the folder size.
+		 *
+		 * @param bool $show_folder_size whether BackWPup will show the folder size or not.
+		 */
+		$show_folder_size = wpm_apply_filters_typed( 'boolean', 'backwpup_show_folder_size', (bool) get_site_option( 'backwpup_cfg_showfoldersize' ) );
+
+		if ( ! $show_folder_size ) {
+			return '';
+		}
+
 		$files_size = 0;
 
 		if ( ! is_readable( $folder ) ) {
-			return $files_size;
+			return self::format_size( $files_size );
 		}
 
 		$iterator = new RecursiveIteratorIterator( new BackWPup_Recursive_Directory( $folder, FilesystemIterator::SKIP_DOTS ) );
@@ -87,145 +97,264 @@ class BackWPup_File {
 			}
 		}
 
-return $files_size;
+		return self::format_size( $files_size );
 	}
 
 	/**
-	 * Get an absolute path if it is relative
+	 * Format size in human readable format.
 	 *
-	 * @param string $path
+	 * @param int $size The size in bytes.
+	 *
+	 * @return string
+	 */
+	protected static function format_size( $size ): string {
+		return ' (' . size_format( $size, 2 ) . ')';
+	}
+
+	/**
+	 * Get an absolute path if it is relative.
+	 *
+	 * @param string $path The path to resolve.
 	 *
 	 * @return string
 	 */
 	public static function get_absolute_path( $path = '/' ) {
+		$path         = BackWPup_Path_Fixer::slashify( $path );
+		$content_path = trailingslashit( BackWPup_Path_Fixer::slashify( (string) WP_CONTENT_DIR ) );
 
-		$path = str_replace( '\\', '/', $path );
-		$content_path = trailingslashit( str_replace( '\\', '/', WP_CONTENT_DIR ) );
-
-		//use WP_CONTENT_DIR as root folder
-		if ( empty( $path ) || $path === '/' ) {
+		// Use WP_CONTENT_DIR as root folder.
+		if ( empty( $path ) || '/' === $path ) {
 			$path = $content_path;
 		}
 
-		//make relative path to absolute
-		if ( substr( $path, 0, 1 ) !== '/' && ! preg_match( '#^[a-zA-Z]:/#', $path ) ) {
-			$path =  $content_path . $path;
+		// Make relative path to absolute.
+		if ( '/' !== substr( $path, 0, 1 ) && ! preg_match( '#^[a-zA-Z]+:/#', $path ) ) {
+			$path = $content_path . $path;
 		}
 
-		$path = self::resolve_path( $path );
-
-		return $path;
+		return self::resolve_path( $path );
 	}
 
 	/**
+	 * Check if folder is readable and exists. Create it if not.
+	 * Add .htaccess or index.html file in folder to prevent directory listing.
 	 *
-	 * Check is folder readable and exists create it if not
-	 * add .htaccess or index.html file in folder to prevent directory listing
+	 * @param string $folder      The folder to check.
+	 * @param bool   $donotbackup Create a file that the folder will not be backed up.
 	 *
-	 * @param string $folder the folder to check
-	 * @param bool   $donotbackup Create a file that the folder will not backuped
-	 *
-     * @return string with error message if one
+	 * @return string Error message if any.
 	 */
-	public static function check_folder( $folder, $donotbackup = FALSE ) {
-
+	public static function check_folder( string $folder, bool $donotbackup = false ): string {
 		$folder = self::get_absolute_path( $folder );
 		$folder = untrailingslashit( $folder );
 
-		//check that is not home of WP
+		// Check that is not home of WP.
 		$uploads = self::get_upload_dir();
-		if ( $folder === untrailingslashit( str_replace( '\\', '/', ABSPATH ) )
-		     || $folder === untrailingslashit( str_replace( '\\', '/', dirname( ABSPATH ) ) )
-		     || $folder === untrailingslashit( str_replace( '\\', '/', WP_PLUGIN_DIR ) )
-		     || $folder === untrailingslashit( str_replace( '\\', '/', WP_CONTENT_DIR ) )
-		     || $folder === untrailingslashit( $uploads )
-		     || $folder === '/'
+		if ( untrailingslashit( BackWPup_Path_Fixer::slashify( ABSPATH ) ) === $folder
+			|| untrailingslashit( BackWPup_Path_Fixer::slashify( dirname( ABSPATH ) ) ) === $folder
+			|| untrailingslashit( BackWPup_Path_Fixer::slashify( WP_PLUGIN_DIR ) ) === $folder
+			|| untrailingslashit( BackWPup_Path_Fixer::slashify( WP_CONTENT_DIR ) ) === $folder
+			|| untrailingslashit( BackWPup_Path_Fixer::slashify( $uploads ) ) === $folder
 		) {
-			return sprintf( __( 'Folder %1$s not allowed, please use another folder.', 'backwpup' ), $folder );
+			return sprintf(
+				/* translators: %s: folder path. */
+				__( 'Folder %1$s not allowed, please use another folder.', 'backwpup' ),
+				$folder
+			);
 		}
 
-		//open base dir check
+		// Open base dir check.
 		if ( ! self::is_in_open_basedir( $folder ) ) {
-			return sprintf( __( 'Folder %1$s is not in open basedir, please use another folder.', 'backwpup' ), $folder );
+			return sprintf(
+				/* translators: %s: folder path. */
+				__( 'Folder %1$s is not in open basedir, please use another folder.', 'backwpup' ),
+				$folder
+			);
 		}
 
-		//create folder if it not exists
-		if ( ! is_dir( $folder ) ) {
-			if ( ! wp_mkdir_p( $folder ) ) {
-				return sprintf( __( 'Cannot create folder: %1$s', 'backwpup' ), $folder );
+		// We always want to at least process `$folder`.
+		$folders_to_process = [ $folder ];
+		$parent_folder      = dirname( $folder );
+
+		while ( ! file_exists( $parent_folder ) ) {
+			array_unshift( $folders_to_process, $parent_folder );
+			$parent_folder = dirname( $parent_folder );
+		}
+
+		// Process each child folder separately.
+		foreach ( $folders_to_process as $child_folder ) {
+			if ( ! is_dir( $child_folder ) && ! wp_mkdir_p( $child_folder ) ) {
+				return sprintf(
+					/* translators: %s: folder path. */
+					__( 'Cannot create folder: %1$s', 'backwpup' ),
+					$child_folder
+				);
 			}
-		}
 
-		//check is writable dir
-		if ( ! is_writable( $folder ) ) {
-			return sprintf( __( 'Folder "%1$s" is not writable', 'backwpup' ), $folder );
-		}
-
-		//create files for securing folder
-		if ( get_site_option( 'backwpup_cfg_protectfolders' ) ) {
-			$server_software = strtolower( $_SERVER[ 'SERVER_SOFTWARE' ] );
-			//IIS
-			if ( strstr( $server_software, 'microsoft-iis' ) ) {
-				if ( ! file_exists( $folder . '/Web.config' ) ) {
-					file_put_contents( $folder . '/Web.config',
-						"<configuration>" . PHP_EOL .
-						"\t<system.webServer>" . PHP_EOL .
-						"\t\t<authorization>" . PHP_EOL .
-						"\t\t\t<deny users=\"*\" />" . PHP_EOL .
-						"\t\t</authorization>" . PHP_EOL .
-						"\t</system.webServer>" . PHP_EOL .
-						"</configuration>" );
-				}
-			} //Nginx
-			elseif ( strstr( $server_software, 'nginx' ) ) {
-				if ( ! file_exists( $folder . '/index.php' ) ) {
-					file_put_contents( $folder . '/index.php', "<?php" . PHP_EOL . "header( \$_SERVER['SERVER_PROTOCOL'] . ' 404 Not Found' );" . PHP_EOL . "header( 'Status: 404 Not Found' );" . PHP_EOL );
-				}
-			} //Aapche and other
-			else {
-				if ( ! file_exists( $folder . '/.htaccess' ) ) {
-					file_put_contents( $folder . '/.htaccess', "<Files \"*\">" . PHP_EOL . "<IfModule mod_access.c>" . PHP_EOL . "Deny from all" . PHP_EOL . "</IfModule>" . PHP_EOL . "<IfModule !mod_access_compat>" . PHP_EOL . "<IfModule mod_authz_host.c>" . PHP_EOL . "Deny from all" . PHP_EOL . "</IfModule>" . PHP_EOL . "</IfModule>" . PHP_EOL . "<IfModule mod_access_compat>" . PHP_EOL . "Deny from all" . PHP_EOL . "</IfModule>" . PHP_EOL . "</Files>" );
-				}
-				if ( ! file_exists( $folder . '/index.php' ) ) {
-					file_put_contents( $folder . '/index.php', "<?php" . PHP_EOL . "header( \$_SERVER['SERVER_PROTOCOL'] . ' 404 Not Found' );" . PHP_EOL . "header( 'Status: 404 Not Found' );" . PHP_EOL );
-				}
+            // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_is_writable
+			if ( ! is_writable( $child_folder ) ) {
+				return sprintf(
+					/* translators: %s: folder path. */
+					__( 'Folder "%1$s" is not writable', 'backwpup' ),
+					$child_folder
+				);
 			}
-		}
 
-		//Create do not backup file for this folder
-		if ( $donotbackup && ! file_exists( $folder . '/.donotbackup' ) ) {
-			file_put_contents( $folder . '/.donotbackup', __( 'BackWPup will not backup folders and its sub folders when this file is inside.', 'backwpup' ) );
+			// Create files for securing folder.
+			/**
+			 * Filter whether BackWPup will protect the folders.
+			 *
+			 * @param bool $protect_folders Whether the folder will be protect or not.
+			 */
+			$protect_folders = wpm_apply_filters_typed( 'boolean', 'backwpup_protect_folders', true );
+			if ( $protect_folders ) {
+				self::protect_folder( $child_folder ); // phpcs:ignore
+			}
+
+			// Create do not backup file for this folder.
+			if ( $donotbackup ) {
+				self::write_do_not_backup_file( $child_folder );
+			}
 		}
 
 		return '';
 	}
 
 	/**
-	 * Resolve internal .. within a path
+	 * Normalize a relative path.
 	 *
-	 * @param string $path The path to resolve
+	 * @param string $path The path to normalize.
+	 *
+	 * @return string The normalized path.
+	 * @throws InvalidArgumentException If path is absolute or attempts to navigate above root.
+	 */
+	public static function normalize_path( string $path ): string {
+		if ( 0 === strpos( $path, '/' ) ) {
+			throw new InvalidArgumentException( 'Absolute paths are not allowed.' );
+		}
+
+		$parts      = explode( '/', $path );
+		$normalized = [];
+
+		foreach ( $parts as $part ) {
+			if ( '..' === $part ) {
+				if ( empty( $normalized ) ) {
+					throw new InvalidArgumentException(
+						'Invalid path: Attempting to navigate above the root directory.'
+					);
+				}
+				array_pop( $normalized );
+			} elseif ( '.' !== $part && '' !== $part ) {
+				$normalized[] = $part;
+			}
+		}
+
+		if ( empty( $normalized ) ) {
+			throw new InvalidArgumentException( 'The path resolves to an empty path.' );
+		}
+
+		return implode( '/', $normalized );
+	}
+
+	/**
+	 * Resolve internal .. within a path.
+	 *
+	 * @param string $path The path to resolve.
 	 *
 	 * @return string The resolved path
 	 */
-	protected static function resolve_path( $path ) {
+	protected static function resolve_path( $path ): string {
+		$parts          = explode( '/', $path );
+		$resolved_parts = [];
 
-		$search = explode( '/', $path );
-		$append = array();
-		// If last element of $search is blank, this means trailing slash is present.
-		// realpath() will remove trailing slash, so append to $append to preserve.
-		if ( empty( $search[ count( $search ) - 1 ] ) ) {
-			array_unshift( $append, array_pop( $search ) );
+		foreach ( $parts as $part ) {
+			if ( '..' === $part ) {
+				if ( ! empty( $resolved_parts ) ) {
+					array_pop( $resolved_parts );
+				}
+			} elseif ( '.' === $part ) {
+				continue;
+			} else {
+				$resolved_parts[] = $part;
+			}
 		}
 
-		while ( realpath( implode( '/', $search ) ) === false ) {
-			array_unshift( $append, array_pop( $search ) );
-		}
+		return implode( '/', $resolved_parts );
+	}
 
-		$path = realpath( implode( '/', $search ) );
-		if ( ! empty( $append ) ) {
-			$path .= '/' . implode( '/', $append );
+	/**
+	 * Protect a folder from being listed.
+	 *
+	 * @param string $folder The folder to protect.
+	 *
+	 * @return void
+	 */
+	private static function protect_folder( string $folder ): void {
+		$server_software = '';
+		if ( isset( $_SERVER['SERVER_SOFTWARE'] ) ) {
+			$server_software = sanitize_text_field( wp_unslash( $_SERVER['SERVER_SOFTWARE'] ) );
 		}
+		$server_software = strtolower( $server_software );
 
-		return $path;
+		if ( strstr( $server_software, 'microsoft-iis' ) ) {
+			if ( ! file_exists( $folder . '/Web.config' ) ) {
+				// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- Writing small protection files in-place.
+				file_put_contents(
+					$folder . '/Web.config',
+					'<configuration>' . PHP_EOL .
+				"\t<system.webServer>" . PHP_EOL .
+				"\t\t<authorization>" . PHP_EOL .
+				"\t\t\t<deny users=\"*\" />" . PHP_EOL .
+				"\t\t</authorization>" . PHP_EOL .
+				"\t</system.webServer>" . PHP_EOL .
+				'</configuration>'
+				);
+			}
+		} elseif ( strstr( $server_software, 'nginx' ) ) {
+			if ( ! file_exists( $folder . '/index.php' ) ) {
+				// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- Writing small protection files in-place.
+				file_put_contents(
+					$folder . '/index.php',
+					'<?php' . PHP_EOL . "header( \$_SERVER['SERVER_PROTOCOL'] . ' 404 Not Found' );" . PHP_EOL . "header( 'Status: 404 Not Found' );" . PHP_EOL
+				);
+			}
+		} else {
+			if ( ! file_exists( $folder . '/.htaccess' ) ) {
+				// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- Writing small protection files in-place.
+				file_put_contents(
+					$folder . '/.htaccess',
+					'<Files "*">' . PHP_EOL . '<IfModule mod_access.c>' . PHP_EOL . 'Deny from all' . PHP_EOL . '</IfModule>' . PHP_EOL . '<IfModule !mod_access_compat>' . PHP_EOL . '<IfModule mod_authz_host.c>' . PHP_EOL . 'Deny from all' . PHP_EOL . '</IfModule>' . PHP_EOL . '</IfModule>' . PHP_EOL . '<IfModule mod_access_compat>' . PHP_EOL . 'Deny from all' . PHP_EOL . '</IfModule>' . PHP_EOL . '</Files>'
+				);
+			}
+			if ( ! file_exists( $folder . '/index.php' ) ) {
+				// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- Writing small protection files in-place.
+				file_put_contents(
+					$folder . '/index.php',
+					'<?php' . PHP_EOL . "header( \$_SERVER['SERVER_PROTOCOL'] . ' 404 Not Found' );" . PHP_EOL . "header( 'Status: 404 Not Found' );" . PHP_EOL
+				);
+			}
+		}
+	}
+
+	/**
+	 * Write a marker file to exclude a folder from backups.
+	 *
+	 * @param string $folder The folder to exclude.
+	 *
+	 * @return void
+	 */
+	private static function write_do_not_backup_file( string $folder ): void {
+		$do_not_backup_file = "{$folder}/.donotbackup";
+
+		if ( ! file_exists( $do_not_backup_file ) ) {
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- Writing small marker file in-place.
+			file_put_contents(
+				$do_not_backup_file,
+				__(
+					'BackWPup will not backup folders and its sub folders when this file is inside.',
+					'backwpup'
+				)
+			);
+		}
 	}
 }

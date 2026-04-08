@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Colorful Categories
  * Description: New Categories widget in the awesome style! Bring colours to your categories widget - make every category in own colour.
- * Version: 2.0.14
+ * Version: 2.0.21
  * Author: Gesundheit Bewegt GmbH
  * Author URI: http://gesundheit-bewegt.com
  * Text Domain: colorful-categories
@@ -15,7 +15,7 @@
  */
 class ColorfulCategories
 {
-    public $version = '2.0.14';
+    public $version = '2.0.21';
 
     /**
      * Plugin constructor.
@@ -59,7 +59,7 @@ class ColorfulCategories
      */
     public function admin_enqueue_scripts($screen)
     {
-        if ('edit-tags.php' === $screen) {
+        if ($screen === 'edit-tags.php') {
             wp_enqueue_script('wp-color-picker');
             wp_enqueue_script('underscore');
             wp_enqueue_script('color-category', plugin_dir_url(__FILE__) . 'admin-colorful-categories.js', null, null, true);
@@ -282,30 +282,73 @@ class ColorfulCategories
         if (!empty($categoryName)) {
 
             $relations = array(
-                'Facebook'  => '#3C5A98',
-                'Twitter'   => '#1BBBFF',
-                'Google'    => '#D7432D',
-                'xing'      => '#105A63',
-                'pinterest' => '#CD2129',
-                'yahoo'     => '#4101AF',
-                'youtube'   => '#D02226',
-                'wikipedia' => '#6B6B6B',
-                'amazon'    => '#FF9900',
-                'linkedin'  => '#0077B5',
-                'wordpress' => '#00749A',
-                'ebay'      => '#86B817',
-                'orange'    => '#ff9000',
-                'red '      => '#ef0606',
-                ' red'      => '#ef0606',
-                'blue '     => '#007eff',
-                ' blue'     => '#007eff',
-                'black '    => '#222222',
-                ' black'    => '#222222',
-                'gray'      => '#656565',
-                'silver'    => '#c2c2c2',
-                'violet'    => '#8a1ee6',
-                'yellow'    => '#f6e800',
-                'green'     => '#18a114'
+                'Facebook'    => '#4267B2',
+                'Twitter'     => '#1DA1F2',
+                'Google'      => '#4285F4',
+                'xing'        => '#105A63',
+                'pinterest'   => '#E60023',
+                'yahoo'       => '#4101AF',
+                'youtube'     => '#FF0000',
+                'wikipedia'   => '#6B6B6B',
+                'amazon'      => '#FF9900',
+                'microsoft'   => '#F25022',
+                'netflix'     => '#E50914',
+                'linkedin'    => '#0077B5',
+                'wordpress'   => '#00749A',
+                'ebay'        => '#86B817',
+                'orange'      => '#FFA500',
+                'red'         => '#ef0606',
+                'blue'        => '#007eff',
+                'black'       => '#000000',
+                'gray'        => '#656565',
+                'silver'      => '#c2c2c2',
+                'violet'      => '#EE82EE',
+                'yellow'      => '#f6e800',
+                'green'       => '#18a114',
+                'pink'        => '#FFC0CB',
+                'crimson'     => '#DC143C',
+                'tomato'      => '#FF6347',
+                'gold'        => '#FFD700',
+                'peach'       => '#FFDAB9',
+                'lemon'       => '#FFFF00',
+                'purple'      => '#800080',
+                'lime'        => '#00FF00',
+                'forest'      => '#228B22',
+                'olive'       => '#808000',
+                'navy'        => '#000080',
+                'brown'       => '#A52A2A',
+                'reddit'      => '#FF4500',
+                'instagram'   => '#E4405F',
+                'whatsapp'    => '#25D366',
+                'bing'        => '#008373',
+                'bilibili'    => '#00A1D6',
+                'naver'       => '#03C75A',
+                'vk'          => '#4A76A8',
+                'discord'     => '#7289DA',
+                'mail'        => '#007EE5',
+                'samsung'     => '#1428A0',
+                'twitch'      => '#9146FF',
+                'weather'     => '#F5F5F5',
+                'telegram'    => '#0088CC',
+                'quora'       => '#B92B27',
+                'roblox'      => '#E4002B',
+                'duckduckgo'  => '#DE5833',
+                'fandom'      => '#FA005A',
+                'sharepoint'  => '#0078D4',
+                'qq'          => '#000000',
+                'spotify'     => '#1DB954',
+                'paypal'      => '#003087',
+                'booking'     => '#003580',
+                'bbc'         => '#BB1919',
+                'indeed'      => '#2164F3',
+                'nytimes'     => '#000000',
+                'translate'   => '#4285F4',
+                'cricbuzz'    => '#00A859',
+                'espn'        => '#FF0000',
+                'bbc.co.uk'   => '#BB1919',
+                'canva'       => '#00C4CC',
+                'flipkart'    => '#2874F0',
+                'accuweather' => '#F58634',
             );
 
             $relations = apply_filters('colorful_categories_colors_relations', $relations);
@@ -330,14 +373,15 @@ class ColorfulCategories
     public function updateColorOptionsArray()
     {
         if (
-            isset($_POST['termId'], $_POST['color'], $_POST['taxonomy'])
+            isset($_POST['termId'], $_POST['color'], $_POST['taxonomy'], $_POST['colornonce'])
             && current_user_can('manage_categories')
+            && wp_verify_nonce($_POST['colornonce'], 'colorCategoriesNonce')
             && is_admin()
         ) {
 
             $taxonomy = sanitize_text_field($_POST['taxonomy']);
             $termId = absint($_POST['termId']);
-            $color = substr($_POST['color'], 0, 7);
+            $color = substr(sanitize_text_field($_POST['color']), 0, 7);
 
             if ($termId > 0 && self::isTaxonomyInUse($taxonomy)) {
                 update_term_meta($termId, 'cc_color', $color);
@@ -455,7 +499,7 @@ class ColorfulCategories
 
         $color = self::getColorForTerm($termId, true);
 
-        echo '<input type="text" class="colorful-categories-picker" name="category_color" data-term-id="' . $termId . '" data-taxonomy="' . $taxonomy . '" value="' . $color . '" autocomplete="off" />';
+        echo '<input type="text" class="colorful-categories-picker" name="category_color" data-term-id="' . esc_attr($termId) . '" data-taxonomy="' . esc_attr($taxonomy) . '" value="' . esc_attr($color) . '" autocomplete="off" />';
         echo '<span class="colorful-categories-saving" style="display: none;">' . __('Saving...', 'colorful-categories') . '</span>';
     }
 

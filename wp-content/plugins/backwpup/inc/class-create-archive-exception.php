@@ -1,10 +1,10 @@
 <?php
 /**
- * Create Archive Exception
+ * Create Archive Exception.
  */
 
 /**
- * BackWPup_Create_Archive_Exception
+ * BackWPup_Create_Archive_Exception.
  */
 class BackWPup_Create_Archive_Exception extends Exception {
 

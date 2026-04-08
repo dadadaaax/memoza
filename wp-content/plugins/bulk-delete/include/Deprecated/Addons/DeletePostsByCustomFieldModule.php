@@ -21,7 +21,7 @@ class DeletePostsByCustomFieldModule extends DeprecatedModule {
 		$this->meta_box_slug = 'bd_by_custom_field';
 		$this->action        = 'delete_posts_by_custom_field';
 		$this->cron_hook     = '';
-		$this->scheduler_url = '';
+		$this->scheduler_url = 1;
 		$this->messages      = array(
 			'box_label'  => __( 'Delete Posts By Custom Field', 'bulk-delete' ),
 			'scheduled'  => '',

@@ -1,8 +1,11 @@
-<?php # -*- coding: utf-8 -*-
+<?php
+/**
+ * Promoter notice constants.
+ */
 
 namespace Inpsyde\BackWPup\Notice;
 
 class Promoter {
 
-	const OPTION_NAME = 'backwpup_notice_promoter';
+	public const OPTION_NAME = 'backwpup_notice_promoter';
 }

@@ -1,45 +1,62 @@
 <?php
 /**
- * BackWPup_Destination_Downloader
+ * BackWPup_Destination_Downloader.
  *
  * @since   3.6.0
- * @package Inpsyde\BackWPup
  */
 
 use Inpsyde\Restore\Api\Controller\DecryptController;
 use Inpsyde\Restore\Api\Module\Decryption\Exception\DecryptException;
 
+use function Inpsyde\BackWPup\Infrastructure\Restore\restore_container;
+
 /**
- * Class BackWPup_Destination_Downloader
+ * Class BackWPup_Destination_Downloader.
  *
  * @since   3.6.0
- * @package Inpsyde\BackWPup
  */
 class BackWPup_Destination_Downloader {
+	public const CAPABILITY = 'backwpup_backups_download';
 
-	const ARCHIVE_ENCRYPT_OPTION = 'archiveencryption';
-	const CAPABILITY = 'backwpup_backups_download';
-
-	const STATE_DOWNLOADING = 'downloading';
-	const STATE_ERROR = 'error';
-	const STATE_DONE = 'done';
+	public const STATE_DOWNLOADING = 'downloading';
+	public const STATE_ERROR       = 'error';
+	public const STATE_DONE        = 'done';
 
 	/**
+	 * Downloader data object.
+	 *
 	 * @var \BackWpUp_Destination_Downloader_Data
 	 */
 	private $data;
 
 	/**
+	 * Destination downloader service.
+	 *
 	 * @var \BackWPup_Destination_Downloader_Interface
 	 */
 	private $destination;
 
 	/**
-	 * Download file via ajax
+	 * BackWPup_Downloader constructor.
+	 *
+	 * @param \BackWpUp_Destination_Downloader_Data      $data        Download data.
+	 * @param \BackWPup_Destination_Downloader_Interface $destination Destination service.
+	 */
+	public function __construct(
+		BackWpUp_Destination_Downloader_Data $data,
+		BackWPup_Destination_Downloader_Interface $destination
+	) {
+		$this->data        = $data;
+		$this->destination = $destination;
+	}
+
+	/**
+	 * Download file via ajax.
+	 *
+	 * @return void
 	 */
 	public static function download_by_ajax() {
-
-		$dest = (string) filter_input( INPUT_GET, 'destination', FILTER_SANITIZE_STRING );
+		$dest = (string) filter_input( INPUT_GET, 'destination' );
 		if ( ! $dest ) {
 			return;
 		}
@@ -49,27 +66,31 @@ class BackWPup_Destination_Downloader {
 			return;
 		}
 
-		$file = (string) filter_input( INPUT_GET, 'file', FILTER_SANITIZE_STRING );
-		$file_local = (string) filter_input( INPUT_GET, 'local_file', FILTER_SANITIZE_STRING );
+		$file       = (string) filter_input( INPUT_GET, 'file' );
+		$file_local = (string) filter_input( INPUT_GET, 'local_file' );
 		if ( ! $file || ! $file_local ) {
 			return;
 		}
 
 		set_time_limit( 0 );
-		// Set up eventsource headers
+		// Set up eventsource headers.
 		header( 'Content-Type: text/event-stream' );
 		header( 'Cache-Control: no-cache' );
 		header( 'X-Accel-Buffering: no' );
 		header( 'Content-Encoding: none' );
 
-		// 2KB padding for IE
-		echo ':' . str_repeat( ' ', 2048 ) . "\n\n"; // phpcs:ignore
+		// 2KB padding for IE.
+		echo esc_html( ':' . str_repeat( ' ', 2048 ) . "\n\n" );
 
 		// Ensure we're not buffered.
 		wp_ob_end_flush_all();
 		flush();
 
-		/** @var \BackWPup_Destinations $dest_class */
+		/**
+		 * Destination handler.
+		 *
+		 * @var \BackWPup_Destinations $dest_class
+		 */
 		$dest_class = BackWPup::get_destination( $dest );
 		$dest_class->file_download(
 			$job_id,
@@ -79,33 +100,21 @@ class BackWPup_Destination_Downloader {
 	}
 
 	/**
-	 * BackWPup_Downloader constructor
+	 * Downloads the file by chunks.
 	 *
-	 * @param \BackWpUp_Destination_Downloader_Data $data
-	 * @param \BackWPup_Destination_Downloader_Interface $destination
-	 */
-	public function __construct(
-		BackWpUp_Destination_Downloader_Data $data,
-		BackWPup_Destination_Downloader_Interface $destination
-	) {
-
-		$this->data = $data;
-		$this->destination = $destination;
-	}
-
-	/**
-	 * @return bool
+	 * @throws DecryptException When an encrypted archive needs a decryption key.
+	 *
+	 * @return bool True on success, false on error.
 	 */
 	public function download_by_chunks() {
-
 		$this->ensure_user_can_download();
 
 		$source_file_path = $this->data->source_file_path();
-		$local_file_path = $this->data->local_file_path();
-		$size = $this->destination->calculate_size();
-		$start_byte = 0;
-		$chunk_size = 2 * 1024 * 1024;
-		$end_byte = $start_byte + $chunk_size - 1;
+		$local_file_path  = $this->data->local_file_path();
+		$size             = $this->destination->calculate_size();
+		$start_byte       = 0;
+		$chunk_size       = 2 * 1024 * 1024;
+		$end_byte         = $start_byte + $chunk_size - 1;
 
 		if ( $end_byte >= $size ) {
 			$end_byte = $size - 1;
@@ -115,14 +124,14 @@ class BackWPup_Destination_Downloader {
 			while ( $end_byte <= $size ) {
 				$this->destination->download_chunk( $start_byte, $end_byte );
 				self::send_message(
-					array(
-						'state' => self::STATE_DOWNLOADING,
-						'start_byte' => $start_byte,
-						'end_byte' => $end_byte,
-						'size' => $size,
+					[
+						'state'            => self::STATE_DOWNLOADING,
+						'start_byte'       => $start_byte,
+						'end_byte'         => $end_byte,
+						'size'             => $size,
 						'download_percent' => round( ( $end_byte + 1 ) / $size * 100 ),
-						'filename' => basename( $source_file_path ),
-					)
+						'filename'         => basename( $source_file_path ),
+					]
 				);
 
 				if ( $end_byte === $size - 1 ) {
@@ -130,7 +139,7 @@ class BackWPup_Destination_Downloader {
 				}
 
 				$start_byte = $end_byte + 1;
-				$end_byte = $start_byte + $chunk_size - 1;
+				$end_byte   = $start_byte + $chunk_size - 1;
 
 				if ( $start_byte < $size && $end_byte >= $size ) {
 					$end_byte = $size - 1;
@@ -138,49 +147,104 @@ class BackWPup_Destination_Downloader {
 			}
 
 			if ( BackWPup::is_pro() ) {
-				$decrypter = \Inpsyde\BackWPup\Pro\Restore\Functions\restore_container( 'decrypter' );
-				if ( $decrypter->maybe_decrypted( $local_file_path ) ) {
+				/**
+				 * Decryption service.
+				 *
+				 * @var \Inpsyde\Restore\Api\Module\Decryption\Decrypter $decrypter
+				 */
+				$decrypter = restore_container( 'decrypter' );
+				if ( $decrypter->isEncrypted( $local_file_path ) ) {
 					throw new DecryptException( DecryptController::STATE_NEED_DECRYPTION_KEY );
 				}
 			}
-		} catch ( \Exception $e ) {
+		} catch ( Exception $e ) {
 			self::send_message(
-				array(
-					'state' => self::STATE_ERROR,
+				[
+					'state'   => self::STATE_ERROR,
 					'message' => $e->getMessage(),
-				),
+				],
 				'log'
 			);
 
 			return false;
 		}
 
-		self::send_message( array(
-			'state' => self::STATE_DONE,
-			'message' => esc_html__( 'Your download is being generated &hellip;', 'backwpup' ),
-		) );
+		self::send_message(
+			[
+				'state'   => self::STATE_DONE,
+				'message' => esc_html__( 'Your download is being generated &hellip;', 'backwpup' ),
+			]
+			);
 
 		return true;
 	}
 
 	/**
-	 * Ensure user capability
+	 * Downloads a file in chunks using WP-CLI.
+	 *
+	 * The method calculates the file size, divides it into chunks, and downloads each chunk
+	 * sequentially until the entire file is downloaded.
+	 *
+	 * @return void
+	 */
+	public function download_by_chunks_wp_cli() {
+
+		$size       = $this->destination->calculate_size();
+		$start_byte = 0;
+		$chunk_size = 2 * 1024 * 1024;
+		$end_byte   = $start_byte + $chunk_size - 1;
+
+		if ( $end_byte >= $size ) {
+			$end_byte = $size - 1;
+		}
+
+		/* translators: %s: file name */
+		$progress = \WP_CLI\Utils\make_progress_bar( sprintf( __( 'Download %s:', 'backwpup' ), basename( $this->data->source_file_path() ) ), $size );
+		try {
+			while ( $end_byte <= $size ) {
+				$this->destination->download_chunk( $start_byte, $end_byte );
+				$progress->tick( $chunk_size );
+
+				if ( $end_byte === $size - 1 ) {
+					$progress->finish();
+					break;
+				}
+
+				$start_byte = $end_byte + 1;
+				$end_byte   = $start_byte + $chunk_size - 1;
+
+				if ( $start_byte < $size && $end_byte >= $size ) {
+					$end_byte = $size - 1;
+				}
+			}
+		} catch ( \Exception $e ) {
+			/* translators: %s: error message */
+			\WP_CLI::error( sprintf( __( 'Backup file download error: %s.', 'backwpup' ), $e->getMessage() ) );
+		}
+	}
+
+	/**
+	 * Ensure user capability.
+	 *
+	 * @return void
 	 */
 	private function ensure_user_can_download() {
-
 		if ( ! current_user_can( self::CAPABILITY ) ) {
 			wp_die();
 		}
 	}
 
 	/**
-	 * @param        $data
-	 * @param string $event
+	 * Send event source message.
+	 *
+	 * @param array  $data  Message data.
+	 * @param string $event Event name.
+	 *
+	 * @return void
 	 */
 	private static function send_message( $data, $event = 'message' ) {
-
-		echo "event: {$event}\n";
-		echo "data: " . wp_json_encode( $data ) . "\n\n";
+		echo 'event: ' . esc_html( $event ) . "\n";
+		echo 'data: ' . wp_json_encode( $data ) . "\n\n";
 		flush();
 	}
 }

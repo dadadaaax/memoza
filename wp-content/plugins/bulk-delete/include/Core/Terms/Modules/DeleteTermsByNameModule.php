@@ -27,15 +27,15 @@ class DeleteTermsByNameModule extends TermsModule {
 		?>
 
 		<fieldset class="options">
-			<h4><?php _e( 'Select the taxonomy from which you want to delete terms', 'bulk-delete' ); ?></h4>
+			<h4><?php esc_html_e( 'Select the taxonomy from which you want to delete terms', 'bulk-delete' ); ?></h4>
 
 			<?php $this->render_taxonomy_dropdown(); ?>
 
-			<h4><?php _e( 'Choose your filtering options', 'bulk-delete' ); ?></h4>
+			<h4><?php esc_html_e( 'Choose your filtering options', 'bulk-delete' ); ?></h4>
 
-			<?php _e( 'Delete Terms if the name ', 'bulk-delete' ); ?>
+			<?php esc_html_e( 'Delete Terms if the name ', 'bulk-delete' ); ?>
 			<?php $this->render_string_comparison_operators(); ?>
-			<input type="text" name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_value" placeholder="<?php _e( 'Term Name', 'bulk-delete' ); ?>">
+			<input type="text" name="smbd_<?php echo esc_attr( $this->field_slug ); ?>_value" placeholder="<?php esc_html_e( 'Term Name', 'bulk-delete' ); ?>">
 		</fieldset>
 
 		<?php

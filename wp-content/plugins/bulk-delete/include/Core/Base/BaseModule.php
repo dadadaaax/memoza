@@ -168,11 +168,11 @@ abstract class BaseModule extends Renderer {
 	 */
 	public function render_box() {
 		if ( $this->is_hidden() ) {
-			printf(
+			bd_wp_kses_wf(sprintf(
 				/* translators: 1 Module url */
 				__( 'This section just got enabled. Kindly <a href = "%1$s">refresh</a> the page to fully enable it.', 'bulk-delete' ),
 				'admin.php?page=' . esc_attr( $this->page_slug )
-			);
+			));
 
 			return;
 		}
@@ -276,7 +276,7 @@ abstract class BaseModule extends Renderer {
 		 * @param array $request Request array.
 		 * @param \BulkWP\BulkDelete\Core\Base\BaseModule The delete module.
 		 */
-		$options = apply_filters( 'bd_processed_delete_options', $options, $request, $this );
+		$options = apply_filters( 'bd_processed_delete_options', $options, $request, $this ); //phpcs:ignore
 
 		if ( $this->is_scheduled( $cron_options ) ) {
 			$msg = $this->schedule_deletion( $cron_options, $options );
@@ -309,7 +309,7 @@ abstract class BaseModule extends Renderer {
 		 * @param array $options Delete options.
 		 * @param \BulkWP\BulkDelete\Core\Base\BaseModule Modules that is triggering deletion.
 		 */
-		$options = apply_filters( 'bd_delete_options', $options, $this );
+		$options = apply_filters( 'bd_delete_options', $options, $this ); //phpcs:ignore
 
 		return $this->do_delete( $options );
 	}

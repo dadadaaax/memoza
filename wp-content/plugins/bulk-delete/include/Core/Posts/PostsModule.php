@@ -101,7 +101,7 @@ abstract class PostsModule extends BaseModule {
 		 * @param array $post_ids List of post ids that are going to be deleted.
 		 * @param array $options  List of Delete Options.
 		 */
-		do_action( 'bd_before_deleting_posts', $post_ids, $options );
+		do_action( 'bd_before_deleting_posts', $post_ids, $options ); //phpcs:ignore
 
 		$delete_post_count = $this->delete_posts_by_id( $post_ids, $options['force_delete'] );
 
@@ -112,7 +112,7 @@ abstract class PostsModule extends BaseModule {
 		 *
 		 * @param array $options Delete Options.
 		 */
-		do_action( 'bd_after_deleting_posts', $options );
+		do_action( 'bd_after_deleting_posts', $options ); //phpcs:ignore
 
 		return $delete_post_count;
 	}
@@ -159,7 +159,7 @@ abstract class PostsModule extends BaseModule {
 		 *
 		 * @param array $excluded_ids Post IDs to be excluded.
 		 */
-		$excluded_post_ids = apply_filters( 'bd_excluded_post_ids', array() );
+		$excluded_post_ids = apply_filters( 'bd_excluded_post_ids', array() ); //phpcs:ignore
 
 		if ( is_array( $excluded_post_ids ) && ! empty( $excluded_post_ids ) ) {
 			$post_ids = array_diff( $post_ids, $excluded_post_ids );

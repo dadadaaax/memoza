@@ -18,7 +18,7 @@ class DeletePostsByCategoryModule extends PostsModule {
 		$this->meta_box_slug = 'bd_by_category';
 		$this->action        = 'delete_posts_by_category';
 		$this->cron_hook     = 'do-bulk-delete-cat';
-		$this->scheduler_url = 'https://bulkwp.com/addons/scheduler-for-deleting-posts-by-category/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow&utm_content=bd-sc';
+		$this->scheduler_url = 1;
 		$this->messages      = array(
 			'box_label'  => __( 'By Post Category', 'bulk-delete' ),
 			'scheduled'  => __( 'The selected posts are scheduled for deletion', 'bulk-delete' ),
@@ -32,15 +32,15 @@ class DeletePostsByCategoryModule extends PostsModule {
 	public function render() {
 		?>
 		<!-- Category Start-->
-		<h4><?php _e( 'Select the post type from which you want to delete posts by category', 'bulk-delete' ); ?></h4>
+		<h4><?php esc_html_e( 'Select the post type from which you want to delete posts by category', 'bulk-delete' ); ?></h4>
 		<fieldset class="options">
 			<table class="optiontable">
 				<?php $this->render_post_type_dropdown(); ?>
 			</table>
 
-			<h4><?php _e( 'Select the categories from which you want to delete posts', 'bulk-delete' ); ?></h4>
+			<h4><?php esc_html_e( 'Select the categories from which you want to delete posts', 'bulk-delete' ); ?></h4>
 			<p>
-				<?php _e( 'Note: The post count below for each category is the total number of posts in that category, irrespective of post type.', 'bulk-delete' ); ?>
+				<?php esc_html_e( 'Note: The post count below for each category is the total number of posts in that category, irrespective of post type.', 'bulk-delete' ); ?>
 			</p>
 
 			<table class="optiontable">

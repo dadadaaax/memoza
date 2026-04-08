@@ -1,160 +1,227 @@
-<?php # -*- coding: utf-8 -*-
+<?php
 
 namespace Inpsyde\BackWPup\Notice;
 
-/**
- * Class Notice
- *
- * @package Inpsyde\BackWPup\Notice
- */
-abstract class Notice
-{
+use BackWPup;
 
-    const CAPABILITY = 'backwpup';
-    const MAIN_ADMIN_PAGE_ID = 'toplevel_page_backwpup';
-    const NETWORK_ADMIN_PAGE_ID = 'toplevel_page_backwpup-network';
-    const DEFAULT_LANGUAGE = 'en';
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
-    // Notice typees
-    const TYPE_ADMIN = 'admin';
-    const TYPE_BACKWPUP = 'backwpup';
+abstract class Notice {
 
-    /**
-     * @var array
-     */
-    protected static $main_admin_page_ids = [
-        self::MAIN_ADMIN_PAGE_ID,
-        self::NETWORK_ADMIN_PAGE_ID,
-    ];
+	/**
+	 * Notice identifier.
+	 *
+	 * @var string
+	 */
+	public const ID = 'notice';
+	/**
+	 * Required capability to view the notice.
+	 *
+	 * @var string
+	 */
+	public const CAPABILITY = 'backwpup';
 
-    /**
-     * @var \Inpsyde\BackWPup\Notice\NoticeView
-     */
-    protected $view;
+	/**
+	 * Admin notice type.
+	 *
+	 * @var string
+	 */
+	public const TYPE_ADMIN = 'admin';
+	/**
+	 * BackWPup notice type.
+	 *
+	 * @var string
+	 */
+	public const TYPE_BACKWPUP = 'backwpup';
 
-    /**
-     * Notice constructor
-     *
-     * @param \Inpsyde\BackWPup\Notice\NoticeView $view
-     */
-    public function __construct(NoticeView $view)
-    {
-        $this->view = $view;
-    }
+	/**
+	 * Main admin screen ID.
+	 *
+	 * @var string
+	 */
+	private const MAIN_ADMIN_PAGE_ID = 'toplevel_page_backwpup';
+	/**
+	 * Network admin screen ID.
+	 *
+	 * @var string
+	 */
+	private const NETWORK_ADMIN_PAGE_ID = 'toplevel_page_backwpup-network';
 
-    /**
-     * Initialize
-     *
-     * @param string $type The notice type, either Notice::TYPE_ADMIN or Notice::TYPE_BACKWPUP.
-     *                     Notice::TYPE_BACKWPUP makes the notice only visible on BackWPup pages.
-     *                     Notice::TYPE_ADMIN makes the notice available on all WP admin pages.
-     */
-    public function init($type = self::TYPE_BACKWPUP)
-    {
-        if (!is_admin() || !current_user_can(static::CAPABILITY)) {
-            return;
-        }
+	/**
+	 * BackWPup admin screen IDs.
+	 *
+	 * @var string[]
+	 */
+	protected static $main_admin_page_ids = [
+		self::MAIN_ADMIN_PAGE_ID,
+		self::NETWORK_ADMIN_PAGE_ID,
+	];
 
-        if ($type === static::TYPE_BACKWPUP) {
-            add_action('backwpup_admin_messages', [ $this, 'notice' ], 20);
-        } elseif ($type === static::TYPE_ADMIN) {
-            add_action('admin_notices', [ $this, 'notice' ], 20);
-        } else {
-            throw new \InvalidArgumentException(
-                __('Invalid notice type specified', 'backwpup')
-            );
-        }
+	/**
+	 * Notice view instance.
+	 *
+	 * @var NoticeView
+	 */
+	protected $view;
 
-        add_action('admin_enqueue_scripts', [ $this, 'enqueue_scripts' ]);
-        DismissibleNoticeOption::setup_actions(true, static::ID, static::CAPABILITY);
-    }
+	/**
+	 * Whether this notice should be dismissible.
+	 *
+	 * @var bool
+	 */
+	protected $dismissible = false;
 
-    /**
-     * Enqueue Scripts
-     */
-    public function enqueue_scripts()
-    {
-        $suffix = (defined('SCRIPT_DEBUG') && SCRIPT_DEBUG) ? '' : '.min';
+	/**
+	 * Creates a notice instance.
+	 *
+	 * @param NoticeView $view        Notice view instance.
+	 * @param bool       $dismissible Whether the notice is dismissible.
+	 */
+	public function __construct( NoticeView $view, bool $dismissible = true ) {
+		$this->view        = $view;
+		$this->dismissible = $dismissible;
+	}
 
-        wp_enqueue_script(
-            'backwpup-notice',
-            untrailingslashit(\BackWPup::get_plugin_data('URL')) . "/assets/js/notice{$suffix}.js",
-            ['underscore', 'jquery'],
-            filemtime(untrailingslashit(\BackWPup::get_plugin_data('plugindir') . "/assets/js/notice{$suffix}.js")),
-            true
-        );
-    }
+	/**
+	 * Initialize.
+	 *
+	 * @param string $type The notice type, either Notice::TYPE_ADMIN or Notice::TYPE_BACKWPUP.
+	 *                     Notice::TYPE_BACKWPUP makes the notice only visible on BackWPup pages.
+	 *                     Notice::TYPE_ADMIN makes the notice available on all WP admin pages.
+	 *
+	 * @throws \InvalidArgumentException When an invalid notice type is provided.
+	 */
+	public function init( string $type = self::TYPE_BACKWPUP ): void {
+		if ( ! is_admin() ) {
+			return;
+		}
+		if ( ! current_user_can( static::CAPABILITY ) ) {
+			return;
+		}
+		if ( self::TYPE_BACKWPUP === $type ) {
+			add_action(
+				'backwpup_admin_messages',
+				function (): void {
+					$this->notice();
+				},
+				20
+				);
+		} elseif ( static::TYPE_ADMIN === $type ) {
+			$action_name = is_multisite() ? 'network_admin_notices' : 'admin_notices';
+			add_action(
+				$action_name,
+				function (): void {
+					$this->notice();
+				},
+				20
+				);
+		} else {
+			throw new \InvalidArgumentException(
+				esc_html__( 'Invalid notice type specified', 'backwpup' )
+			);
+		}
 
-    /**
-     * Print Notice
-     */
-    public function notice()
-    {
-        if (!$this->is_screen_allowed() || !$this->should_display()) {
-            return;
-        }
+		if ( $this->dismissible ) {
+			add_action(
+				'admin_enqueue_scripts',
+				function (): void {
+					$this->enqueue_scripts();
+				}
+			);
+			DismissibleNoticeOption::setup_actions( true, static::ID, static::CAPABILITY );
+		}
+	}
 
-        $message = $this->message();
-        if (!$message->content()) {
-            return;
-        }
+	/**
+	 * Enqueue Scripts.
+	 */
+	public function enqueue_scripts(): void {
+		$suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
 
-        $this->render($message);
-    }
+		wp_enqueue_script(
+			'backwpup-notice',
+			untrailingslashit( BackWPup::get_plugin_data( 'URL' ) ) . sprintf( '/assets/js/notice%s.js', $suffix ),
+			[ 'underscore', 'jquery' ],
+			BackWPup::get_plugin_data( 'Version' ),
+			true
+		);
+	}
 
-    /**
-     * Render the notice with the appropriate view type
-     *
-     * This method can specify whether the notice should be a success, error,
-     * warning, info, or generic notice.
-     *
-     * @param NoticeMessage $message The message to render
-     */
-    protected function render(NoticeMessage $message)
-    {
-        $this->view->notice($message, $this->get_dismiss_action_url());
-    }
+	/**
+	 * Print Notice.
+	 */
+	public function notice(): void {
+		if ( ! $this->is_screen_allowed() ) {
+			return;
+		}
+		if ( ! $this->should_display() ) {
+			return;
+		}
 
-    /**
-     * Gets the dismissible action URL from DismissibleNoticeOption
-     *
-     * @return string The URL to dismiss the notice
-     */
-    protected function get_dismiss_action_url()
-    {
-        return DismissibleNoticeOption::dismiss_action_url(
-            static::ID,
-            DismissibleNoticeOption::FOR_USER_FOR_GOOD_ACTION
-        );
-    }
+		$this->render( $this->message() );
+	}
 
-    /**
-     * Return the message to display in the notice
-     *
-     * @return \Inpsyde\BackWPup\Notice\NoticeMessage The message to display
-     */
-    abstract protected function message();
+	/**
+	 * Render the notice with the appropriate view type.
+	 *
+	 * This method can specify whether the notice should be a success, error,
+	 * warning, info, or generic notice.
+	 *
+	 * @param NoticeMessage $message The message to render.
+	 */
+	protected function render( NoticeMessage $message ): void {
+		$this->view->notice( $message, $this->get_dismiss_action_url() );
+	}
 
-    /**
-     * Returns whether the current screen should show the notice
-     *
-     * @return bool True if the notice should be displayed
-     */
-    protected function is_screen_allowed()
-    {
-        $screen_id = get_current_screen()->id;
-        return in_array($screen_id, static::$main_admin_page_ids, true);
-    }
+	/**
+	 * Gets the dismissible action URL from DismissibleNoticeOption.
+	 *
+	 * @return string|null The URL to dismiss the notice.
+	 */
+	protected function get_dismiss_action_url(): ?string {
+		if ( $this->dismissible ) {
+			return DismissibleNoticeOption::dismiss_action_url(
+				static::ID,
+				DismissibleNoticeOption::FOR_USER_FOR_GOOD_ACTION
+			);
+		}
 
-    /**
-     * Whether to display the notice
-     *
-     * @return bool True if the notice should be displayed, false otherwise
-     */
-    protected function should_display()
-    {
-        $option = new DismissibleNoticeOption(true);
+		return null;
+	}
 
-        return (bool)$option->is_dismissed(static::ID) === false;
-    }
+	/**
+	 * Return the message to display in the notice.
+	 *
+	 * @return NoticeMessage The message to display.
+	 */
+	abstract protected function message(): NoticeMessage;
+
+	/**
+	 * Returns whether the current screen should show the notice.
+	 */
+	protected function is_screen_allowed(): bool {
+		$screen = get_current_screen();
+		if ( ! $screen instanceof \WP_Screen ) {
+			return false;
+		}
+
+		$screen_id = $screen->id;
+
+		return in_array( $screen_id, static::$main_admin_page_ids, true );
+	}
+
+	/**
+	 * Determines whether to display the notice.
+	 */
+	protected function should_display(): bool {
+		if ( $this->dismissible ) {
+			$option = new DismissibleNoticeOption( true );
+
+			return ! $option->is_dismissed( static::ID );
+		}
+
+		return true;
+	}
 }

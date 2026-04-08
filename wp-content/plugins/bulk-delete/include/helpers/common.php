@@ -21,7 +21,7 @@ defined( 'ABSPATH' ) || exit; // Exit if accessed directly.
  *
  * @return mixed Value if key is present, else the default value.
  */
-function bd_array_get( $array, $key, $default = null ) {
+function bd_array_get( $array, $key, $default = null ) { //phpcs:ignore
 	return isset( $array[ $key ] ) ? $array[ $key ] : $default;
 }
 
@@ -36,7 +36,7 @@ function bd_array_get( $array, $key, $default = null ) {
  *
  * @return bool Boolean converted Value if key is present, else the default value.
  */
-function bd_array_get_bool( $array, $key, $default = false ) {
+function bd_array_get_bool( $array, $key, $default = false ) { //phpcs:ignore
 	return bd_to_bool( bd_array_get( $array, $key, $default ) );
 }
 
@@ -49,7 +49,7 @@ function bd_array_get_bool( $array, $key, $default = false ) {
  *
  * @return bool True if string is "True", False otherwise.
  */
-function bd_to_bool( $string ) {
+function bd_to_bool( $string ) { //phpcs:ignore
 	return filter_var( $string, FILTER_VALIDATE_BOOLEAN );
 }
 
@@ -66,7 +66,7 @@ function bd_to_bool( $string ) {
  *
  * @return bool True if Haystack starts with Needle, False otherwise.
  */
-function bd_starts_with( $haystack, $needle ) {
+function bd_starts_with( $haystack, $needle ) { //phpcs:ignore
 	return ( substr( $haystack, 0, strlen( $needle ) ) === $needle );
 }
 
@@ -83,7 +83,7 @@ function bd_starts_with( $haystack, $needle ) {
  *
  * @return bool True if Haystack ends with Needle, False otherwise.
  */
-function bd_ends_with( $haystack, $needle ) {
+function bd_ends_with( $haystack, $needle ) { //phpcs:ignore
 	return substr( $haystack, - strlen( $needle ) ) === $needle;
 }
 
@@ -100,7 +100,7 @@ function bd_ends_with( $haystack, $needle ) {
  *
  * @return bool True if Haystack ends with Needle, False otherwise.
  */
-function bd_contains( $haystack, $needle ) {
+function bd_contains( $haystack, $needle ) { //phpcs:ignore
 	return strpos( $haystack, $needle ) !== false;
 }
 
@@ -115,7 +115,7 @@ function bd_contains( $haystack, $needle ) {
  *
  * @return string Short class name.
  */
-function bd_get_short_class_name( $class_name_or_object ) {
+function bd_get_short_class_name( $class_name_or_object ) { //phpcs:ignore
 	$class_name = $class_name_or_object;
 
 	if ( is_object( $class_name_or_object ) ) {
@@ -139,7 +139,7 @@ function bd_get_short_class_name( $class_name_or_object ) {
  *
  * @return int GMT Offseted time.in Unix Timestamp.
  */
-function bd_get_gmt_offseted_time( $time_string ) {
+function bd_get_gmt_offseted_time( $time_string ) { //phpcs:ignore
 	$gmt_offset = sanitize_text_field( get_option( 'gmt_offset' ) );
 
 	return strtotime( $time_string ) - ( $gmt_offset * HOUR_IN_SECONDS );
@@ -153,7 +153,7 @@ function bd_get_gmt_offseted_time( $time_string ) {
  *
  * @return array List of allowed mime types after formatting
  */
-function bd_get_allowed_mime_types() {
+function bd_get_allowed_mime_types() { //phpcs:ignore
 	$mime_types = get_allowed_mime_types();
 	sort( $mime_types );
 

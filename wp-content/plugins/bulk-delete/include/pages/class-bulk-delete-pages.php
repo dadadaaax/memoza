@@ -20,8 +20,9 @@ class Bulk_Delete_Pages {
 	 * @since  5.0
 	 */
 	public static function render_delete_pages_by_status_box() {
-		if ( BD_Util::is_pages_box_hidden( Bulk_Delete::BOX_PAGE_STATUS ) ) {
-			printf( __( 'This section just got enabled. Kindly <a href = "%1$s">refresh</a> the page to fully enable it.', 'bulk-delete' ), 'admin.php?page=' . Bulk_Delete::PAGES_PAGE_SLUG );
+		if (BD_Util::is_pages_box_hidden( Bulk_Delete::BOX_PAGE_STATUS ) ) {
+            /* translators: %1$s is the URL to refresh the page */
+			bd_wp_kses_wf(sprintf( __( 'This section just got enabled. Kindly <a href = "%1$s">refresh</a> the page to fully enable it.', 'bulk-delete' ), 'admin.php?page=' . Bulk_Delete::PAGES_PAGE_SLUG ));
 
 			return;
 		}
@@ -34,42 +35,42 @@ class Bulk_Delete_Pages {
 		$page_private = $pages_count->private;
 ?>
         <!-- Pages start-->
-        <h4><?php _e( 'Select the status from which you want to delete pages', 'bulk-delete' ); ?></h4>
+        <h4><?php esc_html_e( 'Select the status from which you want to delete pages', 'bulk-delete' ); ?></h4>
 
         <fieldset class="options">
         <table class="optiontable">
             <tr>
                 <td>
                     <input name="smbd_published_pages" value="published_pages" type="checkbox">
-                    <label for="smbd_published_pages"><?php _e( 'All Published Pages', 'bulk-delete' ); ?> (<?php echo $pages . ' '; _e( 'Pages', 'bulk-delete' ); ?>)</label>
+                    <label for="smbd_published_pages"><?php esc_html_e( 'All Published Pages', 'bulk-delete' ); ?> (<?php echo esc_html($pages) . ' '; esc_html_e( 'Pages', 'bulk-delete' ); ?>)</label>
                 </td>
             </tr>
 
             <tr>
                 <td>
                     <input name="smbd_draft_pages" value="draft_pages" type="checkbox">
-                    <label for="smbd_draft_pages"><?php _e( 'All Draft Pages', 'bulk-delete' ); ?> (<?php echo $page_drafts . ' '; _e( 'Pages', 'bulk-delete' ); ?>)</label>
+                    <label for="smbd_draft_pages"><?php esc_html_e( 'All Draft Pages', 'bulk-delete' ); ?> (<?php echo esc_html($page_drafts) . ' '; esc_html_e( 'Pages', 'bulk-delete' ); ?>)</label>
                 </td>
             </tr>
 
             <tr>
                 <td>
                     <input name="smbd_future_pages" value="scheduled_pages" type="checkbox">
-                    <label for="smbd_future_pages"><?php _e( 'All Scheduled Pages', 'bulk-delete' ); ?> (<?php echo $page_future . ' '; _e( 'Pages', 'bulk-delete' ); ?>)</label>
+                    <label for="smbd_future_pages"><?php esc_html_e( 'All Scheduled Pages', 'bulk-delete' ); ?> (<?php echo esc_html($page_future) . ' '; esc_html_e( 'Pages', 'bulk-delete' ); ?>)</label>
                 </td>
             </tr>
 
             <tr>
                 <td>
                     <input name="smbd_pending_pages" value="pending_pages" type="checkbox">
-                    <label for="smbd_pending_pages"><?php _e( 'All Pending Pages', 'bulk-delete' ); ?> (<?php echo $page_pending . ' '; _e( 'Pages', 'bulk-delete' ); ?>)</label>
+                    <label for="smbd_pending_pages"><?php esc_html_e( 'All Pending Pages', 'bulk-delete' ); ?> (<?php echo esc_html($page_pending) . ' '; esc_html_e( 'Pages', 'bulk-delete' ); ?>)</label>
                 </td>
             </tr>
 
             <tr>
                 <td>
                     <input name="smbd_private_pages" value="private_pages" type="checkbox">
-                    <label for="smbd_private_pages"><?php _e( 'All Private Pages', 'bulk-delete' ); ?> (<?php echo $page_private . ' '; _e( 'Pages', 'bulk-delete' ); ?>)</label>
+                    <label for="smbd_private_pages"><?php esc_html_e( 'All Private Pages', 'bulk-delete' ); ?> (<?php echo esc_html($page_private) . ' '; esc_html_e( 'Pages', 'bulk-delete' ); ?>)</label>
                 </td>
             </tr>
 		</table>
@@ -80,7 +81,7 @@ class Bulk_Delete_Pages {
 			bd_render_restrict_settings( 'pages', 'pages' );
 			bd_render_delete_settings( 'pages' );
 			bd_render_limit_settings( 'pages' );
-			bd_render_cron_settings( 'pages','http://bulkwp.com/addons/scheduler-for-deleting-pages-by-status/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow&utm_content=bd-sp' );
+			bd_render_cron_settings( 'pages','https://bulkwp.com/' );
 ?>
         </table>
         </fieldset>
@@ -90,37 +91,39 @@ class Bulk_Delete_Pages {
 
 	/**
 	 * Request handler for deleting pages by status.
-	 *
+	 * phpcs:ignore nonce check is performed in parent function
 	 * @since 5.0
 	 */
 	public static function do_delete_pages_by_status() {
 		$delete_options                 = array();
-		$delete_options['restrict']     = array_get_bool( $_POST, 'smbd_pages_restrict', false );
-		$delete_options['limit_to']     = absint( array_get( $_POST, 'smbd_pages_limit_to', 0 ) );
-		$delete_options['force_delete'] = array_get_bool( $_POST, 'smbd_pages_force_delete', false );
+		$delete_options['restrict']     = array_get_bool( $_POST, 'smbd_pages_restrict', false ); //phpcs:ignore
+		$delete_options['limit_to']     = absint( array_get( $_POST, 'smbd_pages_limit_to', 0 ) ); //phpcs:ignore
+		$delete_options['force_delete'] = array_get_bool( $_POST, 'smbd_pages_force_delete', false ); //phpcs:ignore
 
-		$delete_options['date_op']      = array_get( $_POST, 'smbd_pages_op' );
-		$delete_options['days']         = absint( array_get( $_POST, 'smbd_pages_days' ) );
+		$delete_options['date_op']      = array_get( $_POST, 'smbd_pages_op' ); //phpcs:ignore
+		$delete_options['days']         = absint( array_get( $_POST, 'smbd_pages_days' ) ); //phpcs:ignore
 
-		$delete_options['publish']      = array_get( $_POST, 'smbd_published_pages' );
-		$delete_options['drafts']       = array_get( $_POST, 'smbd_draft_pages' );
-		$delete_options['pending']      = array_get( $_POST, 'smbd_pending_pages' );
-		$delete_options['future']       = array_get( $_POST, 'smbd_future_pages' );
-		$delete_options['private']      = array_get( $_POST, 'smbd_private_pages' );
+		$delete_options['publish']      = array_get( $_POST, 'smbd_published_pages' ); //phpcs:ignore
+		$delete_options['drafts']       = array_get( $_POST, 'smbd_draft_pages' ); //phpcs:ignore
+		$delete_options['pending']      = array_get( $_POST, 'smbd_pending_pages' ); //phpcs:ignore
+		$delete_options['future']       = array_get( $_POST, 'smbd_future_pages' ); //phpcs:ignore
+		$delete_options['private']      = array_get( $_POST, 'smbd_private_pages' ); //phpcs:ignore
 
-		if ( 'true' == array_get( $_POST, 'smbd_pages_cron', 'false' ) ) {
-			$freq = $_POST['smbd_pages_cron_freq'];
-			$time = strtotime( $_POST['smbd_pages_cron_start'] ) - ( get_option( 'gmt_offset' ) * 60 * 60 );
+		if ( 'true' == array_get( $_POST, 'smbd_pages_cron', 'false' ) ) { //phpcs:ignore
+			$freq = $_POST['smbd_pages_cron_freq']; //phpcs:ignore
+			$time = strtotime( $_POST['smbd_pages_cron_start'] ) - ( get_option( 'gmt_offset' ) * 60 * 60 ); //phpcs:ignore
 
 			if ( $freq == -1 ) {
 				wp_schedule_single_event( $time, Bulk_Delete::CRON_HOOK_PAGES_STATUS, array( $delete_options ) );
 			} else {
 				wp_schedule_event( $time, $freq , Bulk_Delete::CRON_HOOK_PAGES_STATUS, array( $delete_options ) );
 			}
-			$msg = __( 'The selected pages are scheduled for deletion.', 'bulk-delete' ) . ' ' .
-				sprintf( __( 'See the full list of <a href = "%s">scheduled tasks</a>' , 'bulk-delete' ), get_bloginfo( 'wpurl' ) . '/wp-admin/admin.php?page=' . Bulk_Delete::CRON_PAGE_SLUG );
+
+            /* translators: %s is the URL to sheduled tasks page */
+			$msg = __( 'The selected pages are scheduled for deletion.', 'bulk-delete' ) . ' ' . sprintf( __( 'See the full list of <a href = "%s">scheduled tasks</a>' , 'bulk-delete' ), get_bloginfo( 'wpurl' ) . '/wp-admin/admin.php?page=' . Bulk_Delete::CRON_PAGE_SLUG );
 		} else {
 			$deleted_count = self::delete_pages_by_status( $delete_options );
+            /* translators: %d number of posts */
 			$msg           = sprintf( _n( 'Deleted %d page', 'Deleted %d pages' , $deleted_count, 'bulk-delete' ), $deleted_count );
 		}
 
@@ -149,7 +152,7 @@ class Bulk_Delete_Pages {
 			$delete_options['date_op'] = $delete_options['page_op'];
 			$delete_options['days']    = $delete_options['page_days'];
 		}
-		$delete_options = apply_filters( 'bd_delete_options', $delete_options );
+		$delete_options = apply_filters( 'bd_delete_options', $delete_options ); //phpcs:ignore
 
 		$post_status = array();
 

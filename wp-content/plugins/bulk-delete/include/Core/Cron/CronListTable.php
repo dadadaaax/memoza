@@ -39,15 +39,15 @@ class CronListTable extends \WP_List_Table {
 	public function extra_tablenav( $which ) {
 		if ( 'top' === $which ) {
 			echo '<p>';
-			_e( 'This is the list of jobs that are currently scheduled for auto deleting posts in Bulk Delete Plugin.', 'bulk-delete' );
+			esc_html_e( 'This is the list of jobs that are currently scheduled.', 'bulk-delete' );
 			$total_items = count( $this->items );
 			if ( 0 === $total_items ) {
 				echo ' <strong>';
-				_e( 'Note: ', 'bulk-delete' );
+				esc_html_e( 'Note: ', 'bulk-delete' );
 				echo '</strong>';
-				_e( 'Scheduling auto post or user deletion is available only when you buy pro addons.', 'bulk-delete' );
+				esc_html_e( 'Scheduling is ', 'bulk-delete' );
 			}
-			echo '</p>';
+			echo '<span class="open-upsell pro-feature-inline" data-feature="scheduling">Available in PRO</span></p>';
 		}
 	}
 
@@ -103,9 +103,10 @@ class CronListTable extends \WP_List_Table {
 	 * @return string Column output.
 	 */
 	public function column_col_cron_due( $item ) {
+        $page = sanitize_text_field(wp_unslash($_REQUEST['page'] ?? '')); //phpcs:ignore
 		$actions = array(
 			'delete' => sprintf( '<a href="?page=%s&bd_action=%s&cron_id=%s&%s=%s">%s</a>',
-				$_REQUEST['page'],
+				$page,
 				'delete_cron',
 				$item['id'],
 				'bd-delete_cron-nonce',
@@ -113,7 +114,7 @@ class CronListTable extends \WP_List_Table {
 				__( 'Delete', 'bulk-delete' )
 			),
 			'run' => sprintf( '<a href="?page=%s&bd_action=%s&cron_id=%s&%s=%s" onclick="return confirm(%s)">%s</a>',
-				$_REQUEST['page'],
+				$page,
 				'run_cron',
 				$item['id'],
 				'bd-run_cron-nonce',
@@ -140,7 +141,7 @@ class CronListTable extends \WP_List_Table {
 	 * @param array $item The item to be displayed in the row.
 	 */
 	public function column_col_cron_schedule( $item ) {
-		echo $item['schedule'];
+		echo esc_html($item['schedule']);
 	}
 
 	/**
@@ -163,13 +164,13 @@ class CronListTable extends \WP_List_Table {
 	 */
 	public function column_col_cron_options( $item ) {
 		// TODO: Make it pretty
-		print_r( $item['args'] );
+		print_r( $item['args'] ); //phpcs:ignore
 	}
 
 	/**
 	 * Generates the message when no items are present.
 	 */
 	public function no_items() {
-		_e( 'You have not scheduled any bulk delete jobs.', 'bulk-delete' );
+		esc_html_e( 'You have not scheduled any bulk delete jobs.', 'bulk-delete' );
 	}
 }

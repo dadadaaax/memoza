@@ -21,7 +21,7 @@ class DeletePostsByAttachmentModule extends DeprecatedModule {
 		$this->meta_box_slug = 'bd-posts-by-attachment';
 		$this->action        = 'bd_delete_posts_by_attachment';
 		$this->cron_hook     = '';
-		$this->scheduler_url = '';
+		$this->scheduler_url = 1;
 		$this->messages      = array(
 			'box_label'  => __( 'Delete Posts By Attachment', 'bulk-delete' ),
 			'scheduled'  => '',

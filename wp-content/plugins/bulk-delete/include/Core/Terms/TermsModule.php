@@ -119,7 +119,7 @@ abstract class TermsModule extends BaseModule {
 		 *
 		 * @param \WP_Term_Query $term_query Query object.
 		 */
-		do_action( 'bd_before_query', $term_query );
+		do_action( 'bd_before_query', $term_query ); //phpcs:ignore
 
 		$terms = $term_query->query( $query );
 
@@ -130,7 +130,7 @@ abstract class TermsModule extends BaseModule {
 		 *
 		 * @param \WP_Term_Query $term_query Query object.
 		 */
-		do_action( 'bd_after_query', $term_query );
+		do_action( 'bd_after_query', $term_query ); //phpcs:ignore
 
 		return $terms;
 	}

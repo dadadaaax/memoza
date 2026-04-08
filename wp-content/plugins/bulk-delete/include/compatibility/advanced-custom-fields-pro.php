@@ -17,7 +17,7 @@ defined( 'ABSPATH' ) || exit; // Exit if accessed directly
  * @see https://github.com/sudar/bulk-delete/issues/114
  * @since 5.5.2
  */
-function bd_deregister_acf_select2() {
+function bd_deregister_acf_select2() { //phpcs:ignore
 	wp_deregister_style( 'select2' );
 }
 add_action( 'bd_before_admin_enqueue_scripts', 'bd_deregister_acf_select2' );

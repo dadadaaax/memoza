@@ -12,13 +12,13 @@ class BackWPup_Recursive_Directory extends RecursiveDirectoryIterator {
 	 *
 	 * Fixes the path before calling the parent constructor.
 	 *
-	 * @param string $path
+	 * @param string   $path  The directory path.
+	 * @param int|null $flags Optional flags for the iterator.
 	 */
 	public function __construct( $path, $flags = null ) {
-		if ( $flags === null ) {
+		if ( null === $flags ) {
 			$flags = FilesystemIterator::KEY_AS_PATHNAME | FilesystemIterator::CURRENT_AS_FILEINFO;
 		}
 		parent::__construct( BackWPup_Path_Fixer::fix_path( $path ), $flags );
 	}
-
 }

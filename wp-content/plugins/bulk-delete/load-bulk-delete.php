@@ -29,7 +29,6 @@ function bulk_delete_load( $plugin_file ) {
 	$loader->set_custom_mapping( bd_get_custom_class_map( $plugin_dir ) );
 
 	$loader->add_namespace( 'BulkWP\\BulkDelete\\', $plugin_dir . 'include' );
-	$loader->add_namespace( 'Sudar\\WPSystemInfo', $plugin_dir . 'vendor/sudar/wp-system-info/src/' );
 
 	$custom_include_files = bd_get_custom_include_files();
 	foreach ( $custom_include_files as $custom_include_file ) {
@@ -42,7 +41,7 @@ function bulk_delete_load( $plugin_file ) {
 	$plugin->set_plugin_file( $plugin_file );
 	$plugin->set_loader( $loader );
 
-	add_action( 'plugins_loaded', array( $plugin, 'load' ), 101 );
+	add_action( 'init', array( $plugin, 'load' ), 101 );
 }
 
 /**
@@ -57,26 +56,19 @@ function bulk_delete_load( $plugin_file ) {
  *
  * @return array Class map.
  */
-function bd_get_custom_class_map( $plugin_dir ) {
+function bd_get_custom_class_map( $plugin_dir ) { //phpcs:ignore
 	return array(
 		'BD_Base_Page'                             => $plugin_dir . 'include/base/class-bd-base-page.php',
 		'Bulk_Delete_Help_Screen'                  => $plugin_dir . 'include/ui/class-bulk-delete-help-screen.php',
-		'BD_License'                               => $plugin_dir . 'include/license/class-bd-license.php',
-		'BD_License_Handler'                       => $plugin_dir . 'include/license/class-bd-license-handler.php',
-		'BD_EDD_API_Wrapper'                       => $plugin_dir . 'include/license/class-bd-edd-api-wrapper.php',
-		'Bulk_Delete_Misc'                         => $plugin_dir . 'include/misc/class-bulk-delete-misc.php',
-		'Bulk_Delete_Jetpack_Contact_Form_Message' => $plugin_dir . 'include/misc/class-bulk-delete-jetpack-contact-form-messages.php',
 		'BD_Settings_Page'                         => $plugin_dir . 'include/settings/class-bd-settings-page.php',
 		'BD_Settings'                              => $plugin_dir . 'include/settings/class-bd-settings.php',
 
 		// Compatibility. Will be removed once compatibility is addressed.
-		'BD_Meta_Box_Module'                       => $plugin_dir . 'include/base/class-bd-meta-box-module.php', // Used in Bulk Delete Attachments Addon - v1.2.
-		'BD_Page'                                  => $plugin_dir . 'include/base/class-bd-page.php', // Used in Bulk Delete Attachments Addon - v1.2.
+		'BD_Page'                                  => $plugin_dir . 'include/base/class-bd-page.php',
 
-		'BD_Addon'                                 => $plugin_dir . 'include/Deprecated/class-bd-addon.php', // Used in Bulk Delete Attachments Addon - v1.2.
-		'BD_Base_Addon'                            => $plugin_dir . 'include/Deprecated/class-bd-base-addon.php', // Used in Bulk Delete Attachments Addon - v1.2.
-		'BD_Scheduler_Addon'                       => $plugin_dir . 'include/Deprecated/class-bd-scheduler-addon.php', // Used in Scheduler for Deleting Attachments and Users by Meta Addon.
-		'Bulk_Delete_Users_By_User_Meta'           => $plugin_dir . 'include/Deprecated/Bulk_Delete_Users_By_User_Meta.php', // Used in Scheduler for Deleting Users by User Meta Addon - v1.0.
+		'BD_Addon'                                 => $plugin_dir . 'include/Deprecated/class-bd-addon.php',
+		'BD_Base_Addon'                            => $plugin_dir . 'include/Deprecated/class-bd-base-addon.php',
+		'Bulk_Delete_Users_By_User_Meta'           => $plugin_dir . 'include/Deprecated/Bulk_Delete_Users_By_User_Meta.php',
 
 		// Deprecated classes.
 		'Bulk_Delete_Posts'                        => $plugin_dir . 'include/Deprecated/class-bulk-delete-posts.php',
@@ -96,7 +88,7 @@ function bd_get_custom_class_map( $plugin_dir ) {
  *
  * @return array List of files.
  */
-function bd_get_custom_include_files() {
+function bd_get_custom_include_files() { //phpcs:ignore
 	return array(
 		'include/addons/addon-list.php',
 		'include/addons/util.php',

@@ -23,7 +23,7 @@
  *
  * @return void
  */
-function bd_header_callback( $args ) {
+function bd_header_callback( $args ) { //phpcs:ignore
 	echo '<hr/>';
 }
 
@@ -38,7 +38,7 @@ function bd_header_callback( $args ) {
  *
  * @return void
  */
-function bd_text_callback( $args ) {
+function bd_text_callback( $args ) { //phpcs:ignore
 	$option_name = $args['option'];
 	$bd_options  = get_option( $option_name );
 
@@ -52,7 +52,7 @@ function bd_text_callback( $args ) {
 	$html = '<input type="text" class="' . $size . '-text" id="' . $option_name . '[' . $args['id'] . ']" name="' . $option_name . '[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '">';
 	$html .= '<label for="' . $option_name . '[' . $args['id'] . ']"> ' . $args['desc'] . '</label>';
 
-	echo $html;
+	bd_wp_kses_wf($html);
 }
 
 /**
@@ -64,7 +64,7 @@ function bd_text_callback( $args ) {
  *
  * @param array $args Arguments passed by the setting
  */
-function bd_rich_editor_callback( $args ) {
+function bd_rich_editor_callback( $args ) { //phpcs:ignore
 	$option_name = $args['option'];
 	$bd_options  = get_option( $option_name );
 
@@ -80,5 +80,5 @@ function bd_rich_editor_callback( $args ) {
 
 	$html .= '<br/><label for="' . $option_name . '[' . $args['id'] . ']"> ' . $args['desc'] . '</label>';
 
-	echo $html;
+	bd_wp_kses_wf($html);
 }

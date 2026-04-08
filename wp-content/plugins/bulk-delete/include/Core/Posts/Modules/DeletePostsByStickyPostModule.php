@@ -34,12 +34,12 @@ class DeletePostsByStickyPostModule extends PostsModule {
 	public function render() {
 		if ( ! $this->are_sticky_posts_present() ) : ?>
 			<h4>
-				<?php _e( 'There are no sticky post present in this WordPress installation.', 'bulk-delete' ); ?>
+				<?php esc_html_e( 'There are no sticky post present in this WordPress installation.', 'bulk-delete' ); ?>
 			</h4>
 			<?php return; ?>
 		<?php endif; // phpcs:ignore?>
 
-		<h4><?php _e( 'Select the sticky post that you want to delete', 'bulk-delete' ); ?></h4>
+		<h4><?php esc_html_e( 'Select the sticky post that you want to delete', 'bulk-delete' ); ?></h4>
 
 		<fieldset class="options">
 			<table class="optiontable">

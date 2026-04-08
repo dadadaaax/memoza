@@ -14,7 +14,7 @@ defined( 'ABSPATH' ) || exit; // Exit if accessed directly.
  *
  * @return array
  */
-function bd_build_query_options( $delete_options, $options = array() ) {
+function bd_build_query_options( $delete_options, $options = array() ) { //phpcs:ignore
 	// private posts.
 	if ( isset( $delete_options['private'] ) ) {
 		if ( $delete_options['private'] ) {
@@ -69,7 +69,7 @@ function bd_build_query_options( $delete_options, $options = array() ) {
  *
  * @return array Result array
  */
-function bd_query( $options ) {
+function bd_query( $options ) { //phpcs:ignore
 	$defaults = array(
 		'cache_results'          => false, // don't cache results.
 		'update_post_meta_cache' => false, // No need to fetch post meta fields.
@@ -90,7 +90,7 @@ function bd_query( $options ) {
 	 *
 	 * @param \WP_Query $wp_query Query object.
 	 */
-	do_action( 'bd_before_query', $wp_query );
+	do_action( 'bd_before_query', $wp_query ); //phpcs:ignore
 
 	$posts = $wp_query->query( $options );
 
@@ -102,7 +102,7 @@ function bd_query( $options ) {
 	 *
 	 * @param \WP_Query $wp_query Query object.
 	 */
-	do_action( 'bd_after_query', $wp_query );
+	do_action( 'bd_after_query', $wp_query ); //phpcs:ignore
 
 	return $posts;
 }

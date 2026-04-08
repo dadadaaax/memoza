@@ -13,7 +13,7 @@ defined( 'ABSPATH' ) || exit; // Exit if accessed directly
  *
  * Ideally most of the functions should be inside the `BulkDelete\Util` and not as static functions.
  */
-class BD_Util {
+class BD_Util { //phpcs:ignore
 	// Meta boxes
 	const VISIBLE_POST_BOXES     = 'metaboxhidden_toplevel_page_bulk-delete-posts';
 	const VISIBLE_PAGE_BOXES     = 'metaboxhidden_bulk-delete_page_bulk-delete-pages';
@@ -225,7 +225,7 @@ class BD_Util {
  *
  * @return mixed Value if key is present, else the default value.
  */
-function bd_array_get( $array, $key, $default = null ) {
+function bd_array_get( $array, $key, $default = null ) { //phpcs:ignore
 	return isset( $array[ $key ] ) ? $array[ $key ] : $default;
 }
 
@@ -240,7 +240,7 @@ function bd_array_get( $array, $key, $default = null ) {
  *
  * @return bool Boolean converted Value if key is present, else the default value.
  */
-function bd_array_get_bool( $array, $key, $default = false ) {
+function bd_array_get_bool( $array, $key, $default = false ) { //phpcs:ignore
 	return bd_to_bool( bd_array_get( $array, $key, $default ) );
 }
 
@@ -253,7 +253,7 @@ function bd_array_get_bool( $array, $key, $default = false ) {
  *
  * @return bool True if string is "True", False otherwise.
  */
-function bd_to_bool( $string ) {
+function bd_to_bool( $string ) { //phpcs:ignore
 	return filter_var( $string, FILTER_VALIDATE_BOOLEAN );
 }
 
@@ -265,7 +265,7 @@ function bd_to_bool( $string ) {
  *
  * @return array List of allowed mime types after formatting
  */
-function bd_get_allowed_mime_types() {
+function bd_get_allowed_mime_types() { //phpcs:ignore
 	$mime_types = get_allowed_mime_types();
 	sort( $mime_types );
 
@@ -295,16 +295,9 @@ function bd_get_allowed_mime_types() {
  *
  * @return string Current theme name.
  */
-function bd_get_current_theme_name() {
-	if ( get_bloginfo( 'version' ) < '3.4' ) {
-		$theme_data = get_theme_data( get_stylesheet_directory() . '/style.css' );
-
-		return $theme_data['Name'] . ' ' . $theme_data['Version'];
-	} else {
-		$theme_data = wp_get_theme();
-
-		return $theme_data->Name . ' ' . $theme_data->Version;
-	}
+function bd_get_current_theme_name() { //phpcs:ignore
+	$theme_data = wp_get_theme();
+	return $theme_data->Name . ' ' . $theme_data->Version;
 }
 
 /**
@@ -314,7 +307,7 @@ function bd_get_current_theme_name() {
  *
  * @return string Web host name if identified, empty string otherwise.
  */
-function bd_identify_host() {
+function bd_identify_host() { //phpcs:ignore
 	$host = '';
 	if ( defined( 'WPE_APIKEY' ) ) {
 		$host = 'WP Engine';
@@ -330,7 +323,7 @@ function bd_identify_host() {
  *
  * @since 5.5.4
  */
-function bd_print_current_plugins() {
+function bd_print_current_plugins() { //phpcs:ignore
 	$plugins        = get_plugins();
 	$active_plugins = get_option( 'active_plugins', array() );
 
@@ -340,7 +333,7 @@ function bd_print_current_plugins() {
 			continue;
 		}
 
-		echo $plugin['Name'] . ': ' . $plugin['Version'] . "\n";
+		echo esc_html($plugin['Name']) . ': ' . esc_html($plugin['Version']) . "\n";
 	}
 }
 
@@ -349,7 +342,7 @@ function bd_print_current_plugins() {
  *
  * @since 5.5.4
  */
-function bd_print_network_active_plugins() {
+function bd_print_network_active_plugins() { //phpcs:ignore
 	$plugins        = wp_get_active_network_plugins();
 	$active_plugins = get_site_option( 'active_sitewide_plugins', array() );
 
@@ -363,6 +356,6 @@ function bd_print_network_active_plugins() {
 
 		$plugin = get_plugin_data( $plugin_path );
 
-		echo $plugin['Name'] . ' :' . $plugin['Version'] . "\n";
+		echo esc_html($plugin['Name']) . ' :' . esc_html($plugin['Version']) . "\n";
 	}
 }

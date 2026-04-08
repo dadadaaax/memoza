@@ -44,8 +44,12 @@ class CronListPage extends BasePage {
 	 * @since 6.0
 	 */
 	public function run_cron_job() {
-		$cron_id    = absint( $_GET['cron_id'] );
+		$cron_id    = absint( wp_unslash($_GET['cron_id'] ?? '') ); //phpcs:ignore
 		$cron_items = $this->get_cron_schedules();
+
+        if (!wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['bd-run_cron-nonce'] ?? '')), "bd-run_cron")) {
+            exit();
+        }
 
 		if ( 0 === $cron_id ) {
 			return;
@@ -74,7 +78,16 @@ class CronListPage extends BasePage {
 	 * @since 6.0.0 Moved into CronListPage class
 	 */
 	public function delete_cron_job() {
-		$cron_id    = absint( $_GET['cron_id'] );
+        if(!current_user_can('manage_options')){
+            return false;
+        }
+
+        if (!wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['bd-delete_cron-nonce'] ?? '')), "bd-delete_cron")) {
+            exit();
+        }
+        
+
+		$cron_id    = absint( wp_unslash($_GET['cron_id'] ?? '') ); 
 		$cron_items = $this->get_cron_schedules();
 
 		if ( 0 === $cron_id ) {

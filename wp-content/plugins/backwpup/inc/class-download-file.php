@@ -1,85 +1,83 @@
 <?php
 
-use \Inpsyde\BackWPupShared\File\MimeTypeExtractor;
+use Inpsyde\BackWPupShared\File\MimeTypeExtractor;
 
 /**
- * Class BackWPup_Download_File
+ * Class BackWPup_Download_File.
  */
 final class BackWPup_Download_File implements BackWPup_Download_File_Interface {
 
 	/**
-	 * The file path
+	 * The file path.
 	 *
 	 * @var string The path of the file to download
 	 */
 	private $filepath;
 
 	/**
-	 * File Name
+	 * File Name.
 	 *
 	 * @var string The file name
 	 */
 	private $filename;
 
 	/**
-	 * @var string
+	 * Encoding type.
 	 *
-	 * @string The encoding type
+	 * @var string The encoding type.
 	 */
 	private static $encoding = 'binary';
 
 	/**
-	 * File content length
+	 * File content length.
 	 *
 	 * @var int The length of the file
 	 */
 	private $length;
 
 	/**
-	 * Callback
+	 * Callback.
 	 *
 	 * @var callable The callback to call that will perform the download action
 	 */
 	private $callback;
 
 	/**
-	 * Capability
+	 * Capability.
 	 *
-	 * @var @string The capability needed to download the file
+	 * @var string The capability needed to download the file
 	 */
 	private $capability;
 
 	/**
-	 * BackWPup_Download_File constructor
+	 * BackWPup_Download_File constructor.
 	 *
 	 * @todo move the file stuffs into a specific class to manage only files. Blocked by class-file.php
 	 *
-	 * @throws \InvalidArgumentException In case the callback is not a valid callback.
+	 * @param string   $filepath   The path of the file to download.
+	 * @param callable $callback   The callback to call that will perform the download action.
+	 * @param string   $capability The capability needed to download the file.
 	 *
-	 * @param string $filepath The path of the file to download.
-	 * @param callable $callback The callback to call that will perform the download action.
-	 * @param string $capability The capability needed to download the file.
+	 * @throws \InvalidArgumentException In case the callback is not a valid callback.
 	 */
 	public function __construct( $filepath, $callback, $capability ) {
-
 		if ( ! is_callable( $callback ) ) {
 			throw new \InvalidArgumentException(
 				sprintf( 'Invalid callback passed to %s. Callback parameter must be callable.', self::class )
 			);
 		}
 
-		$this->filepath = $filepath;
-		$this->filename = basename( $filepath );
-		$this->callback = $callback;
-		$this->length = file_exists( $filepath ) ? filesize( $filepath ) : 0;
+		$this->filepath   = $filepath;
+		$this->filename   = basename( $filepath );
+		$this->callback   = $callback;
+		$this->length     = file_exists( $filepath ) ? filesize( $filepath ) : 0;
 		$this->capability = $capability;
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritdoc}
 	 */
 	public function download() {
-
 		if ( ! current_user_can( $this->capability ) ) {
 			wp_die( 'Cheating Uh?' );
 		}
@@ -88,13 +86,12 @@ final class BackWPup_Download_File implements BackWPup_Download_File_Interface {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritdoc}
 	 */
 	public function clean_ob() {
-
 		$level = ob_get_level();
 		if ( $level ) {
-			for ( $i = 0; $i < $level; $i ++ ) {
+			for ( $i = 0; $i < $level; ++$i ) {
 				ob_end_clean();
 			}
 		}
@@ -103,29 +100,27 @@ final class BackWPup_Download_File implements BackWPup_Download_File_Interface {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritdoc}
 	 */
 	public function filepath() {
-
 		return $this->filepath;
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritdoc}
 	 */
 	public function headers() {
-
 		$mime = MimeTypeExtractor::fromFilePath( $this->filepath );
 
 		$level = ob_get_level();
 		if ( $level ) {
-			for ( $i = 0; $i < $level; $i ++ ) {
+			for ( $i = 0; $i < $level; ++$i ) {
 				ob_end_clean();
 			}
 		}
 
-		// phpcs:ignore
-		@set_time_limit( 300 );
+        // phpcs:ignore
+        @set_time_limit(300);
 		nocache_headers();
 
 		// Set headers.
@@ -139,14 +134,11 @@ final class BackWPup_Download_File implements BackWPup_Download_File_Interface {
 	}
 
 	/**
-	 * Perform the Download
+	 * Perform the Download.
 	 *
 	 * Note: The callback must call `die` it self.
-	 *
-	 * @return void
 	 */
 	private function perform_download_callback() {
-
 		call_user_func( $this->callback, $this );
 	}
 }

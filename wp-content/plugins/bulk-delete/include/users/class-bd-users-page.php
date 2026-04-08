@@ -16,7 +16,7 @@ defined( 'ABSPATH' ) || exit; // Exit if accessed directly
  *
  * @since 5.5
  */
-class BD_Users_Page extends BD_Page  {
+class BD_Users_Page extends BD_Page  { //phpcs:ignore
 	/**
 	 * Make this class a "hybrid Singleton".
 	 *
@@ -50,7 +50,7 @@ class BD_Users_Page extends BD_Page  {
 		);
 
 		$this->messages = array(
-			'warning_message'      => __( 'WARNING: Users deleted once cannot be retrieved back. Use with caution.', 'bulk-delete' ),
+			'warning_message'      => __( 'WARNING: There is no undo! Once deleted, users are gone. Use with caution.', 'bulk-delete' ),
 		);
 
 		add_filter( 'plugin_action_links', array( $this, 'add_plugin_action_links' ), 10, 2 );

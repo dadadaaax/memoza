@@ -3,133 +3,180 @@
 /**
  * Base class for adding BackWPup destinations.
  *
- * @package BackWPup
  * @since 3.0.0
  */
 abstract class BackWPup_Destinations {
 
 	/**
-	 * @return array
+	 * Download capability name.
+	 *
+	 * @var string
 	 */
-	abstract public function option_defaults();
+	private const CAPABILITY = 'backwpup_backups_download';
+	/**
+	 * Backup archive extensions.
+	 *
+	 * @var string[]
+	 */
+	private const EXTENSIONS = [
+		'.tar.gz',
+		'.tar',
+		'.zip',
+	];
+	/**
+	 * The local destination.
+	 *
+	 * @var array
+	 */
+	private static $local_destination = [
+		'local' => [
+			'slug'  => 'FOLDER',
+			'label' => 'Website Server',
+		],
+	];
+	/**
+	 * The cloud destinations.
+	 *
+	 * @var array
+	 */
+	private static $destinations = [
+		'dropbox'   => [
+			'slug'  => 'DROPBOX',
+			'label' => 'Dropbox',
+		],
+		'sftp'      => [
+			'slug'  => 'FTP',
+			'label' => 'FTP',
+		],
+		'msazure'   => [
+			'slug'  => 'MSAZURE',
+			'label' => 'Microsoft Azure',
+		],
+		's3'        => [
+			'slug'  => 'S3',
+			'label' => 'Amazon S3',
+		],
+		'sugarsync' => [
+			'slug'  => 'SUGARSYNC',
+			'label' => 'Sugar Sync',
+		],
+		'rsc'       => [
+			'slug'  => 'RSC',
+			'label' => 'Rackspace Cloud',
+		],
+	];
 
 	/**
-	 * @param $jobid int
-	 */
-	abstract public function edit_tab( $jobid );
-
-	/**
-	 * @param $jobid int
-	 */
-	public function edit_auth( $jobid ) {
-
-	}
-
-	/**
-	 * @param $jobid int
-	 */
-	abstract public function edit_form_post_save( $jobid );
-
-	/**
-	 * use wp_enqueue_script() here to load js for tab
-	 */
-	public function admin_print_scripts() {
-
-	}
-
-	public function edit_inline_js() {
-
-	}
-
-	public function edit_ajax() {
-
-	}
-
-	public function wizard_admin_print_styles() {
-
-	}
-
-	public function wizard_admin_print_scripts() {
-
-	}
-
-	public function wizard_inline_js() {
-
-	}
-
-	/**
-	 * @param $job_settings array
-	 */
-	public function wizard_page( array $job_settings ) {
-
-		echo '<br /><pre>';
-		print_r( $job_settings );
-		echo '</pre>';
-	}
-
-	/**
-	 * @param $job_settings array
+	 * Get default options for the destination.
 	 *
 	 * @return array
 	 */
-	public function wizard_save( array $job_settings ) {
+	abstract public function option_defaults(): array;
 
-		return $job_settings;
-	}
-
-	public function admin_print_styles() {
-
+	/**
+	 * Edit authentication settings.
+	 *
+	 * @param int $jobid Job id.
+	 *
+	 * @return void
+	 */
+	public function edit_auth( int $jobid ): void {
 	}
 
 	/**
-	 * @param $jobdest string
-	 * @param $backupfile
+	 * Save the form data.
+	 *
+	 * @param int|array $jobid Job id or list of ids.
+	 *
+	 * @return void
 	 */
-	public function file_delete( $jobdest, $backupfile ) {
+	abstract public function edit_form_post_save( $jobid ): void;
 
+	/**
+	 * Use wp_enqueue_script() here to load JS for tab.
+	 *
+	 * @return void
+	 */
+	public function admin_print_scripts(): void {
 	}
 
 	/**
-	 * @param $jobid int
-	 * @param $file_path
-	 * @param $local_file_path
+	 * Print inline JavaScript.
+	 *
+	 * @return void
 	 */
-	public function file_download( $jobid, $file_path, $local_file_path = null ) {
+	public function edit_inline_js(): void {
+	}
 
-		$capability = 'backwpup_backups_download';
+	/**
+	 * Handle AJAX for destination settings.
+	 *
+	 * @return void
+	 */
+	public function edit_ajax(): void {
+	}
+
+	/**
+	 * Enqueue admin styles.
+	 *
+	 * @return void
+	 */
+	public function admin_print_styles(): void {
+	}
+
+	/**
+	 * Delete a file from the destination.
+	 *
+	 * @param string $jobdest    Destination identifier.
+	 * @param string $backupfile Backup file path.
+	 *
+	 * @return void
+	 */
+	public function file_delete( string $jobdest, string $backupfile ): void {
+	}
+
+	/**
+	 * Download a file from the destination.
+	 *
+	 * @param int         $jobid           Job id.
+	 * @param string      $file_path       Remote file path.
+	 * @param string|null $local_file_path Local file path.
+	 *
+	 * @return void
+	 */
+	public function file_download( int $jobid, string $file_path, ?string $local_file_path = null ): void {
 		$filename = untrailingslashit( BackWPup::get_plugin_data( 'temp' ) ) . '/' . basename( $local_file_path ?: $file_path );
-		$job_id = filter_var( $_GET['jobid'], FILTER_SANITIZE_NUMBER_INT );
 
-		// Dynamically get downloader class
-		$class_name = get_class( $this );
-		$parts = explode( '_', $class_name );
+		// Dynamically get downloader class.
+		$class_name  = get_class( $this );
+		$parts       = explode( '_', $class_name );
 		$destination = array_pop( $parts );
 
 		$downloader = new BackWpup_Download_Handler(
 			new BackWPup_Download_File(
 				$filename,
-				function ( \BackWPup_Download_File_Interface $obj ) use (
+				static function () use (
 					$filename,
 					$file_path,
-					$job_id,
+					$jobid,
 					$destination
-				) {
-
+				): void {
 					// Setup Destination service and download file.
-					$factory = new BackWPup_Destination_Downloader_Factory();
+					$factory    = new BackWPup_Destination_Downloader_Factory();
 					$downloader = $factory->create(
 						$destination,
-						$job_id,
+						$jobid,
 						$file_path,
 						$filename
 					);
 					$downloader->download_by_chunks();
-					die();
+
+					exit();
 				},
-				$capability
+				self::CAPABILITY
 			),
 			'backwpup_action_nonce',
-			$capability,
+			self::CAPABILITY,
 			'download_backup_file'
 		);
 
@@ -138,148 +185,189 @@ abstract class BackWPup_Destinations {
 	}
 
 	/**
-	 * @param $jobdest string
+	 * Get the list of files for the job.
 	 *
+	 * @param string $jobdest The job destination identifier.
 	 * @return array
 	 */
-	public function file_get_list( $jobdest ) {
+	public function file_get_list( string $jobdest ): array {
+		$key  = 'backwpup_' . strtolower( $jobdest );
+		$list = get_site_transient( $key );
 
-		return array();
+		if ( false === $list ) {
+			// Legacy compatibility (e.g. Glacier history stored in options).
+			$list = get_site_option( $key, [] );
+		}
+
+		$files = array_filter( (array) $list );
+
+		// Disable auto downloading for onedrive during restoration. See #1239 on Github.
+		if ( BackWPup::is_pro() && $this->get_service_name() !== 'OneDrive' ) {
+			$file_list = new BackWPup_Pro_Destinations();
+
+			return $file_list->file_get_list( $jobdest, $files, $this->get_service_name() );
+		}
+
+		return $files;
 	}
 
 	/**
-	 * @param $job_object BackWPup_Job
-	 */
-	abstract public function job_run_archive( BackWPup_Job $job_object );
-
-	/**
-	 * @param $job_object BackWPup_Job
-	 */
-	public function job_run_sync( BackWPup_Job $job_object ) {
-
-	}
-
-	/**
-	 * Prepare Restore
+	 * Run the archive job for destination.
 	 *
-	 * Method for preparing the restore process.
-	 *
-	 * @param $job_id    int    Number of job.
-	 * @param $file_name string Name of backup.
-	 *
-	 * @return string The file path, empty string if file cannot be found.
-	 */
-	public function prepare_restore( $job_id, $file_name ) {
-
-	}
-
-	/**
-	 * @param $job_settings array
+	 * @param BackWPup_Job $job_object Job object.
 	 *
 	 * @return bool
 	 */
-	abstract public function can_run( array $job_settings );
+	abstract public function job_run_archive( BackWPup_Job $job_object ): bool;
 
 	/**
-	 * Is Backup Archive
+	 * Run the sync job for destination.
 	 *
-	 * Checks if given file is a backup archive.
-	 *
-	 * @param $file
+	 * @param BackWPup_Job $job_object Job object.
 	 *
 	 * @return bool
 	 */
-	public function is_backup_archive( $file ) {
-
-		$extensions = array(
-			'.tar.gz',
-			'.tar',
-			'.zip',
-		);
-
-		$file = trim( basename( $file ) );
-		$filename = '';
-
-		foreach ( $extensions as $extension ) {
-			if ( substr( $file, ( strlen( $extension ) * - 1 ) ) === $extension ) {
-				$filename = substr( $file, 0, ( strlen( $extension ) * - 1 ) );
-			}
-		}
-
-		if ( ! $filename ) {
-			return false;
-		}
+	public function job_run_sync( BackWPup_Job $job_object ): bool {
+		unset( $job_object );
 
 		return true;
 	}
 
-    /**
-     * Checks if the given archive belongs to the given job.
-     *
-     * @param string $file
-     * @param int $jobid
-     *
-     * @return bool
-     */
-    public function is_backup_owned_by_job($file, $jobid)
-    {
+	/**
+	 * Check whether destination can run.
+	 *
+	 * @param array $job_settings Job settings.
+	 *
+	 * @return bool
+	 */
+	abstract public function can_run( array $job_settings ): bool;
 
-        $info = pathinfo($file);
-        $file = basename($file, '.' . $info['extension']);
+	/**
+	 * Is Backup Archive.
+	 *
+	 * Checks if given file is a backup archive.
+	 *
+	 * @param string $file File path.
+	 *
+	 * @return bool
+	 */
+	public function is_backup_archive( string $file ): bool {
+		$filename = trim( basename( $file ) );
+		foreach ( self::EXTENSIONS as $extension ) {
+			if ( substr( $filename, ( strlen( $extension ) * -1 ) ) === $extension ) {
+				return true;
+			}
+		}
 
-        // Try 10-character chunks first for base 32 and most of base 36
-        $data = $this->getDecodedHashAndJobId($file, 10);
+		return false;
+	}
 
-        // Try 9-character chunks for any left-over base 36
-        if (!$data) {
-            $data = $this->getDecodedHashAndJobId($file, 9);
-        }
+	/**
+	 * Checks if the given archive belongs to the given job.
+	 *
+	 * @param string $file  File path.
+	 * @param int    $jobid Job id.
+	 *
+	 * @return bool
+	 */
+	public function is_backup_owned_by_job( string $file, int $jobid ): bool {
+		if ( ! $this->is_backup_archive( $file ) ) {
+			return false;
+		}
 
-        if (!$data || !$this->dataContainsCorrectValues($data, $jobid)) {
-            return false;
-        }
+		$file = basename( $file );
+		$file = str_ireplace( self::EXTENSIONS, '', $file );
 
-        return true;
-    }
+		// Try 10-character chunks first for base 32 and most of base 36.
+		$data = $this->get_decoded_hash_and_job_id( $file, 10 );
 
-    /**
-     * @param string $file
-     * @param int $numberOfCharacters
-     *
-     * @return array|bool
-     */
-    protected function getDecodedHashAndJobId($file, $numberOfCharacters)
-    {
+		// Try 9-character chunks for any left-over base 36.
+		if ( ! $data ) {
+			$data = $this->get_decoded_hash_and_job_id( $file, 9 );
+		}
 
-        $data = array();
+		return $data && $this->data_contains_correct_values( $data, $jobid );
+	}
 
-        for ($i = strlen($file) - $numberOfCharacters; $i >= 0; $i--) {
-            $data = BackWPup_Option::decode_hash(substr($file, $i, $numberOfCharacters));
-            if ($data) {
-                break;
-            }
-        }
+	/**
+	 * Decode hash and job id from the file name.
+	 *
+	 * @param string $file                 File name.
+	 * @param int    $number_of_characters Number of characters to decode.
+	 *
+	 * @return array|bool
+	 */
+	protected function get_decoded_hash_and_job_id( string $file, int $number_of_characters ) {
+		$data = [];
 
-        return $data;
-    }
+		for ( $i = strlen( $file ) - $number_of_characters; $i >= 0; --$i ) {
+			$data = BackWPup_Option::decode_hash( substr( $file, $i, $number_of_characters ) );
+			if ( $data ) {
+				break;
+			}
+		}
 
-    /**
-     * @param array $data
-     * @param int $jobid
-     *
-     * @return bool
-     */
-    protected function dataContainsCorrectValues($data, $jobid)
-    {
+		return $data;
+	}
 
-        if ($data[0] !== BackWPup::get_plugin_data('hash')) {
-            return false;
-        }
+	/**
+	 * Check if decoded data matches expected values.
+	 *
+	 * @param array $data  Decoded data.
+	 * @param int   $jobid Job id.
+	 *
+	 * @return bool
+	 */
+	protected function data_contains_correct_values( array $data, int $jobid ): bool {
+		if ( BackWPup::get_plugin_data( 'hash' ) !== $data[0] ) {
+			return false;
+		}
 
-        if ($data[1] !== $jobid) {
-            return false;
-        }
+		return $data[1] === $jobid;
+	}
 
-        return true;
-    }
+	/**
+	 * Get the storage destinations list.
+	 *
+	 * @param bool $with_array Include the local destination.
+	 * @return array
+	 */
+	public static function get_destinations( bool $with_array = false ): array {
+		$destinations = [];
+		if ( $with_array ) {
+			$destinations = array_merge( self::$local_destination, self::$destinations );
+		} else {
+			$destinations = self::$destinations;
+		}
+		if ( BackWPup::is_pro() ) {
+			$destinations = array_merge( $destinations, BackWPup_Pro_Destinations::get_destinations() );
+		}
+
+		$checked_destinations = \BackWPup::get_registered_destinations();
+		foreach ( $destinations as $key => $destination ) {
+			$error = $checked_destinations[ $destination['slug'] ]['error'];
+			if ( $error ) {
+				$destinations[ $key ]['deactivated_message'] = $error;
+			}
+		}
+
+		return $destinations;
+	}
+
+	/**
+	 * Remove file history from database
+	 *
+	 * @param array  $files Array of files that should be removed.
+	 * @param string $destination The destination of the backup.
+	 *
+	 * @return void
+	 */
+	public function remove_file_history_from_database( array $files, string $destination ): void {
+		do_action( 'backwpup_after_delete_backups', $files, $destination );
+	}
+
+	/**
+	 * Implement this to return the service name for this destination.
+	 */
+	abstract public function get_service_name(): string;
 }

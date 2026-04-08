@@ -38,7 +38,7 @@ class BD_Settings {
 		 *
 		 * @since 5.0
 		 */
-		do_action( 'bd_license_field' );
+		do_action( 'bd_license_field' ); //phpcs:ignore
 	}
 
 	/**
@@ -57,6 +57,6 @@ class BD_Settings {
 		 *
 		 * @since 5.0
 		 */
-		return apply_filters( 'bd_license_input', $input );
+		return apply_filters( 'bd_license_input', $input ); //phpcs:ignore
 	}
 }

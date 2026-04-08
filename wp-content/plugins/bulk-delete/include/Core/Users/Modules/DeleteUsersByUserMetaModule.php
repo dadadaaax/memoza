@@ -24,7 +24,7 @@ class DeleteUsersByUserMetaModule extends UsersModule {
 		$this->meta_box_slug = 'bd_users_by_meta';
 		$this->action        = 'delete_users_by_meta';
 		$this->cron_hook     = 'do-bulk-delete-users-by-meta';
-		$this->scheduler_url = 'https://bulkwp.com/addons/scheduler-for-deleting-users-by-meta/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow&utm_content=bd-u-ma';
+		$this->scheduler_url = 1;
 		$this->messages      = array(
 			'box_label'  => __( 'By User Meta', 'bulk-delete' ),
 			'scheduled'  => __( 'Users from with the selected user meta are scheduled for deletion.', 'bulk-delete' ),
@@ -40,7 +40,7 @@ class DeleteUsersByUserMetaModule extends UsersModule {
 	public function render() {
 ?>
 		<!-- Users Start-->
-		<h4><?php _e( 'Select the user meta from which you want to delete users', 'bulk-delete' ); ?></h4>
+		<h4><?php esc_html_e( 'Select the user meta from which you want to delete users', 'bulk-delete' ); ?></h4>
 
 		<fieldset class="options">
 			<table class="optiontable">
@@ -65,12 +65,12 @@ class DeleteUsersByUserMetaModule extends UsersModule {
 					<option value="STARTS WITH">Starts with</option>
 					<option value="ENDS WITH">Ends with</option>
 				</select>
-				<input type="text" name="smbd_u_meta_value" id="smbd_u_meta_value" placeholder="<?php _e( 'Meta Value', 'bulk-delete' ); ?>">
+				<input type="text" name="smbd_u_meta_value" id="smbd_u_meta_value" placeholder="<?php esc_html_e( 'Meta Value', 'bulk-delete' ); ?>">
 
 			</table>
 
 			<p>
-				<?php _e( 'If you want to check for null values, then leave the value column blank', 'bulk-delete' ); ?>
+				<?php esc_html_e( 'If you want to check for null values, then leave the value column blank', 'bulk-delete' ); ?>
 			</p>
 
 			<table class="optiontable">

@@ -116,7 +116,7 @@ final class Bulk_Delete {
 	 * @return void
 	 */
 	public function __clone() {
-		_doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'bulk-delete' ), '5.0' );
+		_doing_it_wrong( __FUNCTION__, esc_html__( 'Cheatin&#8217; huh?', 'bulk-delete' ), '5.0' );
 	}
 
 	/**
@@ -128,7 +128,7 @@ final class Bulk_Delete {
 	 * @return void
 	 */
 	public function __wakeup() {
-		_doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'bulk-delete' ), '5.0' );
+		_doing_it_wrong( __FUNCTION__, esc_html__( 'Cheatin&#8217; huh?', 'bulk-delete' ), '5.0' );
 	}
 
 	/**
@@ -205,11 +205,129 @@ final class Bulk_Delete {
 				break;
 		}
 
-		$trace = debug_backtrace();
-		trigger_error( 'Undefined property via __get(): ' . $name . ' in ' . $trace[0]['file'] . ' on line ' . $trace[0]['line'], E_USER_NOTICE );
-
 		return null;
 	}
+
+    static function sidebar(){
+        echo '<div class="sidebar-box pro-ad-box">
+            <p class="text-center"><a style="margin-left: -50px;" href="#" data-pro-feature="sidebar-box-logo" class="open-pro-dialog sidebar-box-logo">
+            <img src="' . esc_url(BULK_DELETE_URL . 'assets/img/bulkwp-logo.png') . '" alt="Bulk Delete PRO" title="Bulk Delete PRO">WP Bulk Delete PRO</a><br><b>Save time &amp; money when cleaning your site!</b></p>
+            <ul class="plain-list">
+                <li>Delete posts by any advanced property or parametar</li>
+                <li>Bulk delete any WP object with advanced rules</li>
+                <li>Clean up Media files</li>
+                <li>Delete Post Meta Fields</li>
+                <li>Delete Comment Meta Fields</li>
+                <li>Delete User Meta Fields</li>
+                <li>Shedule Tasks to run automatically</li>
+                <li>Email support directly from plugin developers</li>
+            </ul>
+
+            <p class="text-center"><a href="#" class="open-pro-dialog button button-buy" data-pro-feature="sidebar-box-btn">Get a license Now</a></p>
+            </div>';
+
+        if (!defined('EPS_REDIRECT_VERSION') && !defined('WF301_PLUGIN_FILE')) {
+        echo '<div class="sidebar-box pro-ad-box box-301">
+                <h3 class="textcenter"><b>Problems with redirects?<br>Moving content around or changing posts\' URL?<br>Old URLs giving you problems?<br><br><u>Improve your SEO &amp; manage all redirects in one place!</u></b></h3>
+
+                <p class="text-center"><a href="#" class="install-wp301">
+                <img src="' . esc_url(BULK_DELETE_URL . 'assets/img/wp-301-logo.png') . '" alt="WP 301 Redirects" title="WP 301 Redirects"></a></p>
+
+                <p class="text-center"><a href="#" class="button button-buy install-wp301">Install and activate the <u>free</u> WP 301 Redirects plugin</a></p>
+
+                <p><a href="https://wordpress.org/plugins/eps-301-redirects/" target="_blank">WP 301 Redirects</a> is a free WP plugin maintained by the same team as this Bulk Delete plugin. It has <b>+250,000 users, 5-star rating</b>, and is hosted on the official WP repository.</p>
+                </div>';
+        }
+
+        echo '<div class="sidebar-box" style="margin-top: 35px;">
+                <p>Please <a href="https://wordpress.org/support/plugin/bulk-delete/reviews/#new-post" target="_blank">rate the plugin ★★★★★</a> to <b>keep it up-to-date &amp; maintained</b>. It only takes a second to rate. Thank you! 👋</p>
+                </div>';
+        echo '</div>';
+        echo '</form>';
+
+        echo ' <div id="bulkwp-pro-dialog" style="display: none;" title="Bulk Delete PRO is here!"><span class="ui-helper-hidden-accessible"><input type="text"/></span>
+
+            <div class="center logo"><a href="https://bulkwp.com/?ref=bulkwp-free-pricing-table" target="_blank" class="sidebar-box-logo"><img src="' . esc_url(BULK_DELETE_URL . 'assets/img/bulkwp-logo.png') . '" alt="Bulk Delete PRO" title="Bulk Delete PRO">  Bulk Delete</a><br>
+
+            </div>
+
+            <table id="bulkwp-pro-table">
+            <tr>
+            <td class="center">Personal License</td>
+            <td class="center">Team License</td>
+            <td class="center">Agency License</td>
+            </tr>
+
+            <tr class="prices">
+            <td class="center"><span>$59</span> <b>/year</b></td>
+            <td class="center"><span>$99</span> <b>/year</b></td>
+            <td class="center"><span>$119</span> <b>/year</b></td>
+            </tr>
+
+            <tr>
+            <td><span class="dashicons dashicons-yes"></span><b>1 Site License</b>  ($59 per site)</td>
+            <td><span class="dashicons dashicons-yes"></span><b>5 Sites License</b>  ($19 per site)</td>
+            <td><span class="dashicons dashicons-yes"></span><b>100 Sites License</b>  ($1.1 per site)</td>
+            </tr>
+
+            <tr>
+            <td><span class="dashicons dashicons-yes"></span>All Plugin Features</td>
+            <td><span class="dashicons dashicons-yes"></span>All Plugin Features</td>
+            <td><span class="dashicons dashicons-yes"></span>All Plugin Features</td>
+            </tr>
+
+            <tr>
+            <td><span class="dashicons dashicons-yes"></span>Bulk delete any WP object with advanced rules</td>
+            <td><span class="dashicons dashicons-yes"></span>Bulk delete any WP object with advanced rules</td>
+            <td><span class="dashicons dashicons-yes"></span>Bulk delete any WP object with advanced rules</td>
+            </tr>
+
+            <tr>
+            <td><span class="dashicons dashicons-yes"></span>Schedule tasks to run automatically</td>
+            <td><span class="dashicons dashicons-yes"></span>Schedule tasks to run automatically</td>
+            <td><span class="dashicons dashicons-yes"></span>Schedule tasks to run automatically</td>
+            </tr>
+
+            <tr>
+            <td><span class="dashicons dashicons-yes"></span>Email reports &amp; notifications</td>
+            <td><span class="dashicons dashicons-yes"></span>Email reports &amp; notifications</td>
+            <td><span class="dashicons dashicons-yes"></span>Email reports &amp; notifications</td>
+            </tr>
+
+            <tr>
+            <td><span class="dashicons dashicons-yes"></span>1 year of updates</td>
+            <td><span class="dashicons dashicons-yes"></span>1 year of updates</td>
+            <td><span class="dashicons dashicons-yes"></span>1 year of updates</td>
+            </tr>
+
+            <tr>
+            <td><span class="dashicons dashicons-yes"></span>1 year of support</td>
+            <td><span class="dashicons dashicons-yes"></span>1 year of support</td>
+            <td><span class="dashicons dashicons-yes"></span>1 year of support</td>
+            </tr>
+
+            <tr>
+            <td><span class="dashicons dashicons-yes"></span>Email support from plugin devs</td>
+            <td><span class="dashicons dashicons-yes"></span>Email support from plugin devs</td>
+            <td><span class="dashicons dashicons-yes"></span>Email support from plugin devs</td>
+            </tr>
+
+            <tr>
+            <td><span class="dashicons dashicons-no"></span>White-label mode</td>
+            <td><span class="dashicons dashicons-no"></span>White-label mode</td>
+            <td><span class="dashicons dashicons-yes"></span>White-label mode</td>
+            </tr>
+
+            <tr>
+            <td><a class="button button-buy" data-href-org="https://bulkwp.com/buy/?product=personal-yearly&ref=pricing-table" href="https://bulkwp.com/buy/?product=personal-yearly&ref=pricing-table" target="_blank">BUY NOW</a><br>- or -<br><a data-href-org="https://bulkwp.com/buy/?product=personal-ltd-launch&ref=pricing-table" href="https://bulkwp.com/buy/?product=personal-ltd-launch&ref=pricing-table" target="_blank">Only <del>$159</del> $89 for a lifetime license</a>
+            <td><a class="button button-buy" data-href-org="https://bulkwp.com/buy/?product=team-yearly&ref=pricing-table" href="https://bulkwp.com/buy/?product=team-yearly&ref=pricing-table" target="_blank">BUY NOW</a></td>
+            <td><a class="button button-buy" data-href-org="https://bulkwp.com/buy/?product=agency-yearly&ref=pricing-table" href="https://bulkwp.com/buy/?product=agency-yearly&ref=pricing-table" target="_blank">BUY NOW</a></td>
+            </tr>
+
+            </table>
+
+            <div class="center footer"><b>100% No-Risk Money Back Guarantee!</b> If you don\'t like the plugin over the next 7 days, we will happily refund 100% of your money. No questions asked! Payments are processed by our merchant of records - <a href="https://paddle.com/" target="_blank">Paddle</a>.</div>';
+    }
 }
 
 /**
@@ -238,7 +356,7 @@ function BULK_DELETE() {
  *
  * @param string $plugin_file Main plugin file.
  */
-function bd_setup_backward_compatibility( $plugin_file ) {
+function bd_setup_backward_compatibility( $plugin_file ) { //phpcs:ignore
 	$bd = BULK_DELETE();
 	$bd->set_plugin_file( $plugin_file );
 }

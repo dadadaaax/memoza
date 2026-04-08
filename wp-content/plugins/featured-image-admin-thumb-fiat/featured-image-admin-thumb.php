@@ -11,7 +11,7 @@
  * Plugin Name:       Featured Image Admin Thumb
  * Plugin URI:        https://www.seanhayes.biz
  * Description:       Adds inline thumbnail image to admin columns for All Post/post types view (where supported). Click to easily set/change the featured image for that content.
- * Version:           1.5.3
+ * Version:           1.6.1
  * Author:            Sean Hayes
  * Author URI:        https://www.seanhayes.biz
  * Text Domain:       featured-image-admin-thumb-fiat
@@ -56,5 +56,14 @@ add_action( 'plugins_loaded',           array( 'Featured_Image_Admin_Thumb', 'ge
 if ( is_admin() ) {
 	require_once( plugin_dir_path( __FILE__ ) . 'admin/class-featured-image-admin-thumb-admin.php' );
 	add_action( 'plugins_loaded', array( 'Featured_Image_Admin_Thumb_Admin', 'get_instance' ) );
-
+	add_action(
+		'init',
+		static function (){
+			load_plugin_textdomain(
+				'featured-image-admin-thumb-fiat',
+				false,
+				dirname( dirname( plugin_basename( __FILE__ ) ) ) . '/languages/'
+			);
+		}
+	);
 }

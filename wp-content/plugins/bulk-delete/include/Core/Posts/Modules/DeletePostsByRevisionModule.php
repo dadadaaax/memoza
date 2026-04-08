@@ -24,17 +24,17 @@ class DeletePostsByRevisionModule extends PostsModule {
 
 	public function render() {
 		global $wpdb;
-		$revisions = $wpdb->get_var( "select count(*) from $wpdb->posts where post_type = 'revision'" );
+		$revisions = $wpdb->get_var( "select count(*) from $wpdb->posts where post_type = 'revision'" ); //phpcs:ignore
 ?>
         <!-- Post Revisions start-->
-        <h4><?php _e( 'Select the posts which you want to delete', 'bulk-delete' ); ?></h4>
+        <h4><?php esc_html_e( 'Select the posts which you want to delete', 'bulk-delete' ); ?></h4>
 
         <fieldset class="options">
         <table class="optiontable">
             <tr>
                 <td>
                     <input name="smbd_revisions" id ="smbd_revisions" value="revisions" type="checkbox">
-                    <label for="smbd_revisions"><?php _e( 'All Revisions', 'bulk-delete' ); ?> (<?php echo $revisions . ' '; _e( 'Revisions', 'bulk-delete' ); ?>)</label>
+                    <label for="smbd_revisions"><?php esc_html_e( 'All Revisions', 'bulk-delete' ); ?> (<?php echo esc_html($revisions) . ' '; esc_html_e( 'Revisions', 'bulk-delete' ); ?>)</label>
                 </td>
             </tr>
 
@@ -55,7 +55,7 @@ class DeletePostsByRevisionModule extends PostsModule {
 
 		// Revisions
 		if ( 'revisions' == $delete_options['revisions'] ) {
-			$revisions = $wpdb->get_results( "select ID from $wpdb->posts where post_type = 'revision'" );
+			$revisions = $wpdb->get_results( "select ID from $wpdb->posts where post_type = 'revision'" ); //phpcs:ignore
 
 			foreach ( $revisions as $revision ) {
 				wp_delete_post( $revision->ID );

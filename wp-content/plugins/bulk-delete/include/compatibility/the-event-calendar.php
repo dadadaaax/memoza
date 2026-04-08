@@ -15,7 +15,7 @@ defined( 'ABSPATH' ) || exit; // Exit if accessed directly
  *
  * @since 5.5.1
  */
-function bd_remove_event_calendar_filter() {
+function bd_remove_event_calendar_filter() { //phpcs:ignore
 	if ( class_exists( 'Tribe__Events__Query' ) ) {
 		remove_action( 'pre_get_posts', array( 'Tribe__Events__Query', 'pre_get_posts' ), 50 );
 	}

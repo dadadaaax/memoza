@@ -18,7 +18,7 @@ defined( 'ABSPATH' ) || exit; // Exit if accessed directly.
  *
  * @return \BulkWP\BulkDelete\Addon\BaseAddon Instance of the add-on.
  */
-function load_bulk_delete_addon( $addon_class, $addon_details ) {
+function load_bulk_delete_addon( $addon_class, $addon_details ) { //phpcs:ignore
 	$addon_info = new \BulkWP\BulkDelete\Core\Addon\AddonInfo( $addon_details );
 
 	$bulk_delete = \BulkWP\BulkDelete\Core\BulkDelete::get_instance();

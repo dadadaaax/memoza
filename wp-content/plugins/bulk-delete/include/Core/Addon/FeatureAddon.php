@@ -91,7 +91,7 @@ abstract class FeatureAddon extends BaseAddon {
 			 *
 			 * @param \BulkWP\BulkDelete\Core\Base\BaseDeletePage $page The page in which the modules are registered.
 			 */
-			do_action( "bd_after_modules_{$page->get_page_slug()}", $page );
+			do_action( "bd_after_modules_{$page->get_page_slug()}", $page ); //phpcs:ignore
 
 			/**
 			 * After the modules are registered in a delete page.
@@ -100,7 +100,7 @@ abstract class FeatureAddon extends BaseAddon {
 			 *
 			 * @param BasePage $posts_page The page in which the modules are registered.
 			 */
-			do_action( 'bd_after_modules', $page );
+			do_action( 'bd_after_modules', $page ); //phpcs:ignore
 
 			$primary_pages[ $page->get_page_slug() ] = $page;
 		}

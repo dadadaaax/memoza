@@ -44,10 +44,10 @@ class Controller {
 	 */
 	public function request_handler() {
 		if ( isset( $_POST['bd_action'] ) ) {
-			$bd_action   = sanitize_text_field( $_POST['bd_action'] );
+			$bd_action   = sanitize_text_field( wp_unslash($_POST['bd_action'] ?? '') );
 			$nonce_valid = false;
 
-			if ( 'delete_jetpack_messages' === $bd_action && wp_verify_nonce( $_POST['sm-bulk-delete-misc-nonce'], 'sm-bulk-delete-misc' ) ) {
+			if ( 'delete_jetpack_messages' === $bd_action && wp_verify_nonce( sanitize_text_field(wp_unslash($_POST['sm-bulk-delete-misc-nonce'] ?? '')), 'sm-bulk-delete-misc' ) ) {
 				$nonce_valid = true;
 			}
 
@@ -56,7 +56,7 @@ class Controller {
 			 *
 			 * @since 5.5
 			 */
-			if ( ! apply_filters( 'bd_action_nonce_check', $nonce_valid, $bd_action ) ) {
+			if ( ! apply_filters( 'bd_action_nonce_check', $nonce_valid, $bd_action ) ) { //phpcs:ignore
 				return;
 			}
 
@@ -66,7 +66,7 @@ class Controller {
 			 *
 			 * @since 5.4
 			 */
-			do_action( 'bd_pre_bulk_action', $bd_action );
+			do_action( 'bd_pre_bulk_action', $bd_action ); //phpcs:ignore
 
 			/**
 			 * Perform the bulk operation.
@@ -74,11 +74,11 @@ class Controller {
 			 *
 			 * @since 5.4
 			 */
-			do_action( 'bd_' . $bd_action, $_POST );
+			do_action( 'bd_' . $bd_action, $_POST ); //phpcs:ignore
 		}
 
 		if ( isset( $_GET['bd_action'] ) ) {
-			$bd_action   = sanitize_text_field( $_GET['bd_action'] );
+			$bd_action   = sanitize_text_field( wp_unslash($_GET['bd_action'] ?? '') );
 			$nonce_valid = false;
 
 			/**
@@ -86,7 +86,7 @@ class Controller {
 			 *
 			 * @since 5.5.4
 			 */
-			if ( ! apply_filters( 'bd_get_action_nonce_check', $nonce_valid, $bd_action ) ) {
+			if ( ! apply_filters( 'bd_get_action_nonce_check', $nonce_valid, $bd_action ) ) { //phpcs:ignore
 				return;
 			}
 
@@ -96,7 +96,7 @@ class Controller {
 			 *
 			 * @since 5.5.4
 			 */
-			do_action( 'bd_' . $bd_action, $_GET );
+			do_action( 'bd_' . $bd_action, $_GET ); //phpcs:ignore
 		}
 	}
 
@@ -109,7 +109,7 @@ class Controller {
 	 */
 	public function increase_timeout() {
 		// phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
-		@set_time_limit( 0 );
+		set_time_limit( 0 ); //phpcs:ignore
 	}
 
 	/**
@@ -138,13 +138,17 @@ class Controller {
 	public function load_taxonomy_term() {
 		$response = array();
 
-		$taxonomy = sanitize_text_field( $_GET['taxonomy'] );
+        if (!isset($_REQUEST['nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['nonce'] ?? '')), "bl-nonce")) {
+            exit();
+        }
+
+		$taxonomy = sanitize_text_field( wp_unslash($_GET['taxonomy'] ?? '') );
 
 		$terms = get_terms(
 			array(
 				'taxonomy'   => $taxonomy,
 				'hide_empty' => false,
-				'search'     => sanitize_text_field( $_GET['q'] ),
+				'search'     => sanitize_text_field( wp_unslash($_GET['q'] ?? '') ),
 			)
 		);
 
@@ -190,11 +194,14 @@ class Controller {
 			 *
 			 * @param array Plugin Links.
 			 */
-			$bm_action_links = apply_filters( 'bd_plugin_action_links', array() );
+			$bm_action_links = apply_filters( 'bd_plugin_action_links', array() ); //phpcs:ignore
 
 			if ( ! empty( $bm_action_links ) ) {
 				$action_links = array_merge( $bm_action_links, $action_links );
 			}
+
+      array_unshift($action_links, '<a href="' . admin_url('admin.php?page=bulk-delete-posts#open-pro-dialog') . '"><b>Get PRO</b></a>');
+      array_unshift($action_links, '<a href="' . admin_url('admin.php?page=bulk-delete-posts') . '">Start deleting</a>');
 		}
 
 		return $action_links;
@@ -224,9 +231,9 @@ class Controller {
 		 *
 		 * @param string $query Bulk Delete SQL Query.
 		 */
-		do_action( 'bd_log_sql_query', $query );
+		do_action( 'bd_log_sql_query', $query ); //phpcs:ignore
 
-		error_log( 'Bulk Delete Query: ' . $query );
+		//error_log( 'Bulk Delete Query: ' . $query );
 	}
 
 	/**
@@ -252,19 +259,10 @@ class Controller {
 	 * @since 6.0.0
 	 */
 	protected function load_old_hooks() {
-		// license related.
-		add_action( 'bd_license_form', array( 'BD_License', 'display_activate_license_form' ), 100 );
-		add_action( 'bd_deactivate_license', array( 'BD_License', 'deactivate_license' ) );
-		add_action( 'bd_delete_license', array( 'BD_License', 'delete_license' ) );
-		add_action( 'bd_validate_license', array( 'BD_License', 'validate_license' ), 10, 2 );
-
 		// Settings related.
 		add_action( 'bd_before_secondary_menus', array( 'BD_Settings_Page', 'add_menu' ) );
 		add_action( 'bd_admin_footer_settings_page', 'bd_modify_admin_footer' );
 		add_action( 'admin_init', array( 'BD_Settings', 'create_settings' ), 100 );
-
-		// Help tab related.
-		add_action( 'bd_add_contextual_help', array( 'Bulk_Delete_Help_Screen', 'add_contextual_help' ) );
 
 		// Misc page related.
 		add_action( 'bd_admin_footer_misc_page', 'bd_modify_admin_footer' );

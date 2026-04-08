@@ -24,13 +24,13 @@ class DeletePostsByURLModule extends PostsModule {
 
 	public function render() { ?>
 		<!-- URLs start-->
-        <h4><?php _e( 'Delete posts and pages that have the following Permalink', 'bulk-delete' ); ?></h4>
+        <h4><?php esc_html_e( 'Delete posts and pages that have the following Permalink', 'bulk-delete' ); ?></h4>
 
         <fieldset class="options">
         <table class="optiontable">
             <tr>
                 <td scope="row" colspan="2">
-                    <label for="smdb_specific_pages"><?php _e( 'Enter one post url (not post ids) per line', 'bulk-delete' ); ?></label>
+                    <label for="smdb_specific_pages"><?php esc_html_e( 'Enter one post url (not post ids) per line', 'bulk-delete' ); ?></label>
                     <br>
                     <textarea id="smdb_specific_pages_urls" name="smdb_specific_pages_urls" rows="5" columns="80"></textarea>
                 </td>

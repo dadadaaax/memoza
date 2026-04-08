@@ -25,6 +25,8 @@ use BulkWP\BulkDelete\Core\SystemInfo\SystemInfoPage;
 use BulkWP\BulkDelete\Core\Terms\DeleteTermsPage;
 use BulkWP\BulkDelete\Core\Terms\Modules\DeleteTermsByNameModule;
 use BulkWP\BulkDelete\Core\Terms\Modules\DeleteTermsByPostCountModule;
+use BulkWP\BulkDelete\Core\Attachments\DeleteAttachmentsPage;
+use BulkWP\BulkDelete\Core\Attachments\Modules\DeleteAttachmentsModule;
 use BulkWP\BulkDelete\Core\Users\DeleteUsersPage;
 use BulkWP\BulkDelete\Core\Users\Modules\DeleteUsersByUserMetaModule;
 use BulkWP\BulkDelete\Core\Users\Modules\DeleteUsersByUserRoleModule;
@@ -174,7 +176,7 @@ final class BulkDelete {
 		 *
 		 * @param string Plugin main file.
 		 */
-		do_action( 'bd_loaded', $this->get_plugin_file() );
+		do_action( 'bd_loaded', $this->get_plugin_file() ); //phpcs:ignore
 
 		$this->load_primary_pages();
 	}
@@ -191,7 +193,7 @@ final class BulkDelete {
 	 * @return void
 	 */
 	public function __clone() {
-		_doing_it_wrong( __FUNCTION__, __( "This class can't be cloned. Use `get_instance()` method to get an instance.", 'bulk-delete' ), '5.0' );
+		_doing_it_wrong( __FUNCTION__, esc_html__( "This class can't be cloned. Use `get_instance()` method to get an instance.", 'bulk-delete' ), '5.0' );
 	}
 
 	/**
@@ -203,7 +205,7 @@ final class BulkDelete {
 	 * @return void
 	 */
 	public function __wakeup() {
-		_doing_it_wrong( __FUNCTION__, __( "This class can't be serialized. Use `get_instance()` method to get an instance.", 'bulk-delete' ), '5.0' );
+		_doing_it_wrong( __FUNCTION__, esc_html__( "This class can't be serialized. Use `get_instance()` method to get an instance.", 'bulk-delete' ), '5.0' );
 	}
 
 	/**
@@ -235,24 +237,6 @@ final class BulkDelete {
 	}
 
 	/**
-	 * Triggered when the `init` hook is fired.
-	 *
-	 * @since 6.0.0
-	 */
-	public function on_init() {
-		$this->load_textdomain();
-	}
-
-	/**
-	 * Loads the plugin language files.
-	 *
-	 * @since  5.0
-	 */
-	private function load_textdomain() {
-		load_plugin_textdomain( 'bulk-delete', false, $this->get_translations_path() );
-	}
-
-	/**
 	 * Triggered when the `admin_menu` hook is fired.
 	 *
 	 * Register all admin pages.
@@ -264,47 +248,36 @@ final class BulkDelete {
 			$page->register();
 		}
 
-		\Bulk_Delete_Misc::add_menu();
-
 		/**
-		 * Runs just after adding all *delete* menu items to Bulk WP main menu.
+		 * Runs just after adding all *delete* menu items to Bulk Delete main menu.
 		 *
-		 * This action is primarily for adding extra *delete* menu items to the Bulk WP main menu.
+		 * This action is primarily for adding extra *delete* menu items to the Bulk Delete main menu.
 		 *
 		 * @since 5.3
 		 */
-		do_action( 'bd_after_primary_menus' );
+		do_action( 'bd_after_primary_menus' ); //phpcs:ignore
 
 		/**
-		 * Runs just before adding non-action menu items to Bulk WP main menu.
+		 * Runs just before adding non-action menu items to Bulk Delete main menu.
 		 *
-		 * This action is primarily for adding extra menu items before non-action menu items to the Bulk WP main menu.
+		 * This action is primarily for adding extra menu items before non-action menu items to the Bulk Delete main menu.
 		 *
 		 * @since 5.3
 		 */
-		do_action( 'bd_before_secondary_menus' );
+		do_action( 'bd_before_secondary_menus' ); //phpcs:ignore
 
 		foreach ( $this->get_secondary_pages() as $page ) {
 			$page->register();
 		}
 
-		$this->addon_page = add_submenu_page(
-			\Bulk_Delete::POSTS_PAGE_SLUG,
-			__( 'Addon Licenses', 'bulk-delete' ),
-			__( 'Addon Licenses', 'bulk-delete' ),
-			'activate_plugins',
-			\Bulk_Delete::ADDON_PAGE_SLUG,
-			array( 'BD_License', 'display_addon_page' )
-		);
-
 		/**
-		 * Runs just after adding all menu items to Bulk WP main menu.
+		 * Runs just after adding all menu items to Bulk Delete main menu.
 		 *
-		 * This action is primarily for adding extra menu items to the Bulk WP main menu.
+		 * This action is primarily for adding extra menu items to the Bulk Delete main menu.
 		 *
 		 * @since 5.3
 		 */
-		do_action( 'bd_after_all_menus' );
+		do_action( 'bd_after_all_menus' ); //phpcs:ignore
 	}
 
 	/**
@@ -333,12 +306,14 @@ final class BulkDelete {
 		$users_page = $this->get_delete_users_admin_page();
 		$metas_page = $this->get_delete_metas_admin_page();
 		$terms_page = $this->get_delete_terms_admin_page();
+        $attachments_page = $this->get_delete_attachments_admin_page();
 
 		$this->primary_pages[ $posts_page->get_page_slug() ] = $posts_page;
 		$this->primary_pages[ $pages_page->get_page_slug() ] = $pages_page;
 		$this->primary_pages[ $users_page->get_page_slug() ] = $users_page;
 		$this->primary_pages[ $metas_page->get_page_slug() ] = $metas_page;
 		$this->primary_pages[ $terms_page->get_page_slug() ] = $terms_page;
+		$this->primary_pages[ $attachments_page->get_page_slug() ] = $attachments_page;
 
 		/**
 		 * List of primary admin pages.
@@ -347,7 +322,7 @@ final class BulkDelete {
 		 *
 		 * @param \BulkWP\BulkDelete\Core\Base\BaseDeletePage[] List of Admin pages.
 		 */
-		$this->primary_pages = apply_filters( 'bd_primary_pages', $this->primary_pages );
+		$this->primary_pages = apply_filters( 'bd_primary_pages', $this->primary_pages ); //phpcs:ignore
 	}
 
 	/**
@@ -375,7 +350,7 @@ final class BulkDelete {
 		 *
 		 * @param DeletePostsPage $posts_page The page in which the modules are registered.
 		 */
-		do_action( "bd_after_modules_{$posts_page->get_page_slug()}", $posts_page );
+		do_action( "bd_after_modules_{$posts_page->get_page_slug()}", $posts_page ); //phpcs:ignore
 
 		/**
 		 * After the modules are registered in a delete page.
@@ -384,7 +359,7 @@ final class BulkDelete {
 		 *
 		 * @param BasePage $posts_page The page in which the modules are registered.
 		 */
-		do_action( 'bd_after_modules', $posts_page );
+		do_action( 'bd_after_modules', $posts_page ); //phpcs:ignore
 
 		return $posts_page;
 	}
@@ -408,7 +383,7 @@ final class BulkDelete {
 		 *
 		 * @param DeletePagesPage $pages_page The page in which the modules are registered.
 		 */
-		do_action( "bd_after_modules_{$pages_page->get_page_slug()}", $pages_page );
+		do_action( "bd_after_modules_{$pages_page->get_page_slug()}", $pages_page ); //phpcs:ignore
 
 		/**
 		 * After the modules are registered in a delete page.
@@ -417,7 +392,7 @@ final class BulkDelete {
 		 *
 		 * @param BasePage $pages_page The page in which the modules are registered.
 		 */
-		do_action( 'bd_after_modules', $pages_page );
+		do_action( 'bd_after_modules', $pages_page ); //phpcs:ignore
 
 		return $pages_page;
 	}
@@ -442,7 +417,7 @@ final class BulkDelete {
 		 *
 		 * @param DeleteUsersPage $users_page The page in which the modules are registered.
 		 */
-		do_action( "bd_after_modules_{$users_page->get_page_slug()}", $users_page );
+		do_action( "bd_after_modules_{$users_page->get_page_slug()}", $users_page ); //phpcs:ignore
 
 		/**
 		 * After the modules are registered in a delete page.
@@ -451,7 +426,7 @@ final class BulkDelete {
 		 *
 		 * @param BasePage $users_page The page in which the modules are registered.
 		 */
-		do_action( 'bd_after_modules', $users_page );
+		do_action( 'bd_after_modules', $users_page ); //phpcs:ignore
 
 		return $users_page;
 	}
@@ -477,7 +452,7 @@ final class BulkDelete {
 		 *
 		 * @param DeleteMetasPage $metas_page The page in which the modules are registered.
 		 */
-		do_action( "bd_after_modules_{$metas_page->get_page_slug()}", $metas_page );
+		do_action( "bd_after_modules_{$metas_page->get_page_slug()}", $metas_page ); //phpcs:ignore
 
 		/**
 		 * After the modules are registered in a delete page.
@@ -486,7 +461,7 @@ final class BulkDelete {
 		 *
 		 * @param BasePage $metas_page The page in which the modules are registered.
 		 */
-		do_action( 'bd_after_modules', $metas_page );
+		do_action( 'bd_after_modules', $metas_page ); //phpcs:ignore
 
 		return $metas_page;
 	}
@@ -511,7 +486,7 @@ final class BulkDelete {
 		 *
 		 * @param DeleteTermsPage $terms_page The page in which the modules are registered.
 		 */
-		do_action( "bd_after_modules_{$terms_page->get_page_slug()}", $terms_page );
+		do_action( "bd_after_modules_{$terms_page->get_page_slug()}", $terms_page ); //phpcs:ignore
 
 		/**
 		 * After the modules are registered in a delete page.
@@ -520,7 +495,40 @@ final class BulkDelete {
 		 *
 		 * @param BasePage $terms_page The page in which the modules are registered.
 		 */
-		do_action( 'bd_after_modules', $terms_page );
+		do_action( 'bd_after_modules', $terms_page ); //phpcs:ignore
+
+		return $terms_page;
+	}
+
+    	/**
+	 * Get Bulk Delete Terms admin page.
+	 *
+	 * @since 6.0.0
+	 *
+	 * @return \BulkWP\BulkDelete\Core\Attachments\DeleteAttachmentsPage
+	 */
+	private function get_delete_attachments_admin_page() {
+		$terms_page = new DeleteAttachmentsPage( $this->get_plugin_file() );
+
+		$terms_page->add_module( new DeleteAttachmentsModule() );
+
+		/**
+		 * After the modules are registered in the delete terms page.
+		 *
+		 * @since 6.0.0
+		 *
+		 * @param DeleteAttachmentsPage $terms_page The page in which the modules are registered.
+		 */
+		do_action( "bd_after_modules_{$terms_page->get_page_slug()}", $terms_page ); //phpcs:ignore
+
+		/**
+		 * After the modules are registered in a delete page.
+		 *
+		 * @since 6.0.0
+		 *
+		 * @param BasePage $terms_page The page in which the modules are registered.
+		 */
+		do_action( 'bd_after_modules', $terms_page ); //phpcs:ignore
 
 		return $terms_page;
 	}
@@ -539,19 +547,6 @@ final class BulkDelete {
 	}
 
 	/**
-	 * Get the System Info page.
-	 *
-	 * @since 6.0.0
-	 *
-	 * @return \BulkWP\BulkDelete\Core\SystemInfo\SystemInfoPage
-	 */
-	private function get_system_info_page() {
-		$system_info_page = new SystemInfoPage( $this->get_plugin_file() );
-
-		return $system_info_page;
-	}
-
-	/**
 	 * Get the list of secondary pages.
 	 *
 	 * @return BasePage[] Secondary Pages.
@@ -559,10 +554,8 @@ final class BulkDelete {
 	private function get_secondary_pages() {
 		if ( empty( $this->secondary_pages ) ) {
 			$cron_list_page   = $this->get_cron_list_admin_page();
-			$system_info_page = $this->get_system_info_page();
 
 			$this->secondary_pages[ $cron_list_page->get_page_slug() ]   = $cron_list_page;
-			$this->secondary_pages[ $system_info_page->get_page_slug() ] = $system_info_page;
 		}
 
 		/**
@@ -572,7 +565,7 @@ final class BulkDelete {
 		 *
 		 * @param BasePage[] List of Admin pages.
 		 */
-		return apply_filters( 'bd_secondary_pages', $this->secondary_pages );
+		return apply_filters( 'bd_secondary_pages', $this->secondary_pages ); //phpcs:ignore
 	}
 
 	/**
@@ -687,6 +680,6 @@ final class BulkDelete {
 	 * @return bool True, if yes, False otherwise.
 	 */
 	private function is_admin_or_cron() {
-		return is_admin() || defined( 'DOING_CRON' ) || isset( $_GET['doing_wp_cron'] );
+		return is_admin() || defined( 'DOING_CRON' ) || isset( $_GET['doing_wp_cron'] ); //phpcs:ignore
 	}
 }

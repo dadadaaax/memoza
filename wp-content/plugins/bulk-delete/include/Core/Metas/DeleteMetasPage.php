@@ -27,7 +27,7 @@ class DeleteMetasPage extends BaseDeletePage {
 		);
 
 		$this->messages = array(
-			'warning_message' => __( 'WARNING: Meta Fields deleted once cannot be retrieved back. Use with caution.', 'bulk-delete' ),
+			'warning_message' => __( 'WARNING: There is no undo! Once deleted, meta fields are gone. Use with caution.', 'bulk-delete' ),
 		);
 	}
 

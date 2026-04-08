@@ -2,7 +2,6 @@
 
 namespace BulkWP\BulkDelete\Core\Addon;
 
-use BD_License_Handler;
 use BulkWP\BulkDelete\Core\BulkDelete;
 
 defined( 'ABSPATH' ) || exit; // Exit if accessed directly.
@@ -19,13 +18,6 @@ abstract class BaseAddon {
 	 * @var \BulkWP\BulkDelete\Core\Addon\AddonInfo
 	 */
 	protected $addon_info;
-
-	/**
-	 * Handler for license.
-	 *
-	 * @var \BD_License_Handler
-	 */
-	protected $license_handler;
 
 	/**
 	 * Initialize and setup variables.
@@ -52,7 +44,6 @@ abstract class BaseAddon {
 		$this->addon_info = $addon_info;
 
 		$this->initialize();
-		$this->setup_license_handler();
 	}
 
 	/**
@@ -71,20 +62,5 @@ abstract class BaseAddon {
 	 */
 	public function get_bd() {
 		return BulkDelete::get_instance();
-	}
-
-	/**
-	 * Setup License Handler.
-	 *
-	 * TODO: Need this to be refactored.
-	 */
-	protected function setup_license_handler() {
-		$this->license_handler = new BD_License_Handler(
-			$this->addon_info->get_name(),
-			$this->addon_info->get_code(),
-			$this->addon_info->get_version(),
-			$this->addon_info->get_root_file(),
-			$this->addon_info->get_author()
-		);
 	}
 }

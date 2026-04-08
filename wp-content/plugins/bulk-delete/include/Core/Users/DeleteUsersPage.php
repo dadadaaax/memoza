@@ -30,10 +30,10 @@ class DeleteUsersPage extends BaseDeletePage {
 		);
 
 		$this->messages = array(
-			'warning_message' => __( 'WARNING: Users deleted once cannot be retrieved back. Use with caution.', 'bulk-delete' ),
+			'warning_message' => __( 'WARNING: There is no undo! Once deleted, users are gone. Use with caution.', 'bulk-delete' ),
 		);
 
-		$this->show_link_in_plugin_list = true;
+		$this->show_link_in_plugin_list = 0;
 	}
 
 	/**

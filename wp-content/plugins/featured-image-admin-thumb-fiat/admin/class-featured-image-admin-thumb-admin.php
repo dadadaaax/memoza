@@ -44,7 +44,6 @@ class Featured_Image_Admin_Thumb_Admin {
 	 */
 
 	protected $fiat_nonce = null;
-	protected $text_domain;
 	protected $fiat_image_size = 'fiat_thumb';
 	protected $is_woocommerce_active;
 	protected $is_ninja_forms_active;
@@ -70,8 +69,6 @@ class Featured_Image_Admin_Thumb_Admin {
 		 */
 		$plugin              = Featured_Image_Admin_Thumb::get_instance();
 		$this->plugin_slug   = $plugin->get_plugin_slug();
-		$this->text_domain   = $plugin->load_plugin_textdomain();
-		$this->template_html = '<a title="' . __( 'Change featured image', 'featured-image-admin-thumb-fiat' ) . '" href="%1$s" class="fiat_thickbox" data-thumbnail-id="%3$d">%2$s</a>';
 		$this->fiat_kses     = array(
 			'a'   => array(
 				'href'              => array(),
@@ -101,6 +98,7 @@ class Featured_Image_Admin_Thumb_Admin {
 		}
 
 		add_action( 'admin_init', array( $this, 'fiat_init_columns' ) );
+		add_action( 'admin_init', array( $this, 'fiat_set_template_html' ) );
 
 		add_action( 'wp_ajax_fiat_get_thumbnail', array( $this, 'fiat_get_thumbnail' ) );
 
@@ -108,24 +106,32 @@ class Featured_Image_Admin_Thumb_Admin {
 	}
 
 	/**
+	 * Set the admin html template with language support
+	 *
+	 * Fired in the 'admin_init' action
+	 */
+	public function fiat_set_template_html() {
+		$this->template_html = '<a title="' . __( 'Change featured image', 'featured-image-admin-thumb-fiat' ) . '" href="%1$s" class="fiat_thickbox" data-thumbnail-id="%3$d">%2$s</a>';
+	}
+
+	/**
 	 * Register admin column handlers for posts and pages, taxonomies and other custom post types
+	 *
+	 * Find all post_types that support thumbnails and remove those that are excluded with our filter
+	 * Then add thumbnail support
 	 *
 	 * Fired in the 'admin_init' action
 	 */
 	public function fiat_init_columns() {
 
-		$available_post_types = array_diff( get_post_types(), apply_filters( 'fiat/restrict_post_types', $this->default_excluded_post_types ) );
+        $available_post_types = array_keys( array_diff( array_flip ( get_post_types_by_support('thumbnail') ), apply_filters( 'fiat/restrict_post_types', $this->default_excluded_post_types ) ) );
 
 		if ( $this->is_edd_active && isset( $available_post_types['download'] ) ) {
 			add_filter( 'edd_download_columns', array( $this, 'include_thumb_column_edd' ) );
-            add_filter( 'fes_download_table_columns', array( $this, 'include_thumb_column_edd' ) );
-        }
-
-		foreach ( $available_post_types as $post_type ) {
-			add_action( "manage_{$post_type}_posts_custom_column", array( $this, 'fiat_custom_columns' ), 2, 2 );
-			add_filter( "manage_{$post_type}_posts_columns", array( $this, 'fiat_add_thumb_column' ) );
-			add_filter( "manage_edit-{$post_type}_sortable_columns", array( $this, 'fiat_thumb_sortable_columns' ) );
+			add_filter( 'fes_download_table_columns', array( $this, 'include_thumb_column_edd' ) );
 		}
+
+		array_map( array( $this, 'add_post_type_thumb_support' ), $available_post_types );
 
 		// For taxonomies.
 		$taxonomies = get_taxonomies( array(), 'names' );
@@ -136,6 +142,18 @@ class Featured_Image_Admin_Thumb_Admin {
 		}
 
 
+	}
+
+	/**
+	 * @param $post_type
+	 *
+	 * Add thumbnail display support for the selected post_type
+	 */
+	public function add_post_type_thumb_support( $post_type )
+	{
+		add_action( "manage_{$post_type}_posts_custom_column", array( $this, 'fiat_custom_columns' ), 2, 2 );
+		add_filter( "manage_{$post_type}_posts_columns", array( $this, 'fiat_add_thumb_column' ) );
+		add_filter( "manage_edit-{$post_type}_sortable_columns", array( $this, 'fiat_thumb_sortable_columns' ) );
 	}
 	/**
 	 * Return an instance of this class.
@@ -177,7 +195,12 @@ class Featured_Image_Admin_Thumb_Admin {
 		/*if ( ! isset( $this->plugin_screen_hook_suffix ) ) {
 			return;
 		}*/
-		$screen               = get_current_screen();
+        $screen = get_current_screen();
+        // Check if we are on an "all posts" screen type.
+        // If not then just return and do not load the JavaScript code
+        if ( ! $screen || ( 'edit-' . $screen->post_type !== $screen->id ) ) {
+            return;
+        }
 		$available_post_types = array_diff( get_post_types(), apply_filters( 'fiat/restrict_post_types', $this->default_excluded_post_types ) );
 		// Add custom uploader css and js support for specific post types.
 		if ( isset( $available_post_types[ $screen->post_type ] ) ) {
@@ -265,7 +288,7 @@ class Featured_Image_Admin_Thumb_Admin {
 				// Get thumbnail ID so we can then get html src to use for thumbnail
 				if ( isset( $_POST['thumbnail_id'] ) && ! empty( $_POST['thumbnail_id'] ) ) {
 					$thumbnail_id = intval( $_POST['thumbnail_id'] );
-					$thumb_url    = get_image_tag( $thumbnail_id, '', '', '', $this->fiat_image_size );
+					$thumb_url    = get_image_tag( $thumbnail_id, '', '', '', array( 60, 60 ) );
 					$html         = sprintf(
 						$this->template_html,
 						admin_url( 'media-upload.php?post_id=' . $post_ID . '&amp;type=image&amp;TB_iframe=1&_wpnonce=' . wp_create_nonce( 'set_post_thumbnail-' . $post_ID ) ),
