@@ -1,0 +1,278 @@
+
+
+
+
+
+
+
+
+
+<!-- KONIEC KODU BANNERA UPLOADERA -->
+
+
+<!DOCTYPE html>
+<html dir="ltr" lang="pl-PL"
+ xmlns:og='http://opengraphprotocol.org/schema/'
+ xmlns:fb='http://www.facebook.com/2008/fbml'>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Wrzuć Q-pę &laquo; Puść Q-pę w minutę!</title>
+        <link rel="stylesheet" href="http://87.98.218.155/qpa/wp-content/themes/photographic/style.css" type="text/css" media="screen" />
+        <link rel="pingback" href="http://87.98.218.155/qpa/xmlrpc.php" />
+        <!--[if lt IE 9]>
+                      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+        
+
+        <!-- ZMIANA QPA - skrypty na frontendzie potrzebuja urla ajaxa -->
+        <script type="text/javascript">
+            var ajaxurl = 'http://87.98.218.155/qpa/wp-admin/admin-ajax.php'
+            
+          
+        </script>
+        
+        
+
+
+        <link rel="alternate" type="application/rss+xml" title="Puść Q-pę w minutę! &raquo; Kanał z wpisami" href="http://87.98.218.155/qpa/feed/" />
+<link rel="alternate" type="application/rss+xml" title="Puść Q-pę w minutę! &raquo; Kanał z komentarzami" href="http://87.98.218.155/qpa/comments/feed/" />
+<link rel="alternate" type="application/rss+xml" title="Puść Q-pę w minutę! &raquo; Wrzuć Q-pę Kanał z komentarzami" href="http://87.98.218.155/qpa/wrzuc-q-pe/feed/" />
+<link rel='stylesheet' id='wp_sidebarlogin_css_styles-css'  href='http://87.98.218.155/qpa/wp-content/plugins/sidebar-login/style.css?ver=3.4.1' type='text/css' media='all' />
+<link rel='stylesheet' id='jquery-style-css'  href='http://87.98.218.155/qpa/wp-content/plugins/magn-html5-drag-and-drop-media-uploader/jquery-ui.css?ver=3.4.1' type='text/css' media='all' />
+<link rel='stylesheet' id='dndupload_css-css'  href='http://87.98.218.155/qpa/wp-content/plugins/magn-html5-drag-and-drop-media-uploader/dndupload.css?ver=3.4.1' type='text/css' media='all' />
+<script type='text/javascript' src='http://87.98.218.155/qpa/wp-includes/js/jquery/jquery.js?ver=1.7.2'></script>
+<script type='text/javascript' src='http://87.98.218.155/qpa/wp-content/plugins/sidebar-login/js/blockui.js?ver=1.0'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var sidebar_login_params = {"ajax_url":"http:\/\/87.98.218.155\/qpa\/wp-admin\/admin-ajax.php","login_nonce":"77bfdea71c"};
+/* ]]> */
+</script>
+<script type='text/javascript' src='http://87.98.218.155/qpa/wp-content/plugins/sidebar-login/js/sidebar-login.js?ver=1.0'></script>
+<script type='text/javascript' src='http://87.98.218.155/qpa/wp-includes/js/jquery/ui/jquery.ui.widget.min.js?ver=1.8.20'></script>
+<script type='text/javascript' src='http://87.98.218.155/qpa/wp-content/plugins/magn-html5-drag-and-drop-media-uploader/js/ui.progressbar.js?ver=1.0'></script>
+<script type='text/javascript' src='http://87.98.218.155/qpa/wp-content/plugins/magn-html5-drag-and-drop-media-uploader/js/jsupload/fileuploader.js?ver=1.0'></script>
+<script type='text/javascript' src='http://87.98.218.155/qpa/wp-content/plugins/magn-html5-drag-and-drop-media-uploader/dndupload.js?ver=1.0'></script>
+<script type='text/javascript' src='http://87.98.218.155/qpa/wp-includes/js/comment-reply.js?ver=3.4.1'></script>
+<link rel='canonical' href='http://87.98.218.155/qpa/wrzuc-q-pe/' />
+
+	<!--Facebook Like Button OpenGraph Settings Start-->
+	<meta property="og:site_name" content="Puść Q-pę w minutę!"/>
+	<meta property="og:title" content="Wrzuć Q-pę"/>
+		<meta property="og:description" content=""/>
+	
+	<meta property="og:url" content="http://87.98.218.155/qpa/wrzuc-q-pe/"/>
+	<meta property="fb:admins" content="" />
+	<meta property="fb:app_id" content="" />
+	<meta property="og:type" content="article" />
+		<!--Facebook Like Button OpenGraph Settings End-->
+	<style type="text/css" id="custom-background-css">
+body.custom-background { background-color: #ffffff; }
+</style>
+
+        <script type="text/javascript">
+
+            (function($,W,D)
+            {
+                var JQUERY4U = {};
+
+                JQUERY4U.UTIL =
+                    { 
+                    setupFormValidation: function()
+                    {
+                        //form validation rules
+                        $("#dnd_new_post").validate({
+                            rules: {
+                                firstname: "required",
+                                lastname: "required",
+                                email: {
+                                    required: true,
+                                    email: true
+                                },
+                                password: {
+                                    required: true,
+                                    minlength: 5
+                                },
+                                agree: "required"
+                            },
+                            messages: {
+                                firstname: "Please enter your firstname",
+                                lastname: "Please enter your lastname",
+                                password: {
+                                    required: "Please provide a password",
+                                    minlength: "Your password must be at least 5 characters long"
+                                },
+                                email: "Please enter a valid email address",
+                                agree: "Please accept our policy"
+                            },
+                            submitHandler: function(form) {
+                                form.submit();
+                            }
+                        });
+                    }
+                }
+
+                //when the dom has loaded setup form validation rules
+                $(D).ready(function($) {
+                    JQUERY4U.UTIL.setupFormValidation();
+                });
+
+            })(jQuery, window, document);
+        </script>        
+
+
+        <script type="text/javascript">
+           
+           
+           
+            function initBrowserWarning() {
+                var isChrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
+                var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+	
+                if(!isChrome && !isFirefox){
+                jQuery('#drop-box-overlay-gmail').hide();
+                jQuery('#dndmedia_status').hide();
+                 jQuery('#load_instrukcja1').hide();
+                 jQuery('#load_instrukcja2').hide();
+           
+                jQuery("#browser-warning").fadeIn(125);
+                
+                jQuery('#old_choosefile').fadeIn(125);
+                 
+                }
+            }      
+           
+            jQuery(document).ready(function() {
+               
+                // dla użytkowników IE zaproponujemy wtyczkę Google dla IE 
+                //  http://www.google.com/chromeframe/?hl=pl&prefersystemlevel=true
+           
+                        initBrowserWarning();
+                       
+                
+                       
+                    });
+
+            
+        </script>
+
+
+
+    </head>
+
+    <body class="page page-id-8 page-template-default custom-background has_sidebar">
+
+        <header class="header">
+
+
+
+            <div id="logobox" class="headerbox">
+                <a href="http://87.98.218.155/qpa"> 
+                    <img src="http://87.98.218.155/qpa/wp-content/themes/photographic/img/qpa-logo-small.png" />
+
+
+
+                </a>
+                <p>Q-pa śmiechu. Memy, cytaty, obrazki</p>
+            </div>
+
+
+
+            <div id="banbox" class="headerbox">
+                
+            </div>
+
+
+        </header>
+
+
+
+        <div id="wrapper">
+
+            <div id="leftbanbox" >
+
+            </div>
+
+            <section class="content">
+
+
+
+
+
+    
+               
+        <article class="post-8 page type-page status-publish hentry" id="post-8">
+            <a href="http://87.98.218.155/qpa/wrzuc-q-pe/?action=new_post&qpatmplid=8&qpatmpl=">
+            
+            
+            
+                          <img src="http://87.98.218.155/qpa/wp-content/themes/photographic/img/news.png" width="200" height="200" />
+             
+            <strong>Wrzuć Q-pę</strong>
+          </a>
+        </article>
+
+      
+		
+			<ul class="prevnext">
+				<li></li>
+				<li></li>
+			</ul>
+
+	
+
+
+  		</section>
+
+		  	  	<nav id="sidebar">	
+  			<aside id="nav_menu-2" class="widget widget_nav_menu"><div class="menu-subqpy-container"><ul id="menu-subqpy" class="menu"><li id="menu-item-11" class="logged-in-nav menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-8 current_page_item menu-item-11"><a href="http://87.98.218.155/qpa/wrzuc-q-pe/">Wrzuć Q-pę</a></li>
+<li id="menu-item-17" class="logged-in-nav menu-item menu-item-type-post_type menu-item-object-page menu-item-17"><a href="http://87.98.218.155/qpa/szablony-qpy/">Z szablonu</a></li>
+<li id="menu-item-20" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-20"><a href="http://87.98.218.155/qpa/qpa-dnia/">Qpa dnia</a></li>
+<li id="menu-item-51" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-51"><a href="http://87.98.218.155/qpa/o-q-pie/">O Q-pie</a></li>
+<li id="menu-item-1111" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1111"><a href="http://87.98.218.155/qpa/wrzuc-q-pe-2/">Wrzuć Q-pę</a></li>
+<li id="menu-item-1115" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1115"><a href="http://87.98.218.155/qpa/wrzuc-q-pe-3/">Wrzuć Q-pę</a></li>
+</ul></div></aside><aside id="wp_sidebarlogin-2" class="widget widget_wp_sidebarlogin"><h3 class="widgettitle"><span>Zaloguj</span></h3>
+		<form name="loginform" id="loginform" action="http://87.98.218.155/qpa/wp-login.php" method="post">
+			
+			<p class="login-username">
+				<label for="user_login">Nazwa użytkownika:</label>
+				<input type="text" name="log" id="user_login" class="input" value="" size="20" tabindex="10" />
+			</p>
+			<p class="login-password">
+				<label for="user_pass">Hasło:</label>
+				<input type="password" name="pwd" id="user_pass" class="input" value="" size="20" tabindex="20" />
+			</p>
+			
+			<p class="login-remember"><label><input name="rememberme" type="checkbox" id="rememberme" value="forever" tabindex="90" checked="checked" /> Zapamiętaj mnie</label></p>
+			<p class="login-submit">
+				<input type="submit" name="wp-submit" id="wp-submit" class="button-primary" value="Login &raquo;" tabindex="100" />
+				<input type="hidden" name="redirect_to" value="http://87.98.218.155/qpa/wrzuc-q-pe/" />
+			</p>
+			
+		</form><ul class="sidebarlogin_otherlinks"><li><a href="http://87.98.218.155/qpa/wp-login.php?action=register" rel="nofollow">Zarejestruj</a></li><li><a href="http://87.98.218.155/qpa/wp-login.php?action=lostpassword" rel="nofollow">Nie pamiętasz hasła?</a></li></ul></aside>		<aside id="recent-posts-2" class="widget widget_recent_entries">		<h3 class="widgettitle">Najnowsze Q-py</h3>		<ul>
+				<a href="http://87.98.218.155/qpa/cc/" title="cc"> cc / </a>
+				<a href="http://87.98.218.155/qpa/1129/" title="1129"> 1129 / </a>
+				<a href="http://87.98.218.155/qpa/1125/" title="1125"> 1125 / </a>
+				<a href="http://87.98.218.155/qpa/1121/" title="1121"> 1121 / </a>
+				<a href="http://87.98.218.155/qpa/1117/" title="1117"> 1117 / </a>
+				</ul>
+		</aside><aside id="search-2" class="widget widget_search"><form role="search" method="get" id="searchform" action="http://87.98.218.155/qpa/" >
+	<div><label class="screen-reader-text" for="s">Szukaj:</label>
+	<input type="text" value="" name="s" id="s" />
+	<input type="submit" id="searchsubmit" value="Szukaj" />
+	</div>
+	</form></aside>  	</nav>
+  
+      <hr />
+
+	  </div>
+
+		<footer>
+      <!-- feel free to remove the credit below, but we'd love it if you would leave it in. -->
+			<p>
+				&copy; 2013 Puść Q-pę w minutę! | Powered by <a href="http://wordpress.org/">WordPress</a><br />
+				<a href="http://87.98.218.155/qpa/feed/">pobierz RSS</a>.
+			</p>
+		</footer>
+		<script type='text/javascript' src='http://87.98.218.155/qpa/wp-includes/js/jquery/ui/jquery.ui.core.min.js?ver=1.8.20'></script>
+	</body>
+</html>

@@ -1,0 +1,148 @@
+@font-face {
+  font-family: 'iconmememe';
+  src:  url('../fonts/iconmememe.eot?iec4tb');
+  src:  url('../fonts/iconmememe.eot?iec4tb#iefix') format('embedded-opentype'),
+    url('../fonts/iconmememe.ttf?iec4tb') format('truetype'),
+    url('../fonts/iconmememe.woff?iec4tb') format('woff'),
+    url('../fonts/iconmememe.svg?iec4tb#iconmememe') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+.immm {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'iconmememe' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  vertical-align: middle;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.immm-spacer:before {
+  content: "\e900";
+}
+.immm-save:before {
+  content: "\e161";
+}
+.immm-font:before {
+  content: "\e167";
+}
+.immm-draw-mode:before {
+  content: "\e22b";
+}
+.immm-text-mode:before {
+  content: "\e23c";
+}
+.immm-text-box:before {
+  content: "\e25e";
+}
+.immm-upload:before {
+  content: "\e2c6";
+}
+.immm-brush:before {
+  content: "\e3ae";
+}
+.immm-colorize:before {
+  content: "\e3b8";
+}
+.immm-palette:before {
+  content: "\e40a";
+}
+.immm-photo:before {
+  content: "\e439";
+}
+.immm-cancel:before {
+  content: "\e5c9";
+}
+.immm-check:before {
+  content: "\e5ca";
+}
+.immm-close:before {
+  content: "\e5cd";
+}
+.immm-refresh:before {
+  content: "\e5d5";
+}
+.immm-loading:before {
+  content: "\e627";
+}
+.immm-check-box:before {
+  content: "\e834";
+}
+.immm-check-circle:before {
+  content: "\e86c";
+}
+.immm-done:before {
+  content: "\e876";
+}
+.immm-settings:before {
+  content: "\e8b8";
+}
+.immm-tools:before {
+  content: "\e901";
+}
+.immm-link-external:before {
+  content: "\e902";
+}
+.immm-angle-top:before {
+  content: "\e903";
+}
+.immm-angle-right:before {
+  content: "\e904";
+}
+.immm-angle-left:before {
+  content: "\e905";
+}
+.immm-angle-down:before {
+  content: "\e906";
+}
+.immm-pencil:before {
+  content: "\e907";
+}
+.immm-thumb_up:before {
+  content: "\e908";
+}
+.immm-thumb_down:before {
+  content: "\e909";
+}
+.immm-cover-up:before {
+  content: "\e90c";
+}
+.immm-outline:before {
+  content: "\e91a";
+}
+.immm-layers:before {
+  content: "\e92e";
+}
+.immm-comments:before {
+  content: "\e96d";
+}
+.immm-quote:before {
+  content: "\e978";
+}
+.immm-link:before {
+  content: "\e9cb";
+}
+.immm-flag:before {
+  content: "\e9cc";
+}
+.immm-arrow-circle-up:before {
+  content: "\ea41";
+}
+.immm-arrow-circle-right:before {
+  content: "\ea42";
+}
+.immm-arrow-circle-down:before {
+  content: "\ea43";
+}
+.immm-arrow-circle-left:before {
+  content: "\ea44";
+}

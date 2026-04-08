@@ -1,0 +1,66 @@
+<wpml-config>
+    <admin-texts>
+        <key name="theme_mods_supernews">
+            <key name="supernews_theme_options">
+                <key name="supernews-feature-cat"/>
+                <key name="supernews-enable-feature"/>
+                <key name="supernews-feature-slider-enable"/>
+                <key name="supernews-header-logo"/>
+                <key name="supernews-header-id-display-opt"/>
+                <key name="supernews-show-date"/>
+                <key name="supernews-header-date-format"/>
+                <key name="supernews-breaking-news-title"/>
+                <key name="supernews-enable-breaking-news"/>
+                <key name="supernews-facebook-url"/>
+                <key name="supernews-twitter-url"/>
+                <key name="supernews-youtube-url"/>
+                <key name="supernews-instagram-url"/>
+                <key name="supernews-google-plus-url"/>
+                <key name="supernews-pinterest-url"/>
+                <key name="supernews-enable-social"/>
+                <key name="supernews-enable-sticky-menu"/>
+                <key name="supernews-header-media-position"/>
+                <key name="supernews-header-media-customizer-link"/>
+                <key name="supernews-header-image-link"/>
+                <key name="supernews-header-image-link-new-tab"/>
+                <key name="supernews-header-main-show-banner-ads"/>
+                <key name="supernews-header-main-banner-ads"/>
+                <key name="supernews-header-main-banner-ads-link"/>
+                <key name="supernews-header-logo-ads-display-position"/>
+                <key name="supernews-header-show-search"/>
+                <key name="supernews-footer-copyright"/>
+                <key name="supernews-blog-archive-image-layout"/>
+                <key name="supernews-blog-archive-more-text"/>
+                <key name="supernews-sidebar-layout"/>
+                <key name="supernews-front-page-sidebar-layout"/>
+                <key name="supernews-archive-sidebar-layout"/>
+                <key name="supernews-enable-sticky-sidebar"/>
+                <key name="supernews-blog-archive-layout"/>
+                <key name="supernews-primary-color"/>
+                <key name="supernews-cat-hover-color"/>
+                <key name="supernews-custom-css"/>
+                <key name="supernews-show-related"/>
+                <key name="supernews-related-title"/>
+                <key name="supernews-related-post-display-from"/>
+                <key name="supernews-single-image-layout"/>
+                <key name="supernews-search-placholder"/>
+                <key name="supernews-show-breadcrumb"/>
+                <key name="supernews-side-show-message"/>
+                <key name="supernews-side-image-message"/>
+                <key name="supernews-hide-front-page-content"/>
+                <key name="supernews-you-are-here-text"/>
+                <key name="supernews-wc-shop-archive-sidebar-layout"/>
+                <key name="supernews-wc-product-column-number"/>
+                <key name="supernews-wc-shop-archive-total-product"/>
+                <key name="supernews-wc-single-product-sidebar-layout"/>
+                <key name="supernews-reset-options"/>
+            </key>
+        </key>
+    </admin-texts>
+</wpml-config>
+
+
+
+
+
+

@@ -1,0 +1,111 @@
+== Change log ==
+
+= 3.0.1 - Aug 11 2020 =
+* Updated :  Remote data removed
+* Updated :  Keyboard navigation
+* Updated :  Tested up to and Requires PHP added on style.css
+* Fixed :  New Theme Check and Theme Sniffer some notices
+
+= 3.0.0 - Nov 12 2019 =
+* Added   : Advanced Demo Import
+* Removed : Acme Demo Setup Plugin from TGM
+* Updated : Getting Started experience
+* Fixed : Breadcrumbs error on google console, $item,$attributes,$meta updates inside function trail
+
+= 2.0.2 - Oct 01 2019 =
+* Added : wp_body_open hook in header
+* Added : Gutentor Plugin in TGM
+* Added : wpml-config.xml file
+* Fixed : Screen Reader Text
+
+= 2.0.1 - Apr 08 2019 =
+* Fixed : Quick fix Bxslider
+
+= 2.0.0 - Jan 27 2019 =
+
+* Added : Both and Middle Column Sidebar layout
+* Added : Gutenberg Ready
+* Added : WooCommerce Sidebar Options
+* Update : RTL CSS
+* Fixed : Space before DOCTYPE
+* Fixed : Other Minor Issues
+
+= 1.2.2 - Mar 30 2018 =
+
+* Fixed : Bxslider bugs https://github.com/stevenwanderski/bxslider-4/issues/1188
+
+= 1.2.1 - Jan 07 2018 =
+
+* Added : New Upgrade to Pro class
+* Updated : Admin script enqueue
+* Updated : Font Awesome and theia-sticky-sidebar library
+* Updated : div class change for header ads
+* Updated : Breadcrumb and TGM-Plugin-Activation
+* Fixed: Minor changes
+
+= 1.2.0 - July 02 2016 =
+
+* Added: Header Date Format
+* Added: Header Widgets
+* Added: Header Placement Options
+* Added: Multiple Advertisement Position
+* Added: Header Media and its Options
+* Added: Feature Slider
+* Added: Sticky Menu Options
+* Added: Sticky Sidebar Options
+* Added: Front Page, Archive and Single Page/Post Advanced Sidebar
+* Added: Category Color
+* Added: Image size on Blog
+* Added: Blog/Archive Category Display
+* Added: Read More Text on Blog/Archive Page
+* Added: Related Post form Category or Tag
+* Added: Image size on Single
+* Added: Widget on different places
+* Added: Social Icons
+* Added: Widget Image Size
+* Added: Hide Front Page
+* Added: Theme Menu Page
+* Added: Demo Data Important
+* Added: Page Builder Compatible
+* Updated : Customizer experience
+* Fixed: Jetpack infinite scroll
+* Fixed: Menu Background if there are many menus
+* Fixed: Reset Customizer
+
+= 1.0.5/1.0.6  - Oct 02 2016 =
+
+* Fixed: Minor Bug
+* Updated: No Image Available Removed from different section
+
+= 1.0.4 - July 17 2016 =
+
+* Updated: Default Footer Copyright Text
+* Fixed: Bug in comments
+
+= 1.0.3 - July 04 2016 =
+
+* Added: Link in related post title
+* Added: Upgrade to pro link
+* Fixed: Bug fixes in breadcrumbs
+
+= 1.0.2 - June 14 2016 =
+
+* Added: New theme tags
+* Fixed: Minor bug fixes
+* Fixed: CSS fixes
+
+= 1.0.1 - Apr 20 2016 =
+
+* Added: Support Custom Logo in WP >= 4.5
+* Check: Compatibility with WP 4.5
+* Fixed: Minor bug fixes
+* Updated: Minimum required WP 4.3
+
+= 1.0.0 - Apr 5 2016 =
+
+* Updated: Extend theme options
+* Fixed: CSS tweaks
+
+= 0.0.1 - Dec 24 2015 =
+
+* Initial release

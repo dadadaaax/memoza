@@ -1,0 +1,1454 @@
+.mememe-wrap-gallery *,
+.mememe-wrap-gallery *:before,
+.mememe-wrap-gallery *:after,
+.wrap-mememe *,
+.wrap-mememe *:before,
+.wrap-mememe *:after {
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+}
+.wrap-mememe{
+  font-size: 16px;
+}
+/**
+* Hide default CMB2 Submit
+*/
+.hide-mememe{
+  display: none !important;
+}
+.wrap-mememe > form input[type="submit"]{
+  width: 100%;
+  display: none !important;
+}
+
+/**
+* Box Preloader
+*/
+.mememe-preloader{
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  -webkit-transition:  opacity .5s ease-in-out;
+  transition: opacity .5s ease-in-out;
+  opacity: 0;
+  z-index: -2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mememe-preloader.show-mememe{
+  opacity: 1;
+  z-index: 99;
+}
+
+.mememe-loader {
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  position: relative;
+  border: 4px solid #fff;
+  animation: loader 2s infinite ease;
+  -webkit-box-shadow: 0 0 8px 2px rgba(0,0,0,0.3), inset 0 0 3px 1px rgba(0,0,0,0.3);
+  box-shadow: 0 0 8px 2px rgba(0,0,0,0.3), inset 0 0 3px 1px rgba(0,0,0,0.3);
+}
+
+.mememe-loader-inner {
+  vertical-align: top;
+  display: inline-block;
+  width: 100%;
+  background-color: #fff;
+  animation: loader-inner 2s infinite ease-in;
+  -webkit-box-shadow: inset 0 0 3px 1px rgba(0,0,0,0.3);
+box-shadow: inset 0 0 3px 1px rgba(0,0,0,0.3);
+}
+
+@keyframes loader {
+  0% {
+    transform: rotate(0deg);
+  }
+  
+  25% {
+    transform: rotate(180deg);
+  }
+  
+  50% {
+    transform: rotate(180deg);
+  }
+  
+  75% {
+    transform: rotate(360deg);
+  }
+  
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes loader-inner {
+  0% {
+    height: 0%;
+  }
+  
+  25% {
+    height: 0%;
+  }
+  
+  50% {
+    height: 100%;
+  }
+  
+  75% {
+    height: 100%;
+  }
+  100% {
+    height: 0%;
+  }
+}
+
+/**
+* Utils 
+*/
+.clear-mememe{
+  clear: both;
+}
+
+.pull-left{
+  float: left;
+}
+.pull-right{
+  float: right;
+}
+
+/**
+* Tools Menu
+*/
+.mememe-menu{
+  float: left;
+  clear: both;
+  width: 100%;
+  position: relative;
+  display: inline-block;
+  margin-bottom: .6em;
+}
+.mememe-menu .mememe-btn{
+  border-radius: 0;
+}
+.mememe-btn svg{
+  vertical-align: middle;
+}
+.mememe-menu .pull-right{
+  float: right;
+}
+.wrap-mememe .mememe-app .mememe-group {
+  font-size: 1em;
+    display: inline-block;
+    margin-right: 2px;
+    margin-bottom: 6px;
+    margin-top: 0;
+    margin-left: 0;
+    padding: 0;
+    box-shadow: none;
+    background: none;
+    position: relative;
+    border-radius: 0;
+    width: auto;
+    vertical-align: baseline;
+}
+.wrap-mememe .mememe-app .mememe-protools-text-group {
+    display: inline-block;
+    margin-right: 2px;
+    margin-bottom: 0;
+    margin-top: 0;
+    margin-left: 0;
+    padding: 0;
+    box-shadow: none;
+    background: none;
+    position: relative;
+}
+
+.mememe-group.pull-right{
+  margin-right: 0;
+  margin-left: 2px;
+}
+.mememe-protools{
+  display: inline-block;
+}
+.mememe-protools.mememe-dropdown{
+  position: absolute;
+  left: 0;
+  top: auto;
+  z-index: 98;
+  display: none;
+  background-color: #fff;
+  padding-left: 6px;
+  padding-top: 6px;
+  padding-right: 4px;
+  -webkit-box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.4);
+  -moz-box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.4);
+  box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.4);
+}
+.mememe-protools.mememe-dropdown.open{
+  display: block;
+}
+.mememe-protools .mememe-btn{
+  box-shadow: 0px 0px 2px 0px rgba(0,0,0,0.3);
+}
+.mememe-strokemenu .mememe-btn,
+.wrap-mememe .mememe-strokemenu .mememe-btn{
+  padding: 6px;
+}
+.mememe-brush, .mememe-outline{
+  min-width: 21px;
+  display: inline-block;
+}
+
+.wrap-mememe .mememe-app .mememe-group.mememe-font-group{
+  max-width: 160px;
+}
+
+.mememe-set-stroke, .mememe-set-outline{
+  text-align: center;
+}
+input[type="number"].mememe-set-shadow{
+  max-width: 4em;
+  padding: .5em;
+}
+.mememe-outline{
+  width: 12px;
+  display: inline-block;
+  vertical-align: middle;
+  background: #333;
+}
+.mememe-dot{
+    border-radius: 50%;
+    background: #333;
+  display: inline-block;
+  vertical-align: middle;
+}
+.mememe-spacer-tools{
+  display: block;
+  clear: both;
+  width: 100%;
+}
+
+.wrap-mememe .mememe-inputs select.mememe-select,
+.wrap-mememe .mememe-protools select.mememe-select,
+.wrap-mememe select.mememe-custom-select{
+    display: inline-block;
+    width: 100%;
+    height: calc(1.5em + .75rem);
+    padding: .375rem 1.5rem .375rem .75rem;
+    font-size: 1em;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #495057;
+    vertical-align: middle;
+    background: #fff url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='%23343a40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") no-repeat right .75rem center/8px 10px;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    position: relative;
+}
+.wrap-mememe .mememe-inputs select.mememe-select:focus,
+.wrap-mememe .mememe-protools select.mememe-select:focus,
+.wrap-mememe select.mememe-custom-select:focus{
+  box-shadow: none;
+    border-color: #ced4da;
+    outline: 0;
+}
+
+.wrap-mememe select.mememe-custom-select{
+  margin-bottom: 6px;
+}
+.wrap-mememe .mememe-protools input{
+    display: inline-block;
+    width: 100%;
+    height: calc(1.5em + .75rem);
+    font-size: 1em;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #495057;
+    vertical-align: middle;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    position: relative;
+    min-width: 50px;
+}
+.wrap-mememe .mememe-app .mememe-spacer-group{
+  text-align: center;
+  width: 25%;
+  display: inline-block;
+  padding-right: 2px;
+  font-size: 1em;
+  line-height: 1.5;
+  min-width: 100px;
+  max-width: 25%;
+}
+
+/**
+* Inputs and Buttons
+*/
+select.mememe-select-font{
+  border: 1px solid rgba(0, 0, 0, .075);
+}
+.mememe-inputs input[type="text"]{
+  padding: 6px 10px;
+}
+.wrap-mememe > form, .mememe-menu, .wrapmememe{
+  position: relative;
+  -webkit-transition: opacity .5s ease-in-out;
+  transition: opacity .5s ease-in-out;
+  clear: both;
+}
+.wrap-mememe > form .mememe-form-control{
+  margin-bottom: 6px;
+  width: 100%;
+  font-size: 1em;
+line-height: 1.5;
+}
+.wrap-mememe .checkmark svg,
+.wrap-mememe .minicolors-theme-default.minicolors{
+  vertical-align: middle;
+  display: inline-block;
+}
+.wrap-mememe .minicolors-theme-default.minicolors{
+  position: absolute;
+  left: 6px;
+  top: 6px;
+  right: 6px;
+  bottom: 6px;
+}
+.wrap-mememe .mememe-app .minicolors input[type="hidden"] + .minicolors-swatch{
+  width: 1px !important;
+  height: 1px !important;
+}
+
+.mememe-picker, 
+.mememe-wrap-gallery .mememe-btn,
+.wrap-mememe .mememe-btn,
+.mememe .mememe-btn{
+  display: inline-block;
+  padding: 6px 10px;
+  min-height: calc(1.5em + .75rem);
+  min-width: calc(1.5em + .75rem);
+  line-height: 1.5;
+  margin: 0;
+  font-weight: normal;
+  font-size: 1em;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  -ms-touch-action: manipulation;
+  touch-action: manipulation;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-image: none;
+  border: none;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  text-decoration: none;
+}
+.wrap-mememe .mememe-addons a.mememe-btn span,
+.wrap-mememe .mememe-addons a.mememe-btn svg{
+  vertical-align: middle;
+}
+
+.mememe-wrap-gallery .mememe-btn.mememe-outline-btn{
+  border: 1px solid #D7DADA;
+  color:  #D7DADA;
+  background: none;
+  background-color: transparent;
+}
+.mememe-wrap-gallery .mememe-btn.mememe-outline-btn:hover,
+.mememe-wrap-gallery .mememe-btn.mememe-outline-btn:active,
+.mememe-wrap-gallery .mememe-btn.mememe-outline-btn:focus{
+  color:  #fff;
+  background-color: #D7DADA;
+}
+.mememe-btn.disabled{
+  opacity: 0.5;
+}
+.mememe-btn:hover,
+.mememe-btn:focus,
+.mememe-btn.focus,
+.wrap-mememe .mememe-btn:hover,
+.wrap-mememe .mememe-btn:focus,
+.wrap-mememe .mememe-btn.focus
+ {
+  text-decoration: none;
+  box-shadow: none;
+  -webkit-box-shadow: none;
+}
+.mememe-picker {
+  cursor: default;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.mememe-btn.active{
+  background-color: #DDE0E3;
+}
+input.mememe-up{
+  display: none !important;
+}
+
+.mememe-btn.save-mememe{
+  width: 100%;
+  margin: 15px 0;
+  padding: 12px;
+}
+.save-mememe.disabled,
+.wrap-mememe .mememe-btn.save-mememe.disabled{
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/**
+* Menu Tooltips 
+*/
+.mmm-tooltip {
+  position: relative;
+}
+.mmm-tooltip:before,
+.mmm-tooltip:after {
+  display: block;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 99;
+  font-family: Arial, sans-serif;
+  text-transform: uppercase;
+}
+
+.mmm-tooltip:before {
+  background: rgba(0,0,0,.75);
+  border-radius: 2px;
+  color: #fff;
+  content: attr(data-title);
+  font-size: 11px;
+  padding: 6px 12px;
+  bottom: 100%;
+  left: 0;
+  white-space: nowrap;
+}
+
+.mmm-tooltip.mememe-left:before {
+    right: 0;
+    left: auto;
+}
+
+.mmm-tooltip:after,
+.mmm-tooltip:before {
+  transform: translate3d(0,-10px,0);
+  -webkit-transition:  all .15s ease-in-out;
+  transition: all .15s ease-in-out;
+}
+.mmm-tooltip:hover:after,
+.mmm-tooltip:hover:before {
+  opacity: 1;
+  transform: translate3d(0,0,0);
+}
+
+/**
+* Template Carousel
+*/
+.wrapmememe, .mememe-template-list{
+  position: relative;
+}
+.mememe-template-list{
+  overflow: hidden;
+  opacity: 0;
+  -webkit-transition: opacity .4s;
+  transition: opacity .4s;
+  margin-bottom: 10px;
+}
+.mememe-template-list .owl-stage {
+  display: flex;
+}
+
+.mememe-template-list .owl-next, 
+.mememe-template-list .owl-prev{
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  padding: 0;
+  color: #fff;
+  text-shadow: 0 0 2px #000000;
+  font-size: 1.6em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background:none;
+  border: none;
+}
+.mememe-template-list .owl-stage-outer{
+  float: left;
+}
+.mememe-template-list .owl-prev{
+  left: 0;
+}
+.mememe-template-list .owl-next{
+  right: 0;
+}
+.mememe-template-list .owl-item{
+  cursor: pointer;
+  position: relative;
+  min-height: 1px;
+  float: left;
+  -webkit-backface-visibility: hidden;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none; 
+}
+
+.mememe-template-list .owl-item > a{
+  margin: 0;
+  padding: 0;
+  display: block;
+  float: left;
+  text-decoration: none;
+  margin: 0;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  border: none;
+  width: 100%;
+}
+.mememe-template-list .owl-item a:hover,
+.mememe-template-list .owl-item a:focus{
+text-decoration: none;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+.mememe-template-list .owl-item a > img{
+  max-width: 100%;
+  height: auto;
+  text-decoration: none;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
+/* jquery UI drag and resize */
+.dragmememe .ui-draggable-handle{-ms-touch-action:none;touch-action:none;}
+
+.dragmememe .ui-resizable-handle {
+  width: 14px;
+  height: 14px;
+  position: absolute;
+  border-radius: 1px;
+  -webkit-box-shadow: 0px 0px 0px 1px rgba(255,255,255,.9);
+  -moz-box-shadow: 0px 0px 0px 1px rgba(255,255,255,.9);
+  box-shadow: 0px 0px 0px 1px rgba(255,255,255,.9);
+}
+.dragmememe .ui-resizable-nw {
+    left: -5px;
+    top: -5px;
+    cursor: nw-resize;
+    border-bottom-color: transparent;
+    border-right-color: transparent;
+}
+.dragmememe .ui-resizable-ne {
+    top: -5px;
+    right: -5px;
+    cursor: ne-resize;
+    border-bottom-color: transparent;
+    border-left-color: transparent;
+  background: url("../images/ne.svg") center center no-repeat rgba(255,255,255,0.9);
+
+}
+.dragmememe .ui-resizable-sw {
+    bottom: -5px;
+    left: -5px;
+    cursor: sw-resize;
+    border-top-color: transparent;
+    border-right-color: transparent;
+  background: url("../images/sw.svg") center center no-repeat rgba(255,255,255,0.9);
+
+}
+.dragmememe .ui-resizable-se {
+    bottom: -5px;
+    right:-5px;
+    cursor: se-resize;
+  background: url("../images/se.svg") center center no-repeat rgba(255,255,255,0.9);
+}
+.dragmememe .ui-resizable-n {
+    top: -5px;
+    left:50%;
+    cursor: n-resize;
+}
+.dragmememe .ui-resizable-s {
+    bottom: -5px;
+    left: 50%;
+    cursor: s-resize;
+}
+.dragmememe .ui-resizable-w {
+    left:-5px;
+    top:calc(50% - 5px);
+    cursor: w-resize;
+}
+.dragmememe .ui-resizable-e {
+    right:-5px;
+    top:calc(50% - 5px);
+    cursor: e-resize;
+}
+.dragmememe .ui-rotatable-handle,
+.rotatemememe .ui-rotatable-handle {
+  position: absolute;
+  height: 22px;
+  width: 22px;
+  border-radius: 50%;
+  cursor: grab;
+  left: 50%;
+  margin-left: -10px !important;
+  bottom: 0;
+  margin-bottom: -16px !important;
+  background: url("../images/rotate.svg") center center no-repeat rgba(255,255,255,0.9);
+  -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,.3);
+  -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,.3);
+  box-shadow: 0px 0px 0px 1px rgba(0,0,0,.3);
+}
+
+/**
+* MeMeMe app 
+*/
+.finalmeme-placeholder{
+  float: left;
+  width: 100%;
+  margin-bottom: 20px;
+  text-align: center;
+}
+.mememe-placeholder{
+  overflow: hidden;
+  transition: all .3s ease-in-out;
+  float: left;
+  width: 100%;
+  position: relative;
+  z-index: 0;
+}
+.mememe-placeholder img{
+  width: 100%;
+  height: auto;
+  float: left;
+}
+.mememe-stage{
+  z-index: 1;
+  position: relative;
+}
+.mememe-draw{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 85;
+  cursor: crosshair;
+}
+
+.mememe-drag{
+  position: absolute;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 90;
+  -webkit-transition: opacity .2s;
+  transition: opacity .2s;
+}
+.mememe-drag.mememe-disabled-text{
+  opacity: 0.8;
+  z-index: 80;
+}
+
+.mememe-drag.mememe-disabled-text .ui-resizable-handle,
+.mememe-drag.mememe-disabled-text .ui-rotatable-handle,
+.mememe-drag.mememe-disabled-text .mememe-del-text,
+.mememe-drag.mememe-hidden-textbox .ui-resizable-handle,
+.mememe-drag.mememe-hidden-textbox .ui-rotatable-handle,
+.mememe-drag.mememe-hidden-textbox .mememe-del-text{
+  display: none !important;
+}
+
+.mememe-drag.mememe-disabled-text .dragmememe,
+.mememe-drag.mememe-hidden-textbox .dragmememe{
+  border-color: transparent;
+}
+
+/* Hide the browser's default checkbox */
+.mememe-icon-checkbox input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.dragmememe{
+  width: 30%;
+  height: auto;
+  padding: 0;
+  border: 1px dashed #9D9D9D;
+  position: absolute;
+  cursor: move;
+}
+
+.dragmememe .rotatemememe{
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.dragmememe .rotatemememe .mememe-editme{
+  text-align: center;
+  position: relative;
+  line-height: 1;
+  caret-color: red;
+  border:none;
+  outline: 0;
+  width: 100%;
+  display: block;
+  font-size: 2em;
+  min-height: 40px;
+  height: 100%;
+  white-space: nowrap;
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
+  overflow:hidden;
+}
+.dragmememe .rotatemememe .mememe-editme > div{
+  width: 100%;
+  display: block;
+  line-height: 1;
+}
+
+[contenteditable=true].mememe-editme:not(:focus):empty::before {
+  content: attr(data-placeholder);
+  opacity: 0.5;
+  vertical-align: middle;
+  line-height: normal;
+}
+
+.rotatemememe .mememe-editme.mememe-input-highlight:focus{
+  background-color: rgba(235,255,155,0.1);
+}
+.dragmememe input::placeholder {
+  color: #C5C8C8 !important;
+  opacity: .2 !important;
+  font-family: inherit !important;
+  text-shadow: none !important;
+  -webkit-text-stroke: unset !important;
+  text-stroke: unset !important;
+}
+.dragmememe input::-moz-placeholder {
+  color: #C5C8C8 !important;
+  opacity: .2 !important;
+  font-family: inherit !important;
+  text-shadow: none !important;
+  -webkit-text-stroke: unset !important;
+  text-stroke: unset !important;
+}
+.dragmememe input:-ms-input-placeholder {
+  color: #C5C8C8 !important;
+  opacity: .2 !important;
+  font-family: inherit !important;
+  text-shadow: none !important;
+  -webkit-text-stroke: unset !important;
+  text-stroke: unset !important;
+}
+.dragmememe input::-webkit-input-placeholder {
+  color: #C5C8C8 !important;
+  opacity: .2 !important;
+  font-family: inherit !important;
+  text-shadow: none !important;
+  -webkit-text-stroke: unset !important;
+  text-stroke: unset !important;
+}
+.mememe-drag.mememe-disabled-text .dragmememe input::placeholder {
+  opacity: 0 !important;
+}
+.mememe-drag.mememe-disabled-text .dragmememe input::-moz-placeholder {
+  opacity: 0 !important;
+}
+.mememe-drag.mememe-disabled-text .dragmememe input:-ms-input-placeholder {
+  opacity: 0 !important;
+}
+.mememe-drag.mememe-disabled-text .dragmememe input::-webkit-input-placeholder {
+  opacity: 0 !important;
+}
+
+.mememe-drag.mememe-hidden-textbox .dragmememe input::placeholder {
+  opacity: 0 !important;
+}
+.mememe-drag.mememe-hidden-textbox .dragmememe input::-moz-placeholder {
+  opacity: 0 !important;
+}
+.mememe-drag.mememe-hidden-textbox .dragmememe input:-ms-input-placeholder {
+  opacity: 0 !important;
+}
+.mememe-drag.mememe-hidden-textbox .dragmememe input::-webkit-input-placeholder {
+  opacity: 0 !important;
+}
+
+.mememe-alert{
+  margin: 0;
+  padding: 0;
+  margin-bottom: 10px;
+}
+
+/*
+* gallery shortcode [mememe-list] and [mememe-templates]
+*/
+.mememe-wrap-gallery{
+  margin-bottom: 2em;
+  clear: both;
+  display: block;
+  width: 100%;
+  overflow: hidden;
+}
+
+.mememe-hidden{
+  opacity: 0;
+}
+
+.mememe-gallery{
+  position: relative;
+  margin-bottom: 1em;
+    -webkit-transition: opacity 1s ease-out;
+  transition: opacity 1s ease-out;
+}
+
+.mememe-filters .mememe-filter {
+    display: inline-block;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    border: none;
+    padding: .3rem .6rem;
+    font-weight: normal;
+    line-height: 1.25;
+    transition: all .15s ease-in-out;
+    cursor: pointer;
+    font-size: 80%;
+    margin: 0 !important;
+    margin-bottom: 4px !important;
+}
+.mememe-filters .mememe-filter.active {
+    color: #fff;
+    background-color: #007bff;
+    border-radius: 4px;
+}
+
+.mememe-filters .mememe-filter input[type="checkbox"], 
+.mememe-filters .mememe-filter input[type="radio"] {
+    position: absolute;
+    clip: rect(0,0,0,0);
+    pointer-events: none;
+}
+/*
+* Responsive columns: 2x | 3x | 4x | 5x | 
+*/
+.mememe-gallery.mememe-column-0 .mememe-gallery-item,
+.mememe-gallery.mememe-column-0 .grid-sizer {
+  width: 100%;
+}
+
+@media (min-width: 576px) {
+  .mememe-gallery.mememe-column-0 .mememe-gallery-item,
+  .mememe-gallery.mememe-column-0 .grid-sizer {  
+    width: 50%;
+  }
+}
+
+@media (min-width: 768px) {
+  .mememe-gallery.mememe-column-0 .mememe-gallery-item,
+  .mememe-gallery.mememe-column-0 .grid-sizer {  
+    width: 33.3%;
+  }
+}
+
+@media (min-width: 992px) {
+  .mememe-gallery.mememe-column-0 .mememe-gallery-item,
+  .mememe-gallery.mememe-column-0 .grid-sizer {
+    width: 25%;
+  }
+}
+
+@media (min-width: 1200px) {
+  .mememe-gallery.mememe-column-0 .mememe-gallery-item,
+  .mememe-gallery.mememe-column-0 .grid-sizer {
+    width: 20%;
+    clear: none;
+  }
+}
+
+/*
+* Static Columns
+*/
+
+.mememe-gallery.mememe-column-1 .mememe-gallery-item,
+  .mememe-gallery.mememe-column-1 .grid-sizer {
+    width: 100%;
+}
+
+.mememe-gallery.mememe-column-2 .mememe-gallery-item,
+  .mememe-gallery.mememe-column-2 .grid-sizer {
+    width: 50%;
+}
+.mememe-gallery.mememe-column-2 .mememe-gallery-item:nth-child(2n+1){
+    clear:left;
+}
+
+.mememe-gallery.mememe-column-3 .mememe-gallery-item,
+  .mememe-gallery.mememe-column-3 .grid-sizer {
+    width: 33.3%;
+}
+.mememe-gallery.mememe-column-3 .mememe-gallery-item:nth-child(3n+1){
+    clear:left;
+}
+.mememe-gallery.mememe-column-4 .mememe-gallery-item,
+  .mememe-gallery.mememe-column-4 .grid-sizer {
+    width: 25%;
+}
+.mememe-gallery.mememe-column-4 .mememe-gallery-item:nth-child(4n+1){
+    clear:left;
+}
+.mememe-gallery.mememe-column-5 .mememe-gallery-item,
+  .mememe-gallery.mememe-column-5 .grid-sizer {
+    
+    width: 20%;
+}
+.mememe-gallery.mememe-column-5 .mememe-gallery-item:nth-child(5n+1){
+    clear:left;
+}
+.mememe-gallery.mememe-column-6 .mememe-gallery-item,
+  .mememe-gallery.mememe-column-6 .grid-sizer {
+    width: 16.5%;
+}
+.mememe-gallery.mememe-column-6 .mememe-gallery-item:nth-child(6n+1){
+    clear:left;
+}
+.mememe-gallery.mememe-column-7 .mememe-gallery-item,
+  .mememe-gallery.mememe-column-7 .grid-sizer {
+    width: 14.2%;
+}
+.mememe-gallery.mememe-column-7 .mememe-gallery-item:nth-child(7n+1){
+    clear:left;
+}
+.mememe-gallery.mememe-column-8 .mememe-gallery-item,
+  .mememe-gallery.mememe-column-8 .grid-sizer{
+    width: 12.5%;
+}
+.mememe-gallery.mememe-column-8 .mememe-gallery-item:nth-child(8n+1){
+    clear:left;
+}
+.mememe-gallery.mememe-column-9 .mememe-gallery-item,
+  .mememe-gallery.mememe-column-9 .grid-sizer{
+    width: 11%;
+}
+.mememe-gallery.mememe-column-9 .mememe-gallery-item:nth-child(9n+1){
+    clear:left;
+}
+
+.mememe-gallery .mememe-card-body{
+  padding: 10px;
+  float: left;
+  width: 100%;
+  position: relative;
+}
+.mememe-gallery .mememe-card-title{
+  margin: 0;
+  margin-bottom: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+.mememe-gallery .mememe-card-links{
+  float: right;
+  position: relative;
+}
+.mememe-wrap-gallery .mememe-gallery .mememe-card-link{
+  display: inline-block;
+  -webkit-transition: all .2s linear;
+  transition: all .2s linear;
+  text-align: center;
+  vertical-align: middle;
+  width: 2.4em;
+  height: 2.4em;
+  padding: 0;
+  border: none;
+  margin-left: 4px;
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  line-height: 1.25;
+  text-decoration: none;
+}
+.mememe-gallery .mememe-cat-list{
+  margin: 0;
+  padding: 0;
+  font-size: 80%;
+  position: relative;
+}
+.mememe-gallery .mememe-cat-list li{
+  list-style: none;
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+}
+.mememe-gallery .mememe-cat-list li a{
+  padding: 4px 8px;
+  background-color: rgba(130,130,130,0.1);
+  color: #2E2E2E;
+  border-radius: 5em;
+  text-decoration: none;
+  border: none;
+    -webkit-transition: all .2s linear;
+  transition: all .2s linear;
+}
+
+.mememe-gallery .mememe-cat-list li a:hover{
+  background-color: rgba(130,130,130,0.2);
+}
+
+.mememe-wrap-gallery.mmm-dark .mememe-cat-list li a{
+  color: #fff;
+  background-color: rgba(255,255,255,0.1);
+}
+
+.mememe-wrap-gallery.mmm-dark .mememe-cat-list li a:hover{
+  background-color: rgba(255,255,255,0.2);
+}
+
+
+/*
+* Load more
+*/
+
+.mememe-loadmore,
+.mememe-loadmorememes{
+  clear: both;
+  width: 100%;
+  text-align: center;
+  padding: .5rem .75rem;
+  line-height: 1.25;
+  -webkit-transition: all .15s ease-in-out;
+  transition: all .15s ease-in-out;
+}
+
+.mememe-gallery .mememe-card > a{
+  display: block;
+  float: left;
+  border: none;
+  overflow: hidden;
+  width: 100%;
+}
+.mememe-gallery .mememe-card > a:hover{
+  text-decoration: none;
+}
+
+.mememe-gallery .mememe-card > a img{
+  float: left;
+  -webkit-transition: all .8s ease-out;
+  transition: all .8s ease-out;
+  width: 100%;
+  height: auto;
+  margin: 0;
+}
+.mememe-gallery .mememe-card:hover a > img{
+  -ms-transform: scale(1.1);
+  -webkit-transform: scale(1.1);
+  transform: scale(1.1);
+  filter: brightness(110%);
+  -webkit-transition: all .4s ease-out;
+  transition: all .4s ease-out;
+}
+
+/*
+* Widgets
+*/
+.widget_mememe_list_widget .mememe-gallery .mememe-card-body,
+.widget_mememe_templates_widget .mememe-gallery .mememe-card-body{
+  display: none;
+}
+
+/*
+* Custom stuff
+*/
+
+.mememe-card{
+  position: relative;
+  float: left;
+  width: 100%;
+  background-color: #fff;
+  color: #2E2E2E;
+}
+.mememe-card img{
+  margin: 0;
+}
+.mememe-card-title{
+  color: #2E2E2E;
+  position: relative;
+}
+.mememe-wrap-gallery.mmm-dark .mememe-card{
+  background-color: #2E2E2E;
+  color: #fff;
+}
+.mememe-wrap-gallery.mmm-dark .mememe-card-title{
+    color: #fff;
+}
+.mememe-wrap-gallery.mmm-rounded .mememe-card{
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.mememe-wrap-gallery.mmm-shadow .mememe-card{
+  -webkit-box-shadow: 0 0 10px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+  box-shadow: 0 0 10px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+}
+
+.mememe-wrap-gallery.mmm-card .mememe-card{
+  float: left;
+  width: 100%;
+}
+
+.mememe-wrap-gallery.mememe-template-gallery .mememe-card-body{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    background: none;
+    -webkit-box-shadow:inset 0 -50px 30px 0 rgba(255,255,255,0.9);
+    box-shadow:inset 0 -50px 30px 0 rgba(255,255,255,0.9);
+}
+
+.mememe-wrap-gallery.mememe-template-gallery.mmm-dark .mememe-card-body{
+    -webkit-box-shadow:inset 0 -50px 30px 0 rgba(0,0,0,0.9);
+    box-shadow:inset 0 -50px 30px 0 rgba(0,0,0,0.9);
+}
+
+.mememe-wrap-gallery.mememe-template-gallery .mememe-card-title{
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+    padding: 10px;
+    margin: 0;
+}
+
+.mememe-wrap-gallery.mmm-card .mememe-card-link,
+.mememe-wrap-gallery.mmm-card .mememe-card-link:hover{
+  border-radius: 50%;
+  -webkit-box-shadow: 0 2px 8px rgba(0,0,0,0.19);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.19);
+}
+
+.mememe-wrap-gallery.mmm-card .mememe-card-links{
+  position: absolute;
+  right: 10px;
+  top: -1em;
+}
+
+
+.mememe-wrap-gallery.mmm-card .mememe-card-link:hover{
+  -webkit-box-shadow: 0 2px 18px rgba(0,0,0,0.19);
+  box-shadow: 0 2px 18px rgba(0,0,0,0.19);
+}
+
+.mememe-wrap-gallery.mmm-card .mememe-card-title{
+  padding-top: 10px;
+  padding-bottom: 10px;  
+}
+
+.mememe-wrap-gallery.mmm-card .mememe-date{
+  font-size: 60%;
+  float: right;
+}
+
+.mememe-wrap-gallery.mmm-frame .mememe-card:hover > .mememe-card-body{
+  background-color: rgba(255,255,255,0.7);
+}
+.mememe-wrap-gallery.mmm-frame.mmm-dark .mememe-card:hover > .mememe-card-body{
+  background-color: rgba(0,0,0,0.7);
+}
+.mememe-wrap-gallery.mmm-frame .mememe-card{
+  float: left;
+  width: 100%;
+  position: relative;
+  padding: 10px;
+}
+.mememe-card-overlay{
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #FFFFFF;
+  -webkit-transition: opacity .4s ease-out;
+  transition: opacity .4s ease-out;
+  opacity: 0;
+}
+.mememe-wrap-gallery.mmm-frame .mememe-card:hover > .mememe-card-body{
+  opacity: 1;
+}
+.mememe-wrap-gallery.mmm-frame .mememe-card:hover > .mememe-card-body .mememe-card-overlay{
+  opacity: 0.5;
+}
+.mememe-wrap-gallery.mmm-frame .mememe-card-title{
+  padding: 10px;
+}
+.mememe-wrap-gallery.mmm-frame .mememe-card-links{
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+}
+.mememe-wrap-gallery.mmm-frame .mememe-card-body{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  -webkit-transition: opacity .4s ease-out;
+  transition: opacity .4s ease-out;
+}
+
+.mememe-wrap-gallery.mmm-frame.mmm-dark .mememe-card-body{
+  color: #fff;
+}
+.dragmememe .mememe-editme.rtl{
+  direction: RTL !important;
+}
+.hidden-mememe-canvas{
+  display: none;
+}
+.mememe-rotateme{
+  width: 100%;
+  height: 100%;
+}
+.mememe-del-text{
+  position: absolute;
+  left: -8px;
+  top: -8px;
+  width: 16px;
+  height: 16px;
+  font-size: 16px;
+  cursor: pointer;
+  background-color: #fff;
+  color: #000;
+  border-radius:50%;
+  z-index: 9;
+-webkit-box-shadow: 0px 0px 0px 1px rgba(255,255,255,1);
+-moz-box-shadow: 0px 0px 0px 1px rgba(255,255,255,1);
+box-shadow: 0px 0px 0px 1px rgba(255,255,255,1);
+}
+.mememe-del-text svg{
+  display: block;
+}
+.mememe-close-x {
+  stroke: #333;
+  fill: transparent;
+  stroke-linecap: round;
+  stroke-width: 3;
+}
+.mememe-placeholder img{
+  opacity: 0;
+}
+.mememe-placeholder img.mememe-animate-in{
+  opacity: 1;
+  -webkit-transition:  opacity .5s ease-in-out;
+  transition: opacity .5s ease-in-out;
+}
+
+.mememe-hide-title-field .mememe-generator-title{
+  display: none;
+}
+.mememe-generator-title label{
+  display: none;
+}
+.wrap-mememe .mememe-button-group-pills{
+  margin-bottom: .2em;
+  padding: 0;
+  margin: 0;
+  margin-bottom: .6em;
+}
+
+.wrap-mememe .mememe-button-group-pills li{
+  list-style: none;
+  margin: 0;
+  padding:0;
+  display: inline-block;
+  position: relative;
+}
+
+.wrap-mememe .mememe-button-group-pills input:checked + label{
+  opacity: 1;
+}
+.wrap-mememe .mememe-button-group-pills li label{
+  margin: 0;
+  padding: .1em .4em;
+  font-size: 80%;
+  opacity: 0.8;
+  -webkit-transition: background .4s ease-out, color .4s ease-out;
+  transition: background .4s ease-out, color .2s ease-out;
+  border-radius: 6em;
+}
+.wrap-mememe .mememe-button-group-pills input{
+  opacity: 0;
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 2;
+  cursor: pointer;
+}
+
+/**
+ * Add ons
+ */
+.mememe-addons{
+  display: block;
+  clear: both;
+  width: 100%;
+  margin: .5em 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.mememe-addons a.mememe-btn.mememe-addon{
+  border-radius: 4px;
+  margin-right: 4px;
+  text-decoration: none;
+  display: inline-block;
+  padding: 6px 10px;
+  min-height: calc(1.5em + .75rem);
+  min-width: calc(1.5em + .75rem);
+  line-height: 1.5;
+  font-weight: normal;
+  font-size: 1em;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.mememe-social-container {
+    width: 100%;
+    margin-right: auto;
+    margin-left: auto;
+    clear: both;
+    position: relative;
+    margin-bottom: 1em;
+}
+.mememe .mememe-social-row{
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  margin: 0 -4px;
+}
+.mememe .mememe-social-row .mememe-social-col{
+  text-align: center;
+  position: relative;
+  width: 100%;
+  padding-right: 4px;
+  padding-left: 4px;
+  padding-bottom: 4px;
+  -ms-flex-preferred-size: 0;
+  flex-basis: 0;
+  -ms-flex-positive: 1;
+  flex-grow: 1;
+  min-width: 52px;
+  max-width: 100%;
+}
+.mememe .mememe-social-row .mememe-social-col > a{
+  display: block;
+  border-radius: 5em;
+  padding: 8px;
+  color: #fff;
+  font-size: 18px;
+}
+.mememe-addons .mememe-btn.mememe-addon *,
+.mememe .mememe-social-row .mememe-social-col > a *{
+  vertical-align: middle;
+  display: inline-block;
+}
+.mememe .mememe-social-row .mememe-social-col > a:hover,
+.mememe .mememe-social-row .mememe-social-col > a:active,
+.mememe .mememe-social-row .mememe-social-col > a:focus{
+  color: #fff;
+}
+.mememe .mememe-social-row .mememe-social-col > input[type="text"]{
+    border-radius: 5em;
+    font-size: 18px;
+    padding: 6px 10px;
+    width: 100%;
+    border: 1px solid #dadada;
+}
+.mememe .mememe-social-row .mememe-social-col > a.twitter-bg{
+  background-color: #1da1f2;
+}
+.mememe .mememe-social-row .mememe-social-col > a.fb-bg,
+.mememe .mememe-social-row .mememe-social-col > a.facebook-bg{
+  background-color: #4267B2;
+}
+.mememe .mememe-social-row .mememe-social-col > a.linkedin-bg{
+  background-color: #2867b2;
+}
+.mememe .mememe-social-row .mememe-social-col > a.pinterest-bg{
+  background-color: #bd081c;
+}
+.mememe .mememe-social-row .mememe-social-col > a.reddit-bg{
+  background-color: #FF5700;
+}
+.mememe .mememe-social-row .mememe-social-col > a.buffer-bg{
+  background-color: #222A30;
+}
+.mememe .mememe-social-row .mememe-social-col > a.evernote-bg{
+  background-color: #5ba525;
+}
+.mememe .mememe-social-row .mememe-social-col > a.tumblr-bg{
+  background-color: #35465c;
+}
+.mememe .mememe-social-row .mememe-social-col > a.whatsapp-bg{
+  background-color: #4fce5d;
+}
+.mememe .mememe-social-row .mememe-social-col > a:hover{
+  opacity: 0.8;
+}
+
+.mememe .mememe-post-like{
+    display: block;
+    margin: .5em 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.mememe .mememe-post-like .mememe-vote-btn, .mememe-flag-btn{
+  padding: 6px 10px;
+  display: inline-block;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.mememe a.mememe-report,
+.mememe a.mememe-report:hover{
+  text-decoration: none;
+}
+.mememe-app .wrapmememe .original-mememe-temp{
+  width: 100% !important;
+  position: absolute;
+  z-index: -99;
+  visibility: hidden;
+}

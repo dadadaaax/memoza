@@ -1,0 +1,24 @@
+.pjnt-settings-wrap .form-table {
+    display: inline-block;
+}
+
+.pjnt-settings-wrap .form-table tr {
+    border-bottom: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+}
+
+.pjnt-settings-wrap .form-table tr:first-child {
+    border-top: 1px solid #ccc;
+}
+
+.pjnt-settings-wrap .form-table tr th {
+    border-right: 1px solid #ccc;
+    padding-left: 1rem;
+}
+
+.pjnt-settings-wrap select,
+.pjnt-settings-wrap button,
+.pjnt-settings-wrap .wp-picker-container {
+    width: 100%;
+}

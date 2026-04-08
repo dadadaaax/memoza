@@ -1,0 +1,41 @@
+services:
+  db:
+    image: mariadb:10.6
+    container_name: memoza_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - internal
+
+  wordpress:
+    image: wordpress:6.5-php8.1-apache
+    container_name: memoza_app
+    depends_on:
+      - db
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: ${DB_USER}
+      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
+      WORDPRESS_DB_NAME: ${DB_NAME}
+      VIRTUAL_HOST: memoza.pl
+    volumes:
+      - .:/var/www/html
+      - ./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+    networks:
+      - internal
+      - web
+
+networks:
+  internal:
+  web:
+    external: true
+
+volumes:
+  db_data:

@@ -1,0 +1,24 @@
+# WordPress Core and Config
+wp-config.php
+wp-content/uploads/
+wp-content/upgrade/
+
+# Log files
+log/
+*.log
+
+# Environment and sensitive files
+.env
+bitnami.pem
+*.pem
+uploads.ini
+list_temp_files.txt
+.htaccess_backup
+
+# Temporary files and IDE settings
+*.swp
+*~
+.DS_Store
+nbproject/
+.idea/
+.vscode/
