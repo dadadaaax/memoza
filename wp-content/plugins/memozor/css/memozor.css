@@ -1,0 +1,54 @@
+#memozor-container {
+    max-width: 800px;
+    margin: 20px auto;
+    font-family: sans-serif;
+    border: 1px solid #ccc;
+    padding: 15px;
+    background: #f9f9f9;
+    border-radius: 8px;
+}
+
+#memozor-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+#memozor-toolbar button, #memozor-toolbar input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#memozor-toolbar button {
+    background: #0073aa;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#memozor-toolbar button:hover {
+    background: #005177;
+}
+
+#memozor-canvas-container {
+    display: flex;
+    justify-content: center;
+    border: 1px dashed #aaa;
+    background: #eee;
+    overflow: auto;
+}
+
+#memozor-canvas {
+    border: 1px solid #999;
+}
+
+#memozor-message {
+    margin-top: 15px;
+    font-weight: bold;
+    text-align: center;
+}

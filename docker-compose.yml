@@ -25,6 +25,8 @@ services:
       WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
       WORDPRESS_DB_NAME: ${DB_NAME}
       VIRTUAL_HOST: memoza.pl
+      LETSENCRYPT_HOST: memoza.pl
+      LETSENCRYPT_EMAIL: admin@memoza.pl
     volumes:
       - .:/var/www/html
       - ./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
