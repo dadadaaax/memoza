@@ -129,16 +129,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
             });
 
-            const result = await response.json();
+            let result;
+            const textResponse = await response.text();
+            try {
+                result = JSON.parse(textResponse);
+            } catch (e) {
+                console.error("Non-JSON response received: ", textResponse);
+                messageDiv.innerHTML = `<span style="color:red">Server error (${response.status}): The server returned an invalid response.</span>`;
+                return;
+            }
             
             if (response.ok && result.success) {
                 messageDiv.innerHTML = `<span style="color:green">Success! Meme saved. <a href="${result.url}" target="_blank">View Image</a></span>`;
             } else {
-                messageDiv.innerHTML = `<span style="color:red">Error saving meme: ${result.message || 'Unknown error'}</span>`;
+                messageDiv.innerHTML = `<span style="color:red">Error saving meme: ${result.message || result.code || 'Unknown error'}</span>`;
             }
 
         } catch (err) {
-            messageDiv.innerHTML = `<span style="color:red">Network error saving meme.</span>`;
+            messageDiv.innerHTML = `<span style="color:red">Network error saving meme: ${err.message}</span>`;
             console.error(err);
         }
     });

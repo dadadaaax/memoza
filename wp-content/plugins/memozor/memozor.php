@@ -20,7 +20,7 @@ function memozor_enqueue_scripts() {
         
         // Plugin Scripts & Styles
         wp_enqueue_style('memozor-css', plugin_dir_url(__FILE__) . 'css/memozor.css', array(), '1.0.0');
-        wp_enqueue_script('memozor-js', plugin_dir_url(__FILE__) . 'js/memozor.js', array('fabric-js'), '1.0.0', true);
+        wp_enqueue_script('memozor-js', plugin_dir_url(__FILE__) . 'js/memozor.js', array('fabric-js'), '1.0.1', true);
 
         // Localize script to pass REST API details
         wp_localize_script('memozor-js', 'memozorSettings', array(
@@ -58,10 +58,7 @@ add_action('rest_api_init', function () {
     register_rest_route('memozor/v1', '/save', array(
         'methods'             => 'POST',
         'callback'            => 'memozor_save_image_endpoint',
-        'permission_callback' => function () {
-            // Check if user is logged in
-            return is_user_logged_in();
-        }
+        'permission_callback' => '__return_true'
     ));
 });
 
@@ -98,6 +95,19 @@ function memozor_save_image_endpoint(WP_REST_Request $request) {
         return new WP_Error('upload_error', $upload['error'], array('status' => 500));
     }
 
+    // Create a new post
+    $post_data = array(
+        'post_title'    => 'Meme ' . date('Y-m-d H:i:s'),
+        'post_content'  => '',
+        'post_status'   => 'publish',
+        'post_type'     => 'post'
+    );
+    $post_id = wp_insert_post($post_data);
+
+    if (is_wp_error($post_id)) {
+        return new WP_Error('post_error', 'Could not create post', array('status' => 500));
+    }
+
     // Insert into Media Library
     $attachment = array(
         'post_mime_type' => 'image/' . $img_type,
@@ -106,17 +116,28 @@ function memozor_save_image_endpoint(WP_REST_Request $request) {
         'post_status'    => 'inherit'
     );
 
-    $attach_id = wp_insert_attachment($attachment, $upload['file']);
+    $attach_id = wp_insert_attachment($attachment, $upload['file'], $post_id);
     
     if (!is_wp_error($attach_id)) {
         require_once(ABSPATH . 'wp-admin/includes/image.php');
         $attach_data = wp_generate_attachment_metadata($attach_id, $upload['file']);
         wp_update_attachment_metadata($attach_id, $attach_data);
+        
+        // Apply watermark using Image_Watermark plugin if available
+        if (function_exists('Image_Watermark')) {
+            $image_watermark = Image_Watermark();
+            $attach_data = $image_watermark->apply_watermark($attach_data, $attach_id, 'manual');
+            wp_update_attachment_metadata($attach_id, $attach_data);
+        }
+
+        // Set the meme as the featured image (thumbnail) of the post
+        set_post_thumbnail($post_id, $attach_id);
 
         return rest_ensure_response(array(
             'success'       => true,
             'attachment_id' => $attach_id,
-            'url'           => wp_get_attachment_url($attach_id)
+            'post_id'       => $post_id,
+            'url'           => get_permalink($post_id)
         ));
     }
 
