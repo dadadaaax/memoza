@@ -4,20 +4,20 @@
     "src": "src/assets/logo.png"
   },
   "src/assets/preloader_logo.png": {
-    "file": "assets/preloader_logo-DgqMa6MU.png",
+    "file": "assets/preloader_logo-C0QgxU1S.png",
     "src": "src/assets/preloader_logo.png"
   },
   "src/main.tsx": {
-    "file": "assets/main-BMehIjHi.js",
+    "file": "assets/main-_nW0agN0.js",
     "name": "main",
     "src": "src/main.tsx",
     "isEntry": true,
     "css": [
-      "assets/main-CQuUpRxi.css"
+      "assets/main-Bs24eEkz.css"
     ],
     "assets": [
       "assets/logo-DYtD7tKo.png",
-      "assets/preloader_logo-DgqMa6MU.png"
+      "assets/preloader_logo-C0QgxU1S.png"
     ]
   }
 }

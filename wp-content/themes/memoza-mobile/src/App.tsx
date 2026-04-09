@@ -128,9 +128,11 @@ const App: React.FC = () => {
             </div>
           );
         })}
-        <div ref={bottomRef} className="loading-indicator">
-          {loading && <span>Loading more memes...</span>}
-        </div>
+        {posts.length > 0 && (
+          <div ref={bottomRef} className="loading-indicator">
+            {loading && <span>Loading more memes...</span>}
+          </div>
+        )}
       </div>
       
       <nav className="bottom-nav">
