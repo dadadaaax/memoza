@@ -1,6 +1,7 @@
-document.addEventListener('DOMContentLoaded', () => {
+window.initMemozor = function() {
     const canvasEl = document.getElementById('memozor-canvas');
-    if (!canvasEl) return;
+    if (!canvasEl || canvasEl.dataset.initialized) return;
+    canvasEl.dataset.initialized = "true";
 
     // Initialize Fabric.js Canvas
     const canvas = new fabric.Canvas('memozor-canvas');
