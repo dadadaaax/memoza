@@ -111,7 +111,7 @@ const App: React.FC = () => {
       </div>
 
       <div className="top-nav">
-        <img src={logoUrl} alt="Memoza" className="logo" />
+        <img src={preloaderLogoUrl} alt="Memoza" className="logo" />
       </div>
       
       <div className="feed-container" ref={feedRef}>
