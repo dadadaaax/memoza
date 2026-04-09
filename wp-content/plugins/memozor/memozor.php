@@ -18,9 +18,12 @@ function memozor_enqueue_scripts() {
         // Fabric.js (Canvas library)
         wp_enqueue_script('fabric-js', 'https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js', array(), '5.3.1', true);
         
+        // Google Fonts for Memes
+        wp_enqueue_style('memozor-fonts', 'https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Oswald:wght@700&family=Creepster&family=Press+Start+2P&display=swap', array(), null);
+
         // Plugin Scripts & Styles
         wp_enqueue_style('memozor-css', plugin_dir_url(__FILE__) . 'css/memozor.css', array(), '1.0.0');
-        wp_enqueue_script('memozor-js', plugin_dir_url(__FILE__) . 'js/memozor.js', array('fabric-js'), '1.0.1', true);
+        wp_enqueue_script('memozor-js', plugin_dir_url(__FILE__) . 'js/memozor.js', array('fabric-js'), '1.0.3', true);
 
         // Localize script to pass REST API details
         wp_localize_script('memozor-js', 'memozorSettings', array(
@@ -37,7 +40,21 @@ function memozor_editor_shortcode() {
     <div id="memozor-container">
         <div id="memozor-toolbar">
             <input type="file" id="memozor-upload" accept="image/png, image/jpeg, image/webp" title="Upload Image" />
+            <button type="button" id="memozor-undo" disabled title="Undo">↶ Undo</button>
+            <button type="button" id="memozor-redo" disabled title="Redo">↷ Redo</button>
             <button type="button" id="memozor-add-text">Add Text</button>
+            <label>Font: 
+                <select id="memozor-font-family">
+                    <option value="Impact, sans-serif">Impact</option>
+                    <option value="Arial, sans-serif">Arial</option>
+                    <option value="'Comic Sans MS', cursive">Comic Sans</option>
+                    <option value="'Oswald', sans-serif">Oswald</option>
+                    <option value="'Anton', sans-serif">Anton</option>
+                    <option value="'Bebas Neue', sans-serif">Bebas Neue</option>
+                    <option value="'Creepster', cursive">Creepster (Spooky!)</option>
+                    <option value="'Press Start 2P', cursive">Press Start 2P (Retro!)</option>
+                </select>
+            </label>
             <label>Color: <input type="color" id="memozor-text-color" value="#ffffff"></label>
             <label>Outline: <input type="color" id="memozor-stroke-color" value="#000000"></label>
             <label>Size: <input type="range" id="memozor-text-size" min="10" max="150" value="40"></label>

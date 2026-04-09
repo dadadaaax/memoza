@@ -7,12 +7,76 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // UI Elements
     const uploadInput = document.getElementById('memozor-upload');
+    const undoBtn = document.getElementById('memozor-undo');
+    const redoBtn = document.getElementById('memozor-redo');
     const addTextBtn = document.getElementById('memozor-add-text');
+    const fontFamilySelect = document.getElementById('memozor-font-family');
     const textColorInput = document.getElementById('memozor-text-color');
     const strokeColorInput = document.getElementById('memozor-stroke-color');
     const textSizeInput = document.getElementById('memozor-text-size');
     const saveBtn = document.getElementById('memozor-save');
     const messageDiv = document.getElementById('memozor-message');
+
+    // State Management
+    let history = [];
+    let historyIndex = -1;
+    let isStateLoading = false;
+
+    function saveState() {
+        if (isStateLoading) return;
+        
+        // If we are saving a new state after undoing, truncate the future history
+        if (historyIndex < history.length - 1) {
+            history = history.slice(0, historyIndex + 1);
+        }
+        
+        // Save current canvas JSON to history
+        history.push(canvas.toJSON());
+        historyIndex++;
+        
+        updateUndoRedoButtons();
+    }
+
+    function updateUndoRedoButtons() {
+        if (undoBtn) undoBtn.disabled = historyIndex <= 0;
+        if (redoBtn) redoBtn.disabled = historyIndex >= history.length - 1;
+    }
+
+    if (undoBtn) {
+        undoBtn.addEventListener('click', () => {
+            if (historyIndex > 0) {
+                isStateLoading = true;
+                historyIndex--;
+                canvas.loadFromJSON(history[historyIndex], function() {
+                    canvas.renderAll();
+                    updateUndoRedoButtons();
+                    isStateLoading = false;
+                });
+            }
+        });
+    }
+
+    if (redoBtn) {
+        redoBtn.addEventListener('click', () => {
+            if (historyIndex < history.length - 1) {
+                isStateLoading = true;
+                historyIndex++;
+                canvas.loadFromJSON(history[historyIndex], function() {
+                    canvas.renderAll();
+                    updateUndoRedoButtons();
+                    isStateLoading = false;
+                });
+            }
+        });
+    }
+
+    // Save initial blank state
+    saveState();
+
+    // Bind state saving to canvas events
+    canvas.on('object:added', saveState);
+    canvas.on('object:modified', saveState);
+    canvas.on('object:removed', saveState);
 
     // 1. Upload Background Image
     uploadInput.addEventListener('change', function(e) {
@@ -33,7 +97,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 canvas.setWidth(img.width * scale);
                 canvas.setHeight(img.height * scale);
                 
-                canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas), {
+                canvas.setBackgroundImage(img, function() {
+                    canvas.renderAll();
+                    saveState();
+                }, {
                     scaleX: scale,
                     scaleY: scale
                 });
@@ -47,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const text = new fabric.IText('YOUR TEXT HERE', {
             left: canvas.width / 2,
             top: canvas.height / 2,
-            fontFamily: 'Impact, sans-serif',
+            fontFamily: fontFamilySelect ? fontFamilySelect.value : 'Impact, sans-serif',
             fill: textColorInput.value,
             stroke: strokeColorInput.value,
             strokeWidth: 2,
@@ -68,6 +135,17 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateToolbar(e) {
         const activeObj = canvas.getActiveObject();
         if (activeObj && activeObj.type === 'i-text') {
+            if (fontFamilySelect) {
+                // Try to find the matching option in the select
+                const matchingOption = Array.from(fontFamilySelect.options).find(opt => opt.value === activeObj.fontFamily);
+                if (matchingOption) {
+                    fontFamilySelect.value = activeObj.fontFamily;
+                } else if (activeObj.fontFamily === 'Impact' || activeObj.fontFamily === 'Arial') {
+                   // backwards compat handling
+                   const compatOption = Array.from(fontFamilySelect.options).find(opt => opt.value.includes(activeObj.fontFamily));
+                   if (compatOption) fontFamilySelect.value = compatOption.value;
+                }
+            }
             textColorInput.value = activeObj.fill;
             strokeColorInput.value = activeObj.stroke;
             textSizeInput.value = activeObj.fontSize;
@@ -75,6 +153,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // 4. Live Update Active Text
+    if (fontFamilySelect) {
+        fontFamilySelect.addEventListener('change', function() {
+            const activeObj = canvas.getActiveObject();
+            if (activeObj && activeObj.type === 'i-text') {
+                activeObj.set('fontFamily', this.value);
+                canvas.renderAll();
+                saveState();
+            }
+        });
+    }
+
     textColorInput.addEventListener('input', function() {
         const activeObj = canvas.getActiveObject();
         if (activeObj && activeObj.type === 'i-text') {
@@ -82,6 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
             canvas.renderAll();
         }
     });
+    textColorInput.addEventListener('change', function() { saveState(); });
 
     strokeColorInput.addEventListener('input', function() {
         const activeObj = canvas.getActiveObject();
@@ -90,6 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
             canvas.renderAll();
         }
     });
+    strokeColorInput.addEventListener('change', function() { saveState(); });
 
     textSizeInput.addEventListener('input', function() {
         const activeObj = canvas.getActiveObject();
@@ -98,6 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
             canvas.renderAll();
         }
     });
+    textSizeInput.addEventListener('change', function() { saveState(); });
 
     // 5. Save Meme
     saveBtn.addEventListener('click', async () => {

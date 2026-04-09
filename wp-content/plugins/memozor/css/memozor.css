@@ -18,7 +18,7 @@
     border-bottom: 1px solid #ddd;
 }
 
-#memozor-toolbar button, #memozor-toolbar input {
+#memozor-toolbar button, #memozor-toolbar input, #memozor-toolbar select {
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -31,8 +31,14 @@
     font-weight: bold;
 }
 
-#memozor-toolbar button:hover {
+#memozor-toolbar button:hover:not(:disabled) {
     background: #005177;
+}
+
+#memozor-toolbar button:disabled {
+    background: #cccccc;
+    color: #666666;
+    cursor: not-allowed;
 }
 
 #memozor-canvas-container {
