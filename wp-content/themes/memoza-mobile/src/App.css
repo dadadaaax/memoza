@@ -21,14 +21,10 @@
 }
 
 .logo {
-  font-size: 1.8rem;
-  font-weight: 900;
-  color: var(--text-color);
-  margin: 0;
-  letter-spacing: 1px;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
+  height: 40px;
+  width: auto;
   pointer-events: auto;
-  font-style: italic;
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.9));
 }
 
 .feed-container {

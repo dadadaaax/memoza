@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
+import logoUrl from './assets/logo.png';
 
 interface WPPost {
   id: number;
