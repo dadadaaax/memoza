@@ -113,7 +113,11 @@ const App: React.FC = () => {
   };
 
   const handleLogin = () => {
-    alert("Login logic here!");
+    if (window.memozaData.isLoggedIn) {
+      window.location.href = `${window.memozaData.siteUrl}/wp-login.php?action=logout`;
+    } else {
+      window.location.href = `${window.memozaData.siteUrl}/wp-login.php`;
+    }
   };
 
   return (
@@ -124,6 +128,8 @@ const App: React.FC = () => {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
           <div id="memozor-container">
+            {/* Honeypot field for bot protection */}
+            <input type="text" id="memozor-website-url" name="website_url" style={{ display: 'none' }} tabIndex={-1} autoComplete="off" />
             <div id="memozor-toolbar">
                 <input type="file" id="memozor-upload" accept="image/png, image/jpeg, image/webp" title="Upload Image" />
                 <button type="button" id="memozor-undo" disabled title="Undo">↶ Undo</button>
@@ -187,8 +193,17 @@ const App: React.FC = () => {
       
       <nav className="bottom-nav">
         <button onClick={handleLogin} className="nav-btn">
-           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-           <span>Login</span>
+          {window.memozaData.isLoggedIn ? (
+            <>
+              <svg viewBox="0 0 24 24" fill="none" stroke="#ff4d4d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+              <span>Logout</span>
+            </>
+          ) : (
+            <>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              <span>Login</span>
+            </>
+          )}
         </button>
         <button onClick={handleCreateMeme} className="nav-btn create-btn">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
