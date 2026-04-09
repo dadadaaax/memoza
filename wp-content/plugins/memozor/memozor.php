@@ -38,6 +38,8 @@ function memozor_editor_shortcode() {
     ob_start();
     ?>
     <div id="memozor-container">
+        <!-- Honeypot field for bot protection -->
+        <input type="text" id="memozor-website-url" name="website_url" style="display:none" tabindex="-1" autocomplete="off">
         <div id="memozor-toolbar">
             <input type="file" id="memozor-upload" accept="image/png, image/jpeg, image/webp" title="Upload Image" />
             <button type="button" id="memozor-undo" disabled title="Undo">↶ Undo</button>
@@ -81,6 +83,32 @@ add_action('rest_api_init', function () {
 
 function memozor_save_image_endpoint(WP_REST_Request $request) {
     $params = $request->get_json_params();
+
+    // Honeypot check
+    if (!empty($params['website_url'])) {
+        // Silently reject
+        return rest_ensure_response(array(
+            'success'       => true,
+            'attachment_id' => 0,
+            'post_id'       => 0,
+            'url'           => ''
+        ));
+    }
+
+    // Rate limiting (max 5 per hour per IP)
+    $ip = $_SERVER['REMOTE_ADDR'];
+    $transient_key = 'memozor_rate_' . md5($ip);
+    $attempts = get_transient($transient_key);
+    if ($attempts === false) {
+        $attempts = 0;
+    }
+    
+    if ($attempts >= 5) {
+        return new WP_Error('too_many_requests', 'You have reached the submission limit. Please try again later.', array('status' => 429));
+    }
+    
+    set_transient($transient_key, $attempts + 1, HOUR_IN_SECONDS);
+
     $base64_img = isset($params['image_data']) ? $params['image_data'] : '';
 
     if (empty($base64_img)) {
@@ -116,7 +144,7 @@ function memozor_save_image_endpoint(WP_REST_Request $request) {
     $post_data = array(
         'post_title'    => 'Meme ' . date('Y-m-d H:i:s'),
         'post_content'  => '',
-        'post_status'   => 'publish',
+        'post_status'   => 'pending',
         'post_type'     => 'post'
     );
     $post_id = wp_insert_post($post_data);
@@ -124,6 +152,9 @@ function memozor_save_image_endpoint(WP_REST_Request $request) {
     if (is_wp_error($post_id)) {
         return new WP_Error('post_error', 'Could not create post', array('status' => 500));
     }
+
+    // Add meta for identification in admin notice
+    update_post_meta($post_id, '_is_memozor_meme', 1);
 
     // Insert into Media Library
     $attachment = array(
@@ -160,3 +191,43 @@ function memozor_save_image_endpoint(WP_REST_Request $request) {
 
     return new WP_Error('attachment_error', 'Could not create attachment', array('status' => 500));
 }
+
+/**
+ * 3. Admin Notification for Pending Memes
+ */
+function memozor_admin_pending_notice() {
+    if (!current_user_can('edit_others_posts')) {
+        return;
+    }
+
+    $pending_posts = get_posts(array(
+        'post_type'   => 'post',
+        'post_status' => 'pending',
+        'meta_key'    => '_is_memozor_meme',
+        'meta_value'  => '1',
+        'numberposts' => -1,
+    ));
+
+    $pending_count = count($pending_posts);
+
+    if ($pending_count > 0) {
+        $url = admin_url('edit.php?post_status=pending&post_type=post');
+        ?>
+        <div class="notice notice-info is-dismissible">
+            <p>
+                <?php printf(
+                    _n(
+                        'There is %d pending meme awaiting review.',
+                        'There are %d pending memes awaiting review.',
+                        $pending_count,
+                        'memozor'
+                    ),
+                    number_format_i18n($pending_count)
+                ); ?>
+                <a href="<?php echo esc_url($url); ?>"><?php _e('Review Memes', 'memozor'); ?></a>
+            </p>
+        </div>
+        <?php
+    }
+}
+add_action('admin_notices', 'memozor_admin_pending_notice');

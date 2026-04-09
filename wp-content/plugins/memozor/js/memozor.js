@@ -218,7 +218,8 @@ window.initMemozor = function() {
                     'X-WP-Nonce': memozorSettings.nonce
                 },
                 body: JSON.stringify({
-                    image_data: dataURL
+                    image_data: dataURL,
+                    website_url: document.getElementById('memozor-website-url') ? document.getElementById('memozor-website-url').value : ''
                 })
             });
 
