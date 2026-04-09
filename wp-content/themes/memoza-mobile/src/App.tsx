@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import logoUrl from './assets/logo.png';
+import preloaderLogoUrl from './assets/preloader_logo.png';
 
 interface WPPost {
   id: number;
@@ -29,8 +30,11 @@ const App: React.FC = () => {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  
   const observerRef = useRef<IntersectionObserver | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const feedRef = useRef<HTMLDivElement>(null);
 
   const fetchPosts = async (pageNum: number) => {
     setLoading(true);
@@ -55,6 +59,9 @@ const App: React.FC = () => {
       setHasMore(false);
     } finally {
       setLoading(false);
+      if (pageNum === 1) {
+        setTimeout(() => setIsInitialLoad(false), 500);
+      }
     }
   };
 
@@ -77,7 +84,10 @@ const App: React.FC = () => {
       if (entries[0].isIntersecting) {
         setPage(prev => prev + 1);
       }
-    }, { rootMargin: '200px' });
+    }, { 
+      root: feedRef.current,
+      rootMargin: '200px' 
+    });
 
     if (bottomRef.current) {
       observerRef.current.observe(bottomRef.current);
@@ -96,10 +106,15 @@ const App: React.FC = () => {
 
   return (
     <div className="app-container">
-      <div className="top-nav">
-        <h1 className="logo">Memoza</h1>
+      <div className={`preloader-overlay ${isInitialLoad ? '' : 'hidden'}`}>
+        <img src={preloaderLogoUrl} alt="Loading..." className="preloader-logo" />
       </div>
-      <div className="feed-container">
+
+      <div className="top-nav">
+        <img src={logoUrl} alt="Memoza" className="logo" />
+      </div>
+      
+      <div className="feed-container" ref={feedRef}>
         {posts.map((post) => {
           const imageUrl = post._embedded?.['wp:featuredmedia']?.[0]?.source_url;
           return (

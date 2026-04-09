@@ -1,11 +1,23 @@
 {
+  "src/assets/logo.png": {
+    "file": "assets/logo-DYtD7tKo.png",
+    "src": "src/assets/logo.png"
+  },
+  "src/assets/preloader_logo.png": {
+    "file": "assets/preloader_logo-DgqMa6MU.png",
+    "src": "src/assets/preloader_logo.png"
+  },
   "src/main.tsx": {
-    "file": "assets/main-p_yAbMSH.js",
+    "file": "assets/main-BMehIjHi.js",
     "name": "main",
     "src": "src/main.tsx",
     "isEntry": true,
     "css": [
-      "assets/main-BUKYWHL7.css"
+      "assets/main-CQuUpRxi.css"
+    ],
+    "assets": [
+      "assets/logo-DYtD7tKo.png",
+      "assets/preloader_logo-DgqMa6MU.png"
     ]
   }
 }
