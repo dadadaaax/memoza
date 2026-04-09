@@ -97,8 +97,18 @@ const App: React.FC = () => {
     return () => observerRef.current?.disconnect();
   }, [loading, hasMore]);
 
+  useEffect(() => {
+    if (isMemozorOpen && window.initMemozor) {
+      window.initMemozor();
+    }
+  }, [isMemozorOpen]);
+
   const handleCreateMeme = () => {
-    alert("Zrób mema logic here!");
+    setIsMemozorOpen(true);
+  };
+
+  const handleCloseMemozor = () => {
+    setIsMemozorOpen(false);
   };
 
   const handleLogin = () => {
