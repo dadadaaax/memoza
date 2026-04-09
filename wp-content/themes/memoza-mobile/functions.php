@@ -25,6 +25,16 @@ function memoza_mobile_enqueue_scripts() {
         }
     }
 
+    // Enqueue Memozor dependencies
+    wp_enqueue_script('fabric-js', 'https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js', array(), '5.3.1', true);
+    wp_enqueue_style('memozor-fonts', 'https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Oswald:wght@700&family=Creepster&family=Press+Start+2P&display=swap', array(), null);
+    wp_enqueue_style('memozor-css', plugins_url('memozor/css/memozor.css'), array(), '1.0.0');
+    wp_enqueue_script('memozor-js', plugins_url('memozor/js/memozor.js'), array('fabric-js'), '1.0.3', true);
+    wp_localize_script('memozor-js', 'memozorSettings', array(
+        'restUrl' => esc_url_raw(rest_url('memozor/v1/save')),
+        'nonce'   => wp_create_nonce('wp_rest')
+    ));
+
     // Pass data to React
     wp_localize_script( 'memoza-mobile-main', 'memozaData', array(
         'apiUrl' => esc_url_raw( rest_url( 'wp/v2/posts' ) ),

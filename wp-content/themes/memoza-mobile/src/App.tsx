@@ -15,6 +15,7 @@ interface WPPost {
 
 declare global {
   interface Window {
+    initMemozor: () => void;
     memozaData: {
       apiUrl: string;
       nonce: string;

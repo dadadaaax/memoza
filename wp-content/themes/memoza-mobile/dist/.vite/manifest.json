@@ -4,12 +4,12 @@
     "src": "src/assets/preloader_logo.png"
   },
   "src/main.tsx": {
-    "file": "assets/main-BaI16O7w.js",
+    "file": "assets/main-CRPZlPZC.js",
     "name": "main",
     "src": "src/main.tsx",
     "isEntry": true,
     "css": [
-      "assets/main-Bs24eEkz.css"
+      "assets/main-BcqZTfGX.css"
     ],
     "assets": [
       "assets/preloader_logo-C0QgxU1S.png"

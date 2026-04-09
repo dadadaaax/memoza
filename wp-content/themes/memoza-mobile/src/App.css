@@ -59,6 +59,63 @@
   box-sizing: border-box;
 }
 
+.memozor-modal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--bg-color);
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.memozor-close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  cursor: pointer;
+  z-index: 10001;
+}
+
+.memozor-close-btn svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Adjust memozor-container for mobile view */
+#memozor-container {
+  margin-top: 60px;
+  padding: 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#memozor-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+#memozor-canvas-container {
+  width: 100%;
+  overflow-x: auto;
+  display: flex;
+  justify-content: center;
+}
+
 .logo {
   height: 40px;
   width: auto;
