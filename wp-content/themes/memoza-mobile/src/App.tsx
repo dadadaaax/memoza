@@ -1,0 +1,125 @@
+import React, { useState, useEffect, useRef } from 'react';
+import './App.css';
+
+interface WPPost {
+  id: number;
+  title: { rendered: string };
+  content: { rendered: string };
+  excerpt: { rendered: string };
+  _embedded?: {
+    'wp:featuredmedia'?: Array<{ source_url: string }>;
+  };
+}
+
+declare global {
+  interface Window {
+    memozaData: {
+      apiUrl: string;
+      nonce: string;
+      siteUrl: string;
+      themeUrl: string;
+      isLoggedIn: boolean;
+    };
+  }
+}
+
+const App: React.FC = () => {
+  const [posts, setPosts] = useState<WPPost[]>([]);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  const fetchPosts = async (pageNum: number) => {
+    if (loading) return;
+    setLoading(true);
+    try {
+      const response = await fetch(`${window.memozaData.apiUrl}?_embed&page=${pageNum}&per_page=5`, {
+        headers: {
+          'X-WP-Nonce': window.memozaData.nonce
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setPosts(prev => [...prev, ...data]);
+      }
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPosts(1);
+  }, []);
+
+  useEffect(() => {
+    if (loading) return;
+    
+    if (observerRef.current) observerRef.current.disconnect();
+
+    observerRef.current = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        setPage(prev => {
+          const next = prev + 1;
+          fetchPosts(next);
+          return next;
+        });
+      }
+    });
+
+    if (bottomRef.current) {
+      observerRef.current.observe(bottomRef.current);
+    }
+
+    return () => observerRef.current?.disconnect();
+  }, [posts, loading]);
+
+  const handleCreateMeme = () => {
+    alert("Zrób mema logic here!");
+  };
+
+  const handleLogin = () => {
+    alert("Login logic here!");
+  };
+
+  return (
+    <div className="app-container">
+      <div className="feed-container">
+        {posts.map((post) => {
+          const imageUrl = post._embedded?.['wp:featuredmedia']?.[0]?.source_url;
+          return (
+            <div key={post.id} className="post-snap-item">
+              <div className="post-content">
+                <h2 dangerouslySetInnerHTML={{ __html: post.title.rendered }} />
+                {imageUrl && <img src={imageUrl} alt="meme" className="post-image" />}
+                {!imageUrl && <div dangerouslySetInnerHTML={{ __html: post.content.rendered }} className="post-text-content" />}
+              </div>
+              <div className="post-actions-overlay"></div>
+            </div>
+          );
+        })}
+        <div ref={bottomRef} className="loading-indicator">
+          {loading && <span>Loading more memes...</span>}
+        </div>
+      </div>
+      
+      <nav className="bottom-nav">
+        <button onClick={handleLogin} className="nav-btn">
+           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+           <span>Login</span>
+        </button>
+        <button onClick={handleCreateMeme} className="nav-btn create-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </button>
+        <button className="nav-btn">
+           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+           <span>Inbox</span>
+        </button>
+      </nav>
+    </div>
+  );
+};
+
+export default App;
