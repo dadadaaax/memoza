@@ -107,6 +107,42 @@ const App: React.FC = () => {
 
   return (
     <div className="app-container">
+      {isMemozorOpen && (
+        <div className="memozor-modal">
+          <button className="memozor-close-btn" onClick={handleCloseMemozor}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+          <div id="memozor-container">
+            <div id="memozor-toolbar">
+                <input type="file" id="memozor-upload" accept="image/png, image/jpeg, image/webp" title="Upload Image" />
+                <button type="button" id="memozor-undo" disabled title="Undo">↶ Undo</button>
+                <button type="button" id="memozor-redo" disabled title="Redo">↷ Redo</button>
+                <button type="button" id="memozor-add-text">Add Text</button>
+                <label>Font: 
+                    <select id="memozor-font-family" defaultValue="Impact, sans-serif">
+                        <option value="Impact, sans-serif">Impact</option>
+                        <option value="Arial, sans-serif">Arial</option>
+                        <option value="'Comic Sans MS', cursive">Comic Sans</option>
+                        <option value="'Oswald', sans-serif">Oswald</option>
+                        <option value="'Anton', sans-serif">Anton</option>
+                        <option value="'Bebas Neue', sans-serif">Bebas Neue</option>
+                        <option value="'Creepster', cursive">Creepster (Spooky!)</option>
+                        <option value="'Press Start 2P', cursive">Press Start 2P (Retro!)</option>
+                    </select>
+                </label>
+                <label>Color: <input type="color" id="memozor-text-color" defaultValue="#ffffff" /></label>
+                <label>Outline: <input type="color" id="memozor-stroke-color" defaultValue="#000000" /></label>
+                <label>Size: <input type="range" id="memozor-text-size" min="10" max="150" defaultValue="40" /></label>
+                <button type="button" id="memozor-save">Save Meme</button>
+            </div>
+            <div id="memozor-canvas-container">
+                <canvas id="memozor-canvas" width="600" height="400"></canvas>
+            </div>
+            <div id="memozor-message"></div>
+          </div>
+        </div>
+      )}
+
       <div className={`preloader-overlay ${isInitialLoad ? '' : 'hidden'}`}>
         <img src={preloaderLogoUrl} alt="Loading..." className="preloader-logo" />
       </div>
