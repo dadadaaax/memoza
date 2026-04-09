@@ -159,7 +159,9 @@ const App: React.FC = () => {
       </div>
 
       <div className="top-nav">
-        <img src={preloaderLogoUrl} alt="Memoza" className="logo" />
+        <a href="/" style={{ display: 'inline-block' }}>
+          <img src={preloaderLogoUrl} alt="Memoza" className="logo" />
+        </a>
       </div>
       
       <div className="feed-container" ref={feedRef}>

@@ -233,7 +233,7 @@ window.initMemozor = function() {
             }
             
             if (response.ok && result.success) {
-                messageDiv.innerHTML = `<span style="color:green">Success! Meme saved. <a href="${result.url}" target="_blank">View Image</a></span>`;
+                window.location.href = result.url;
             } else {
                 messageDiv.innerHTML = `<span style="color:red">Error saving meme: ${result.message || result.code || 'Unknown error'}</span>`;
             }
