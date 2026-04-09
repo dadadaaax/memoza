@@ -27,11 +27,11 @@ const App: React.FC = () => {
   const [posts, setPosts] = useState<WPPost[]>([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const fetchPosts = async (pageNum: number) => {
-    if (loading) return;
     setLoading(true);
     try {
       const response = await fetch(`${window.memozaData.apiUrl}?_embed&page=${pageNum}&per_page=5`, {
@@ -41,10 +41,17 @@ const App: React.FC = () => {
       });
       if (response.ok) {
         const data = await response.json();
-        setPosts(prev => [...prev, ...data]);
+        if (data.length === 0) {
+          setHasMore(false);
+        } else {
+          setPosts(prev => [...prev, ...data]);
+        }
+      } else {
+        setHasMore(false);
       }
     } catch (error) {
       console.error('Error fetching posts:', error);
+      setHasMore(false);
     } finally {
       setLoading(false);
     }
@@ -55,26 +62,28 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (loading) return;
+    if (page > 1) {
+      fetchPosts(page);
+    }
+  }, [page]);
+
+  useEffect(() => {
+    if (loading || !hasMore) return;
     
     if (observerRef.current) observerRef.current.disconnect();
 
     observerRef.current = new IntersectionObserver((entries) => {
       if (entries[0].isIntersecting) {
-        setPage(prev => {
-          const next = prev + 1;
-          fetchPosts(next);
-          return next;
-        });
+        setPage(prev => prev + 1);
       }
-    });
+    }, { rootMargin: '200px' });
 
     if (bottomRef.current) {
       observerRef.current.observe(bottomRef.current);
     }
 
     return () => observerRef.current?.disconnect();
-  }, [posts, loading]);
+  }, [loading, hasMore]);
 
   const handleCreateMeme = () => {
     alert("Zrób mema logic here!");
@@ -86,6 +95,9 @@ const App: React.FC = () => {
 
   return (
     <div className="app-container">
+      <div className="top-nav">
+        <h1 className="logo">Memoza</h1>
+      </div>
       <div className="feed-container">
         {posts.map((post) => {
           const imageUrl = post._embedded?.['wp:featuredmedia']?.[0]?.source_url;
