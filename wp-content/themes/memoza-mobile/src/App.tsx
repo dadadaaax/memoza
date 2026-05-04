@@ -130,12 +130,19 @@ const App: React.FC = () => {
           <div id="memozor-container">
             {/* Honeypot field for bot protection */}
             <input type="text" id="memozor-website-url" name="website_url" style={{ display: 'none' }} tabIndex={-1} autoComplete="off" />
-            <div id="memozor-toolbar">
-                <input type="file" id="memozor-upload" accept="image/png, image/jpeg, image/webp" title="Upload Image" />
-                <button type="button" id="memozor-undo" disabled title="Undo">↶ Undo</button>
-                <button type="button" id="memozor-redo" disabled title="Redo">↷ Redo</button>
-                <button type="button" id="memozor-add-text">Add Text</button>
-                <label>Font: 
+            <div className="memozor-intro">
+                <strong>Create a meme</strong>
+                <span>Upload an image, add text, then drag or resize the text on the picture.</span>
+            </div>
+            <div id="memozor-canvas-container">
+                <canvas id="memozor-canvas" width="600" height="400"></canvas>
+            </div>
+            <div id="memozor-toolbar" aria-label="Meme editor controls">
+                <label className="memozor-file-control">1. Choose picture
+                    <input type="file" id="memozor-upload" accept="image/png, image/jpeg, image/webp" title="Choose picture for the meme" />
+                </label>
+                <button type="button" id="memozor-add-text">2. Add text box</button>
+                <label>Text font
                     <select id="memozor-font-family" defaultValue="'Anton', Impact, sans-serif">
                         <option value="'Anton', Impact, sans-serif">Anton</option>
                         <option value="'Bebas Neue', Impact, sans-serif">Bebas Neue</option>
@@ -143,18 +150,20 @@ const App: React.FC = () => {
                         <option value="Impact, sans-serif">Impact</option>
                         <option value="Arial, sans-serif">Arial</option>
                         <option value="'Comic Sans MS', cursive">Comic Sans</option>
-                        <option value="'Creepster', cursive">Creepster (Spooky!)</option>
-                        <option value="'Press Start 2P', cursive">Press Start 2P (Retro!)</option>
+                        <option value="'Creepster', cursive">Creepster</option>
+                        <option value="'Press Start 2P', cursive">Retro pixel</option>
                     </select>
                 </label>
-                <label>Color: <input type="color" id="memozor-text-color" defaultValue="#ffffff" /></label>
-                <label>Outline: <input type="color" id="memozor-stroke-color" defaultValue="#000000" /></label>
-                <label>Size: <input type="range" id="memozor-text-size" min="10" max="150" defaultValue="40" /></label>
-                <button type="button" id="memozor-save">Save Meme</button>
+                <label>Text color <input type="color" id="memozor-text-color" defaultValue="#ffffff" /></label>
+                <label>Outline color <input type="color" id="memozor-stroke-color" defaultValue="#000000" /></label>
+                <label className="memozor-size-control">Text size <input type="range" id="memozor-text-size" min="10" max="150" defaultValue="40" /></label>
+                <div className="memozor-history-actions">
+                    <button type="button" id="memozor-undo" disabled title="Undo last change">↶ Undo</button>
+                    <button type="button" id="memozor-redo" disabled title="Redo change">↷ Redo</button>
+                </div>
+                <button type="button" id="memozor-save">3. Save meme</button>
             </div>
-            <div id="memozor-canvas-container">
-                <canvas id="memozor-canvas" width="600" height="400"></canvas>
-            </div>
+            <p className="memozor-help">Tip: tap text to edit it. Drag the corners to resize text. The picture stays fixed in the frame.</p>
             <div id="memozor-message"></div>
           </div>
         </div>
