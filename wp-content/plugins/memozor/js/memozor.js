@@ -84,6 +84,11 @@ window.initMemozor = function() {
         return !!canvas.backgroundImage;
     }
 
+    function getEditableTarget(event) {
+        const target = canvas.getActiveObject() || canvas.findTarget(event, false);
+        return target && target.memozorRole !== 'base-image' ? target : null;
+    }
+
     function getDistance(touches) {
         const dx = touches[0].clientX - touches[1].clientX;
         const dy = touches[0].clientY - touches[1].clientY;
@@ -176,57 +181,34 @@ window.initMemozor = function() {
         messageDiv.textContent = 'Wczytywanie obrazka...';
 
         const reader = new FileReader();
-
         reader.onerror = function() {
             messageDiv.innerHTML = '<span style="color:red">Nie udało się odczytać pliku.</span>';
         };
 
-        reader.onload = function(event) {
-            const imageElement = new Image();
-
-            imageElement.onerror = function() {
-                messageDiv.innerHTML = '<span style="color:red">Nie udało się wczytać obrazka. Spróbuj pliku JPG, PNG albo WebP.</span>';
-            };
-
-            imageElement.onload = function() {
-                const imageWidth = imageElement.naturalWidth || imageElement.width;
-                const imageHeight = imageElement.naturalHeight || imageElement.height;
-
-                if (!imageWidth || !imageHeight) {
-                    messageDiv.innerHTML = '<span style="color:red">Obrazek ma nieprawidłowy rozmiar.</span>';
-                    return;
+        reader.onload = function(f) {
+            const data = f.target.result;
+            fabric.Image.fromURL(data, function(img) {
+                const maxWidth = getEditorWidth();
+                let scale = 1;
+                if (img.width > maxWidth) {
+                    scale = maxWidth / img.width;
                 }
 
                 canvas.clear();
-                canvas.backgroundImage = null;
+                canvas.setWidth(img.width * scale);
+                canvas.setHeight(img.height * scale);
+                canvas.calcOffset();
 
-                const canvasWidth = getEditorWidth();
-                const canvasHeight = Math.max(220, Math.round(canvasWidth * (imageHeight / imageWidth)));
-                setCanvasSize(canvasWidth, canvasHeight);
-
-                const baseImage = new fabric.Image(imageElement, {
-                    originX: 'center',
-                    originY: 'center',
-                    left: canvas.width / 2,
-                    top: canvas.height / 2,
-                    selectable: false,
-                    evented: false,
-                    excludeFromExport: false
-                });
-
-                const scale = Math.min(canvas.width / imageWidth, canvas.height / imageHeight);
-                baseImage.scale(scale);
-
-                canvas.setBackgroundImage(baseImage, function() {
+                canvas.setBackgroundImage(img, function() {
                     canvas.discardActiveObject();
-                    canvas.calcOffset();
-                    canvas.requestRenderAll();
+                    canvas.renderAll();
                     messageDiv.textContent = '';
                     saveState();
+                }, {
+                    scaleX: scale,
+                    scaleY: scale
                 });
-            };
-
-            imageElement.src = event.target.result;
+            }, { crossOrigin: 'anonymous' });
         };
 
         reader.readAsDataURL(file);
