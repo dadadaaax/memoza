@@ -112,7 +112,7 @@ const App: React.FC = () => {
     setIsMemozorOpen(false);
   };
 
-  const handleLogin = () => {
+  const handleZaloguj = () => {
     if (window.memozaData.isLoggedIn) {
       window.location.href = `${window.memozaData.siteUrl}/wp-login.php?action=logout`;
     } else {
@@ -131,18 +131,18 @@ const App: React.FC = () => {
             {/* Honeypot field for bot protection */}
             <input type="text" id="memozor-website-url" name="website_url" style={{ display: 'none' }} tabIndex={-1} autoComplete="off" />
             <div className="memozor-intro">
-                <strong>Create a meme</strong>
-                <span>Upload an image, add text, then drag or resize the text on the picture.</span>
+                <strong>Stwórz mema</strong>
+                <span>Wybierz obrazek, dodaj tekst, a potem przesuń lub powiększ tekst na obrazku.</span>
             </div>
             <div id="memozor-canvas-container">
                 <canvas id="memozor-canvas" width="600" height="400"></canvas>
             </div>
             <div id="memozor-toolbar" aria-label="Meme editor controls">
-                <label className="memozor-file-control">1. Choose picture
-                    <input type="file" id="memozor-upload" accept="image/png, image/jpeg, image/webp" title="Choose picture for the meme" />
+                <label className="memozor-file-control">1. Wybierz obrazek
+                    <input type="file" id="memozor-upload" accept="image/png, image/jpeg, image/webp" title="Wybierz obrazek do mema" />
                 </label>
-                <button type="button" id="memozor-add-text">2. Add text box</button>
-                <label>Text font
+                <button type="button" id="memozor-add-text">2. Dodaj tekst</button>
+                <label>Krój tekstu
                     <select id="memozor-font-family" defaultValue="'Anton', Impact, sans-serif">
                         <option value="'Anton', Impact, sans-serif">Anton</option>
                         <option value="'Bebas Neue', Impact, sans-serif">Bebas Neue</option>
@@ -151,19 +151,19 @@ const App: React.FC = () => {
                         <option value="Arial, sans-serif">Arial</option>
                         <option value="'Comic Sans MS', cursive">Comic Sans</option>
                         <option value="'Creepster', cursive">Creepster</option>
-                        <option value="'Press Start 2P', cursive">Retro pixel</option>
+                        <option value="'Press Start 2P', cursive">Pikselowy retro</option>
                     </select>
                 </label>
-                <label>Text color <input type="color" id="memozor-text-color" defaultValue="#ffffff" /></label>
-                <label>Outline color <input type="color" id="memozor-stroke-color" defaultValue="#000000" /></label>
-                <label className="memozor-size-control">Text size <input type="range" id="memozor-text-size" min="10" max="150" defaultValue="40" /></label>
+                <label>Kolor tekstu <input type="color" id="memozor-text-color" defaultValue="#ffffff" /></label>
+                <label>Kolor obrysu <input type="color" id="memozor-stroke-color" defaultValue="#000000" /></label>
+                <label className="memozor-size-control">Rozmiar tekstu <input type="range" id="memozor-text-size" min="10" max="150" defaultValue="40" /></label>
                 <div className="memozor-history-actions">
-                    <button type="button" id="memozor-undo" disabled title="Undo last change">↶ Undo</button>
-                    <button type="button" id="memozor-redo" disabled title="Redo change">↷ Redo</button>
+                    <button type="button" id="memozor-undo" disabled title="Cofnij ostatnią zmianę">↶ Cofnij</button>
+                    <button type="button" id="memozor-redo" disabled title="Przywróć zmianę">↷ Przywróć</button>
                 </div>
-                <button type="button" id="memozor-save">3. Save meme</button>
+                <button type="button" id="memozor-save">3. Zapisz mema</button>
             </div>
-            <p className="memozor-help">Tip: tap text to edit it. Drag the corners to resize text. The picture stays fixed in the frame.</p>
+            <p className="memozor-help">Wskazówka: dotknij tekstu, żeby go edytować. Przeciągnij rogi, żeby zmienić rozmiar tekstu. Obrazek zostaje nieruchomy w ramce.</p>
             <div id="memozor-message"></div>
           </div>
         </div>
@@ -195,22 +195,22 @@ const App: React.FC = () => {
         })}
         {posts.length > 0 && (
           <div ref={bottomRef} className="loading-indicator">
-            {loading && <span>Loading more memes...</span>}
+            {loading && <span>Ładowanie kolejnych memów...</span>}
           </div>
         )}
       </div>
       
       <nav className="bottom-nav">
-        <button onClick={handleLogin} className="nav-btn">
+        <button onClick={handleZaloguj} className="nav-btn">
           {window.memozaData.isLoggedIn ? (
             <>
               <svg viewBox="0 0 24 24" fill="none" stroke="#ff4d4d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-              <span>Logout</span>
+              <span>Wyloguj</span>
             </>
           ) : (
             <>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-              <span>Login</span>
+              <span>Zaloguj</span>
             </>
           )}
         </button>
@@ -219,7 +219,7 @@ const App: React.FC = () => {
         </button>
         <button className="nav-btn">
            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-           <span>Inbox</span>
+           <span>Skrzynka</span>
         </button>
       </nav>
     </div>

@@ -22,8 +22,8 @@ function memozor_enqueue_scripts() {
         wp_enqueue_style('memozor-fonts', 'https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Oswald:wght@700&family=Creepster&family=Press+Start+2P&display=swap', array(), null);
 
         // Plugin Scripts & Styles
-        wp_enqueue_style('memozor-css', plugin_dir_url(__FILE__) . 'css/memozor.css', array(), '1.1.3');
-        wp_enqueue_script('memozor-js', plugin_dir_url(__FILE__) . 'js/memozor.js', array('fabric-js'), '1.1.3', true);
+        wp_enqueue_style('memozor-css', plugin_dir_url(__FILE__) . 'css/memozor.css', array(), '1.1.4');
+        wp_enqueue_script('memozor-js', plugin_dir_url(__FILE__) . 'js/memozor.js', array('fabric-js'), '1.1.4', true);
 
         // Localize script to pass REST API details
         wp_localize_script('memozor-js', 'memozorSettings', array(
@@ -41,18 +41,18 @@ function memozor_editor_shortcode() {
         <!-- Honeypot field for bot protection -->
         <input type="text" id="memozor-website-url" name="website_url" style="display:none" tabindex="-1" autocomplete="off">
         <div class="memozor-intro">
-            <strong>Create a meme</strong>
-            <span>Upload an image, add text, then drag or resize the text on the picture.</span>
+            <strong>Stwórz mema</strong>
+            <span>Wybierz obrazek, dodaj tekst, a potem przesuń lub powiększ tekst na obrazku.</span>
         </div>
         <div id="memozor-canvas-container">
             <canvas id="memozor-canvas" width="600" height="400"></canvas>
         </div>
         <div id="memozor-toolbar" aria-label="Meme editor controls">
-            <label class="memozor-file-control">1. Choose picture
-                <input type="file" id="memozor-upload" accept="image/png, image/jpeg, image/webp" title="Choose picture for the meme" />
+            <label class="memozor-file-control">1. Wybierz obrazek
+                <input type="file" id="memozor-upload" accept="image/png, image/jpeg, image/webp" title="Wybierz obrazek do mema" />
             </label>
-            <button type="button" id="memozor-add-text">2. Add text box</button>
-            <label>Text font
+            <button type="button" id="memozor-add-text">2. Dodaj tekst</button>
+            <label>Krój tekstu
                 <select id="memozor-font-family">
                     <option value="'Anton', Impact, sans-serif">Anton</option>
                     <option value="'Bebas Neue', Impact, sans-serif">Bebas Neue</option>
@@ -61,19 +61,19 @@ function memozor_editor_shortcode() {
                     <option value="Arial, sans-serif">Arial</option>
                     <option value="'Comic Sans MS', cursive">Comic Sans</option>
                     <option value="'Creepster', cursive">Creepster</option>
-                    <option value="'Press Start 2P', cursive">Retro pixel</option>
+                    <option value="'Press Start 2P', cursive">Pikselowy retro</option>
                 </select>
             </label>
-            <label>Text color <input type="color" id="memozor-text-color" value="#ffffff"></label>
-            <label>Outline color <input type="color" id="memozor-stroke-color" value="#000000"></label>
-            <label class="memozor-size-control">Text size <input type="range" id="memozor-text-size" min="10" max="150" value="40"></label>
+            <label>Kolor tekstu <input type="color" id="memozor-text-color" value="#ffffff"></label>
+            <label>Kolor obrysu <input type="color" id="memozor-stroke-color" value="#000000"></label>
+            <label class="memozor-size-control">Rozmiar tekstu <input type="range" id="memozor-text-size" min="10" max="150" value="40"></label>
             <div class="memozor-history-actions">
-                <button type="button" id="memozor-undo" disabled title="Undo last change">↶ Undo</button>
-                <button type="button" id="memozor-redo" disabled title="Redo change">↷ Redo</button>
+                <button type="button" id="memozor-undo" disabled title="Cofnij ostatnią zmianę">↶ Cofnij</button>
+                <button type="button" id="memozor-redo" disabled title="Przywróć zmianę">↷ Przywróć</button>
             </div>
-            <button type="button" id="memozor-save">3. Save meme</button>
+            <button type="button" id="memozor-save">3. Zapisz mema</button>
         </div>
-        <p class="memozor-help">Tip: tap text to edit it. Drag the corners to resize text. The picture stays fixed in the frame.</p>
+        <p class="memozor-help">Wskazówka: dotknij tekstu, żeby go edytować. Przeciągnij rogi, żeby zmienić rozmiar tekstu. Obrazek zostaje nieruchomy w ramce.</p>
         <div id="memozor-message"></div>
     </div>
     <?php

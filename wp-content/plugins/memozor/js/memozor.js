@@ -56,6 +56,8 @@ window.initMemozor = function() {
 
     function keepTextReadable(text) {
         text.set({
+            lockUniScaling: true,
+            centeredScaling: true,
             fontWeight: '900',
             paintFirst: 'stroke',
             strokeLineJoin: 'round',
@@ -203,7 +205,7 @@ window.initMemozor = function() {
     addTextBtn.addEventListener('click', async () => {
         const selectedFont = fontFamilySelect ? fontFamilySelect.value : DEFAULT_FONT;
         await loadFont(selectedFont);
-        const text = new fabric.IText('YOUR TEXT HERE', {
+        const text = new fabric.IText('TWÓJ TEKST', {
             left: canvas.width / 2,
             top: canvas.height / 2,
             fontFamily: selectedFont,
@@ -278,13 +280,13 @@ window.initMemozor = function() {
 
     saveBtn.addEventListener('click', async () => {
         if (!hasImageObject()) {
-            alert('Please upload an image first.');
+            alert('Najpierw wybierz obrazek.');
             return;
         }
         canvas.discardActiveObject();
         canvas.renderAll();
         const dataURL = canvas.toDataURL({ format: 'png', quality: 1, multiplier: 2 });
-        messageDiv.textContent = 'Saving...';
+        messageDiv.textContent = 'Zapisywanie...';
 
         try {
             const response = await fetch(memozorSettings.restUrl, {
@@ -300,13 +302,13 @@ window.initMemozor = function() {
             try { result = JSON.parse(textResponse); }
             catch (e) {
                 console.error('Non-JSON response received: ', textResponse);
-                messageDiv.innerHTML = `<span style="color:red">Server error (${response.status}): The server returned an invalid response.</span>`;
+                messageDiv.innerHTML = `<span style="color:red">Błąd serwera (${response.status}): serwer zwrócił nieprawidłową odpowiedź.</span>`;
                 return;
             }
             if (response.ok && result.success) window.location.href = result.url;
-            else messageDiv.innerHTML = `<span style="color:red">Error saving meme: ${result.message || result.code || 'Unknown error'}</span>`;
+            else messageDiv.innerHTML = `<span style="color:red">Błąd zapisywania mema: ${result.message || result.code || 'Unknown error'}</span>`;
         } catch (err) {
-            messageDiv.innerHTML = `<span style="color:red">Network error saving meme: ${err.message}</span>`;
+            messageDiv.innerHTML = `<span style="color:red">Błąd sieci podczas zapisywania mema: ${err.message}</span>`;
             console.error(err);
         }
     });
