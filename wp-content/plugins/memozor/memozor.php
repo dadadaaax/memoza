@@ -22,8 +22,8 @@ function memozor_enqueue_scripts() {
         wp_enqueue_style('memozor-fonts', 'https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Oswald:wght@700&family=Creepster&family=Press+Start+2P&display=swap', array(), null);
 
         // Plugin Scripts & Styles
-        wp_enqueue_style('memozor-css', plugin_dir_url(__FILE__) . 'css/memozor.css', array(), '1.1.4');
-        wp_enqueue_script('memozor-js', plugin_dir_url(__FILE__) . 'js/memozor.js', array('fabric-js'), '1.1.4', true);
+        wp_enqueue_style('memozor-css', plugin_dir_url(__FILE__) . 'css/memozor.css', array(), '1.1.5');
+        wp_enqueue_script('memozor-js', plugin_dir_url(__FILE__) . 'js/memozor.js', array('fabric-js'), '1.1.5', true);
 
         // Localize script to pass REST API details
         wp_localize_script('memozor-js', 'memozorSettings', array(

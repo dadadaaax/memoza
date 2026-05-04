@@ -86,15 +86,15 @@
 }
 
 .memozor-intro strong {
-    font-size: 1.25rem;
+    font-size: clamp(1.45rem, 5vw, 2rem);
     letter-spacing: 0.01em;
 }
 
 .memozor-intro span,
 .memozor-help {
     color: #bbb;
-    font-size: 0.95rem;
-    line-height: 1.35;
+    font-size: clamp(1.05rem, 3.8vw, 1.25rem);
+    line-height: 1.45;
 }
 
 #memozor-toolbar {
@@ -110,13 +110,14 @@
     display: grid;
     gap: 6px;
     color: #ddd;
-    font-size: 0.85rem;
+    font-size: clamp(1rem, 3.6vw, 1.15rem);
 }
 
 #memozor-toolbar button,
 #memozor-toolbar input,
 #memozor-toolbar select {
-    min-height: 40px;
+    min-height: clamp(46px, 11vw, 56px);
+    font-size: clamp(1rem, 3.8vw, 1.15rem);
 }
 
 .memozor-file-control,
@@ -152,6 +153,17 @@
     #memozor-toolbar {
         display: grid;
         grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    #memozor-toolbar button,
+    #memozor-toolbar input,
+    #memozor-toolbar select {
+        width: 100%;
+    }
+
+    #memozor-toolbar input[type="color"] {
+        min-height: 52px;
     }
 
     .memozor-history-actions {
