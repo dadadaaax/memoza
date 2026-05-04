@@ -23,7 +23,7 @@ function memozor_enqueue_scripts() {
 
         // Plugin Scripts & Styles
         wp_enqueue_style('memozor-css', plugin_dir_url(__FILE__) . 'css/memozor.css', array(), '1.0.0');
-        wp_enqueue_script('memozor-js', plugin_dir_url(__FILE__) . 'js/memozor.js', array('fabric-js'), '1.0.3', true);
+        wp_enqueue_script('memozor-js', plugin_dir_url(__FILE__) . 'js/memozor.js', array('fabric-js'), '1.1.0', true);
 
         // Localize script to pass REST API details
         wp_localize_script('memozor-js', 'memozorSettings', array(
@@ -47,12 +47,12 @@ function memozor_editor_shortcode() {
             <button type="button" id="memozor-add-text">Add Text</button>
             <label>Font: 
                 <select id="memozor-font-family">
+                    <option value="'Anton', Impact, sans-serif">Anton</option>
+                    <option value="'Bebas Neue', Impact, sans-serif">Bebas Neue</option>
+                    <option value="'Oswald', Arial, sans-serif">Oswald</option>
                     <option value="Impact, sans-serif">Impact</option>
                     <option value="Arial, sans-serif">Arial</option>
                     <option value="'Comic Sans MS', cursive">Comic Sans</option>
-                    <option value="'Oswald', sans-serif">Oswald</option>
-                    <option value="'Anton', sans-serif">Anton</option>
-                    <option value="'Bebas Neue', sans-serif">Bebas Neue</option>
                     <option value="'Creepster', cursive">Creepster (Spooky!)</option>
                     <option value="'Press Start 2P', cursive">Press Start 2P (Retro!)</option>
                 </select>

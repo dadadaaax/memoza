@@ -136,13 +136,13 @@ const App: React.FC = () => {
                 <button type="button" id="memozor-redo" disabled title="Redo">↷ Redo</button>
                 <button type="button" id="memozor-add-text">Add Text</button>
                 <label>Font: 
-                    <select id="memozor-font-family" defaultValue="Impact, sans-serif">
+                    <select id="memozor-font-family" defaultValue="'Anton', Impact, sans-serif">
+                        <option value="'Anton', Impact, sans-serif">Anton</option>
+                        <option value="'Bebas Neue', Impact, sans-serif">Bebas Neue</option>
+                        <option value="'Oswald', Arial, sans-serif">Oswald</option>
                         <option value="Impact, sans-serif">Impact</option>
                         <option value="Arial, sans-serif">Arial</option>
                         <option value="'Comic Sans MS', cursive">Comic Sans</option>
-                        <option value="'Oswald', sans-serif">Oswald</option>
-                        <option value="'Anton', sans-serif">Anton</option>
-                        <option value="'Bebas Neue', sans-serif">Bebas Neue</option>
                         <option value="'Creepster', cursive">Creepster (Spooky!)</option>
                         <option value="'Press Start 2P', cursive">Press Start 2P (Retro!)</option>
                     </select>
