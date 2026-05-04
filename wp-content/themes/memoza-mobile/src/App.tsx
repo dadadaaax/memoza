@@ -138,9 +138,12 @@ const App: React.FC = () => {
                 <canvas id="memozor-canvas" width="600" height="400"></canvas>
             </div>
             <div id="memozor-toolbar" aria-label="Meme editor controls">
-                <label className="memozor-file-control">1. Wybierz obrazek
+                <div className="memozor-file-control">
+                    <span>1. Wybierz obrazek</span>
+                    <label className="memozor-file-button" htmlFor="memozor-upload">Wybierz plik</label>
                     <input type="file" id="memozor-upload" accept="image/png, image/jpeg, image/webp" title="Wybierz obrazek do mema" />
-                </label>
+                    <span id="memozor-file-name">Nie wybrano pliku</span>
+                </div>
                 <button type="button" id="memozor-add-text">2. Dodaj tekst</button>
                 <label>Krój tekstu
                     <select id="memozor-font-family" defaultValue="'Anton', Impact, sans-serif">

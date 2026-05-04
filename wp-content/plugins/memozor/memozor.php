@@ -22,8 +22,8 @@ function memozor_enqueue_scripts() {
         wp_enqueue_style('memozor-fonts', 'https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Oswald:wght@700&family=Creepster&family=Press+Start+2P&display=swap', array(), null);
 
         // Plugin Scripts & Styles
-        wp_enqueue_style('memozor-css', plugin_dir_url(__FILE__) . 'css/memozor.css', array(), '1.1.5');
-        wp_enqueue_script('memozor-js', plugin_dir_url(__FILE__) . 'js/memozor.js', array('fabric-js'), '1.1.5', true);
+        wp_enqueue_style('memozor-css', plugin_dir_url(__FILE__) . 'css/memozor.css', array(), '1.1.6');
+        wp_enqueue_script('memozor-js', plugin_dir_url(__FILE__) . 'js/memozor.js', array('fabric-js'), '1.1.6', true);
 
         // Localize script to pass REST API details
         wp_localize_script('memozor-js', 'memozorSettings', array(
@@ -48,9 +48,12 @@ function memozor_editor_shortcode() {
             <canvas id="memozor-canvas" width="600" height="400"></canvas>
         </div>
         <div id="memozor-toolbar" aria-label="Meme editor controls">
-            <label class="memozor-file-control">1. Wybierz obrazek
+            <div class="memozor-file-control">
+                <span>1. Wybierz obrazek</span>
+                <label class="memozor-file-button" for="memozor-upload">Wybierz plik</label>
                 <input type="file" id="memozor-upload" accept="image/png, image/jpeg, image/webp" title="Wybierz obrazek do mema" />
-            </label>
+                <span id="memozor-file-name">Nie wybrano pliku</span>
+            </div>
             <button type="button" id="memozor-add-text">2. Dodaj tekst</button>
             <label>Krój tekstu
                 <select id="memozor-font-family">

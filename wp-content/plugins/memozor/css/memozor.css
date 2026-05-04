@@ -86,14 +86,14 @@
 }
 
 .memozor-intro strong {
-    font-size: clamp(1.45rem, 5vw, 2rem);
+    font-size: clamp(1.8rem, 7vw, 2.4rem);
     letter-spacing: 0.01em;
 }
 
 .memozor-intro span,
 .memozor-help {
     color: #bbb;
-    font-size: clamp(1.05rem, 3.8vw, 1.25rem);
+    font-size: clamp(1.25rem, 5vw, 1.55rem);
     line-height: 1.45;
 }
 
@@ -110,14 +110,14 @@
     display: grid;
     gap: 6px;
     color: #ddd;
-    font-size: clamp(1rem, 3.6vw, 1.15rem);
+    font-size: clamp(1.2rem, 4.8vw, 1.45rem);
 }
 
 #memozor-toolbar button,
 #memozor-toolbar input,
 #memozor-toolbar select {
-    min-height: clamp(46px, 11vw, 56px);
-    font-size: clamp(1rem, 3.8vw, 1.15rem);
+    min-height: clamp(56px, 14vw, 68px);
+    font-size: clamp(1.15rem, 4.8vw, 1.45rem);
 }
 
 .memozor-file-control,
@@ -147,13 +147,13 @@
 @media (max-width: 640px) {
     #memozor-container {
         margin-top: 58px;
-        padding: 10px;
+        padding: 14px;
     }
 
     #memozor-toolbar {
         display: grid;
         grid-template-columns: 1fr;
-        gap: 14px;
+        gap: 18px;
     }
 
     #memozor-toolbar button,
@@ -170,4 +170,42 @@
         display: grid;
         grid-template-columns: 1fr 1fr;
     }
+}
+
+
+.memozor-file-control {
+    display: grid;
+    gap: 10px;
+    color: #ddd;
+    font-size: clamp(1.2rem, 4.8vw, 1.45rem);
+    font-weight: 700;
+}
+
+#memozor-upload {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.memozor-file-button {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    min-height: clamp(58px, 15vw, 72px);
+    padding: 0 16px;
+    border-radius: 8px;
+    background: #333;
+    color: #fff !important;
+    border: 1px solid #555;
+    font-size: clamp(1.2rem, 5vw, 1.5rem) !important;
+    cursor: pointer;
+}
+
+#memozor-file-name {
+    color: #aaa;
+    font-size: clamp(1rem, 4vw, 1.25rem);
+    font-weight: 500;
+    overflow-wrap: anywhere;
 }

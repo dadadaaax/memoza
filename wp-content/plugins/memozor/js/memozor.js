@@ -162,7 +162,11 @@ window.initMemozor = function() {
 
     uploadInput.addEventListener('change', function(e) {
         const file = e.target.files[0];
-        if (!file) return;
+        if (!file) {
+            if (fileNameLabel) fileNameLabel.textContent = 'Nie wybrano pliku';
+            return;
+        }
+        if (fileNameLabel) fileNameLabel.textContent = file.name;
 
         const reader = new FileReader();
         reader.onload = function(f) {
