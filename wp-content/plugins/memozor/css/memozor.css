@@ -57,9 +57,12 @@
     touch-action: none;
 }
 
-.canvas-container, #memozor-canvas {
-    max-width: 100%;
-    height: auto !important;
+#memozor-canvas-container .canvas-container {
+    flex: 0 0 auto;
+    touch-action: none;
+}
+
+#memozor-canvas-container canvas {
     touch-action: none;
 }
 
