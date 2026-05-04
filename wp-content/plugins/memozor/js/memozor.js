@@ -7,6 +7,7 @@ window.initMemozor = function() {
     const canvas = new fabric.Canvas('memozor-canvas');
     
     // UI Elements
+    const canvasContainer = document.getElementById('memozor-canvas-container');
     const uploadInput = document.getElementById('memozor-upload');
     const undoBtn = document.getElementById('memozor-undo');
     const redoBtn = document.getElementById('memozor-redo');
@@ -88,20 +89,25 @@ window.initMemozor = function() {
         reader.onload = function(f) {
             const data = f.target.result;
             fabric.Image.fromURL(data, function(img) {
-                // Resize canvas to match image dimensions or scale image
-                const maxWidth = 800;
-                let scale = 1;
-                if (img.width > maxWidth) {
-                    scale = maxWidth / img.width;
-                }
-                
-                canvas.setWidth(img.width * scale);
-                canvas.setHeight(img.height * scale);
-                
+                // Fit the canvas to the visible editor frame while preserving image ratio.
+                const containerWidth = canvasContainer ? canvasContainer.clientWidth : window.innerWidth;
+                const maxWidth = Math.max(280, Math.min(800, containerWidth - 24));
+                const scale = Math.min(1, maxWidth / img.width);
+                const fittedWidth = Math.round(img.width * scale);
+                const fittedHeight = Math.round(img.height * scale);
+
+                canvas.setWidth(fittedWidth);
+                canvas.setHeight(fittedHeight);
+                canvas.calcOffset();
+
                 canvas.setBackgroundImage(img, function() {
                     canvas.renderAll();
                     saveState();
                 }, {
+                    originX: 'left',
+                    originY: 'top',
+                    left: 0,
+                    top: 0,
                     scaleX: scale,
                     scaleY: scale
                 });
