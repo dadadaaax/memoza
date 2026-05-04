@@ -3,22 +3,10 @@ window.initMemozor = function() {
     if (!canvasEl || canvasEl.dataset.initialized) return;
     canvasEl.dataset.initialized = "true";
 
-    const canvasContainer = document.getElementById('memozor-canvas-container');
-    const canvas = new fabric.Canvas('memozor-canvas', {
-        preserveObjectStacking: true,
-        enableRetinaScaling: true,
-        selection: true
-    });
-    canvas.defaultCursor = 'default';
-    canvas.hoverCursor = 'move';
-    canvas.moveCursor = 'move';
-
-    const DEFAULT_FONT = "'Anton', Impact, sans-serif";
-    const DEFAULT_CANVAS_WIDTH = 600;
-    const DEFAULT_CANVAS_HEIGHT = 400;
-    const MAX_CANVAS_WIDTH = 800;
-    const MOBILE_CANVAS_MARGIN = 28;
-
+    // Initialize Fabric.js Canvas
+    const canvas = new fabric.Canvas('memozor-canvas');
+    
+    // UI Elements
     const uploadInput = document.getElementById('memozor-upload');
     const undoBtn = document.getElementById('memozor-undo');
     const redoBtn = document.getElementById('memozor-redo');
@@ -30,48 +18,23 @@ window.initMemozor = function() {
     const saveBtn = document.getElementById('memozor-save');
     const messageDiv = document.getElementById('memozor-message');
 
+    // State Management
     let history = [];
     let historyIndex = -1;
     let isStateLoading = false;
-    let pinchState = null;
-
-    function getEditorWidth() {
-        const containerWidth = canvasContainer ? canvasContainer.clientWidth : window.innerWidth;
-        return Math.max(280, Math.min(MAX_CANVAS_WIDTH, containerWidth - MOBILE_CANVAS_MARGIN));
-    }
-
-    function setCanvasSize(width, height) {
-        canvas.setWidth(Math.round(width));
-        canvas.setHeight(Math.round(height));
-        canvas.calcOffset();
-        canvas.renderAll();
-    }
-
-    setCanvasSize(Math.min(DEFAULT_CANVAS_WIDTH, getEditorWidth()), Math.round(Math.min(DEFAULT_CANVAS_WIDTH, getEditorWidth()) * DEFAULT_CANVAS_HEIGHT / DEFAULT_CANVAS_WIDTH));
-
-    function loadFont(fontFamily) {
-        if (!document.fonts || !fontFamily) return Promise.resolve();
-        return document.fonts.load(`700 48px ${fontFamily}`).catch(() => undefined);
-    }
-
-    function keepTextReadable(text) {
-        text.set({
-            lockUniScaling: true,
-            centeredScaling: true,
-            fontWeight: '900',
-            paintFirst: 'stroke',
-            strokeLineJoin: 'round',
-            charSpacing: 20,
-            lineHeight: 0.9,
-            shadow: new fabric.Shadow({ color: 'rgba(0,0,0,0.55)', blur: 2, offsetX: 1, offsetY: 1 })
-        });
-    }
 
     function saveState() {
         if (isStateLoading) return;
-        if (historyIndex < history.length - 1) history = history.slice(0, historyIndex + 1);
-        history.push(canvas.toJSON(['memozorRole']));
+        
+        // If we are saving a new state after undoing, truncate the future history
+        if (historyIndex < history.length - 1) {
+            history = history.slice(0, historyIndex + 1);
+        }
+        
+        // Save current canvas JSON to history
+        history.push(canvas.toJSON());
         historyIndex++;
+        
         updateUndoRedoButtons();
     }
 
@@ -80,170 +43,109 @@ window.initMemozor = function() {
         if (redoBtn) redoBtn.disabled = historyIndex >= history.length - 1;
     }
 
-    function hasImageObject() {
-        return !!canvas.backgroundImage;
-    }
-
-    function getEditableTarget(event) {
-        const target = canvas.getActiveObject() || canvas.findTarget(event, false);
-        return target && target.memozorRole !== 'base-image' ? target : null;
-    }
-
-    function getDistance(touches) {
-        const dx = touches[0].clientX - touches[1].clientX;
-        const dy = touches[0].clientY - touches[1].clientY;
-        return Math.hypot(dx, dy);
-    }
-
-    function installPinchToScale() {
-        const el = canvas.upperCanvasEl;
-        el.style.touchAction = 'none';
-
-        el.addEventListener('touchstart', (event) => {
-            if (event.touches.length !== 2) return;
-            const target = getEditableTarget(event);
-            if (!target) return;
-            event.preventDefault();
-            canvas.setActiveObject(target);
-            pinchState = {
-                target,
-                distance: getDistance(event.touches),
-                scaleX: target.scaleX || 1,
-                scaleY: target.scaleY || 1
-            };
-        }, { passive: false });
-
-        el.addEventListener('touchmove', (event) => {
-            if (!pinchState || event.touches.length !== 2) return;
-            event.preventDefault();
-            const distance = getDistance(event.touches);
-            if (!distance || !pinchState.distance) return;
-            const zoom = distance / pinchState.distance;
-            pinchState.target.scaleX = Math.max(0.05, pinchState.scaleX * zoom);
-            pinchState.target.scaleY = Math.max(0.05, pinchState.scaleY * zoom);
-            pinchState.target.setCoords();
-            canvas.requestRenderAll();
-        }, { passive: false });
-
-        el.addEventListener('touchend', () => {
-            if (pinchState) {
-                pinchState.target.setCoords();
-                saveState();
+    if (undoBtn) {
+        undoBtn.addEventListener('click', () => {
+            if (historyIndex > 0) {
+                isStateLoading = true;
+                historyIndex--;
+                canvas.loadFromJSON(history[historyIndex], function() {
+                    canvas.renderAll();
+                    updateUndoRedoButtons();
+                    isStateLoading = false;
+                });
             }
-            pinchState = null;
         });
     }
 
-    installPinchToScale();
+    if (redoBtn) {
+        redoBtn.addEventListener('click', () => {
+            if (historyIndex < history.length - 1) {
+                isStateLoading = true;
+                historyIndex++;
+                canvas.loadFromJSON(history[historyIndex], function() {
+                    canvas.renderAll();
+                    updateUndoRedoButtons();
+                    isStateLoading = false;
+                });
+            }
+        });
+    }
 
-    if (undoBtn) undoBtn.addEventListener('click', () => {
-        if (historyIndex > 0) {
-            isStateLoading = true;
-            historyIndex--;
-            canvas.loadFromJSON(history[historyIndex], function() {
-                canvas.renderAll();
-                updateUndoRedoButtons();
-                isStateLoading = false;
-            });
-        }
-    });
-
-    if (redoBtn) redoBtn.addEventListener('click', () => {
-        if (historyIndex < history.length - 1) {
-            isStateLoading = true;
-            historyIndex++;
-            canvas.loadFromJSON(history[historyIndex], function() {
-                canvas.renderAll();
-                updateUndoRedoButtons();
-                isStateLoading = false;
-            });
-        }
-    });
-
+    // Save initial blank state
     saveState();
+
+    // Bind state saving to canvas events
     canvas.on('object:added', saveState);
     canvas.on('object:modified', saveState);
     canvas.on('object:removed', saveState);
 
+    // 1. Upload Background Image
     uploadInput.addEventListener('change', function(e) {
         const file = e.target.files[0];
-        if (!file) {
-            if (fileNameLabel) fileNameLabel.textContent = 'Nie wybrano pliku';
-            return;
-        }
-
-        if (!file.type || !file.type.startsWith('image/')) {
-            messageDiv.innerHTML = '<span style="color:red">To nie wygląda jak plik obrazka.</span>';
-            return;
-        }
-
-        if (fileNameLabel) fileNameLabel.textContent = file.name;
-        messageDiv.textContent = 'Wczytywanie obrazka...';
+        if (!file) return;
 
         const reader = new FileReader();
-        reader.onerror = function() {
-            messageDiv.innerHTML = '<span style="color:red">Nie udało się odczytać pliku.</span>';
-        };
-
         reader.onload = function(f) {
             const data = f.target.result;
             fabric.Image.fromURL(data, function(img) {
-                const maxWidth = getEditorWidth();
+                // Resize canvas to match image dimensions or scale image
+                const maxWidth = 800;
                 let scale = 1;
                 if (img.width > maxWidth) {
                     scale = maxWidth / img.width;
                 }
-
-                canvas.clear();
+                
                 canvas.setWidth(img.width * scale);
                 canvas.setHeight(img.height * scale);
-                canvas.calcOffset();
-
+                
                 canvas.setBackgroundImage(img, function() {
-                    canvas.discardActiveObject();
                     canvas.renderAll();
-                    messageDiv.textContent = '';
                     saveState();
                 }, {
                     scaleX: scale,
                     scaleY: scale
                 });
-            }, { crossOrigin: 'anonymous' });
+            });
         };
-
         reader.readAsDataURL(file);
     });
 
-    addTextBtn.addEventListener('click', async () => {
-        const selectedFont = fontFamilySelect ? fontFamilySelect.value : DEFAULT_FONT;
-        await loadFont(selectedFont);
+    // 2. Add Text
+    addTextBtn.addEventListener('click', () => {
         const text = new fabric.IText('TWÓJ TEKST', {
             left: canvas.width / 2,
             top: canvas.height / 2,
-            fontFamily: selectedFont,
+            fontFamily: fontFamilySelect ? fontFamilySelect.value : 'Impact, sans-serif',
             fill: textColorInput.value,
             stroke: strokeColorInput.value,
-            strokeWidth: Math.max(2, Math.round(parseInt(textSizeInput.value, 10) / 16)),
+            strokeWidth: 2,
             fontSize: parseInt(textSizeInput.value, 10),
             originX: 'center',
             originY: 'center',
+            fontWeight: 'bold',
             textAlign: 'center'
         });
-        keepTextReadable(text);
         canvas.add(text);
         canvas.setActiveObject(text);
-        canvas.renderAll();
     });
 
+    // 3. Update Text Properties on Selection
     canvas.on('selection:created', updateToolbar);
     canvas.on('selection:updated', updateToolbar);
 
-    function updateToolbar() {
+    function updateToolbar(e) {
         const activeObj = canvas.getActiveObject();
         if (activeObj && activeObj.type === 'i-text') {
             if (fontFamilySelect) {
+                // Try to find the matching option in the select
                 const matchingOption = Array.from(fontFamilySelect.options).find(opt => opt.value === activeObj.fontFamily);
-                if (matchingOption) fontFamilySelect.value = activeObj.fontFamily;
+                if (matchingOption) {
+                    fontFamilySelect.value = activeObj.fontFamily;
+                } else if (activeObj.fontFamily === 'Impact' || activeObj.fontFamily === 'Arial') {
+                   // backwards compat handling
+                   const compatOption = Array.from(fontFamilySelect.options).find(opt => opt.value.includes(activeObj.fontFamily));
+                   if (compatOption) fontFamilySelect.value = compatOption.value;
+                }
             }
             textColorInput.value = activeObj.fill;
             strokeColorInput.value = activeObj.stroke;
@@ -251,16 +153,17 @@ window.initMemozor = function() {
         }
     }
 
-    if (fontFamilySelect) fontFamilySelect.addEventListener('change', async function() {
-        const activeObj = canvas.getActiveObject();
-        await loadFont(this.value);
-        if (activeObj && activeObj.type === 'i-text') {
-            activeObj.set('fontFamily', this.value);
-            keepTextReadable(activeObj);
-            canvas.requestRenderAll();
-            saveState();
-        }
-    });
+    // 4. Live Update Active Text
+    if (fontFamilySelect) {
+        fontFamilySelect.addEventListener('change', function() {
+            const activeObj = canvas.getActiveObject();
+            if (activeObj && activeObj.type === 'i-text') {
+                activeObj.set('fontFamily', this.value);
+                canvas.renderAll();
+                saveState();
+            }
+        });
+    }
 
     textColorInput.addEventListener('input', function() {
         const activeObj = canvas.getActiveObject();
@@ -283,42 +186,59 @@ window.initMemozor = function() {
     textSizeInput.addEventListener('input', function() {
         const activeObj = canvas.getActiveObject();
         if (activeObj && activeObj.type === 'i-text') {
-            const fontSize = parseInt(this.value, 10);
-            activeObj.set({ fontSize, strokeWidth: Math.max(2, Math.round(fontSize / 16)) });
+            activeObj.set('fontSize', parseInt(this.value, 10));
             canvas.renderAll();
         }
     });
     textSizeInput.addEventListener('change', function() { saveState(); });
 
+    // 5. Save Meme
     saveBtn.addEventListener('click', async () => {
-        if (!hasImageObject()) {
+        if (!canvas.backgroundImage) {
             alert('Najpierw wybierz obrazek.');
             return;
         }
+
+        // Deselect so handles don't appear in final image
         canvas.discardActiveObject();
         canvas.renderAll();
-        const dataURL = canvas.toDataURL({ format: 'png', quality: 1, multiplier: 2 });
+
+        const dataURL = canvas.toDataURL({
+            format: 'png',
+            quality: 1
+        });
+
         messageDiv.textContent = 'Zapisywanie...';
 
         try {
             const response = await fetch(memozorSettings.restUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': memozorSettings.nonce },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-WP-Nonce': memozorSettings.nonce
+                },
                 body: JSON.stringify({
                     image_data: dataURL,
                     website_url: document.getElementById('memozor-website-url') ? document.getElementById('memozor-website-url').value : ''
                 })
             });
+
             let result;
             const textResponse = await response.text();
-            try { result = JSON.parse(textResponse); }
-            catch (e) {
-                console.error('Non-JSON response received: ', textResponse);
+            try {
+                result = JSON.parse(textResponse);
+            } catch (e) {
+                console.error("Non-JSON response received: ", textResponse);
                 messageDiv.innerHTML = `<span style="color:red">Błąd serwera (${response.status}): serwer zwrócił nieprawidłową odpowiedź.</span>`;
                 return;
             }
-            if (response.ok && result.success) window.location.href = result.url;
-            else messageDiv.innerHTML = `<span style="color:red">Błąd zapisywania mema: ${result.message || result.code || 'Unknown error'}</span>`;
+            
+            if (response.ok && result.success) {
+                window.location.href = result.url;
+            } else {
+                messageDiv.innerHTML = `<span style="color:red">Błąd zapisywania mema: ${result.message || result.code || 'Unknown error'}</span>`;
+            }
+
         } catch (err) {
             messageDiv.innerHTML = `<span style="color:red">Błąd sieci podczas zapisywania mema: ${err.message}</span>`;
             console.error(err);
