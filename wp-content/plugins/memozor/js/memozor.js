@@ -94,7 +94,7 @@ window.initMemozor = function() {
 
         el.addEventListener('touchstart', (event) => {
             if (event.touches.length !== 2) return;
-            const target = canvas.getActiveObject() || canvas.findTarget(event, false);
+            const target = getEditableTarget(event);
             if (!target) return;
             event.preventDefault();
             canvas.setActiveObject(target);
@@ -178,15 +178,21 @@ window.initMemozor = function() {
                     originY: 'center',
                     scaleX: scale,
                     scaleY: scale,
-                    selectable: true,
-                    evented: true,
-                    hasControls: true,
-                    lockUniScaling: false,
+                    selectable: false,
+                    evented: false,
+                    hasControls: false,
+                    hoverCursor: 'default',
+                    moveCursor: 'default',
+                    lockMovementX: true,
+                    lockMovementY: true,
+                    lockScalingX: true,
+                    lockScalingY: true,
+                    lockRotation: true,
                     memozorRole: 'base-image'
                 });
                 canvas.add(img);
                 canvas.sendToBack(img);
-                canvas.setActiveObject(img);
+                canvas.discardActiveObject();
                 canvas.renderAll();
                 saveState();
             });
