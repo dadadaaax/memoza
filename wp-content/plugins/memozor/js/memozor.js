@@ -81,7 +81,7 @@ window.initMemozor = function() {
     }
 
     function hasImageObject() {
-        return canvas.getObjects().some(obj => obj.type === 'image' || obj.memozorRole === 'base-image');
+        return !!canvas.backgroundImage;
     }
 
     function getDistance(touches) {
@@ -178,29 +178,21 @@ window.initMemozor = function() {
 
                 const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
                 img.set({
-                    left: canvas.width / 2,
-                    top: canvas.height / 2,
                     originX: 'center',
                     originY: 'center',
+                    left: canvas.width / 2,
+                    top: canvas.height / 2,
                     scaleX: scale,
                     scaleY: scale,
                     selectable: false,
-                    evented: false,
-                    hasControls: false,
-                    hoverCursor: 'default',
-                    moveCursor: 'default',
-                    lockMovementX: true,
-                    lockMovementY: true,
-                    lockScalingX: true,
-                    lockScalingY: true,
-                    lockRotation: true,
-                    memozorRole: 'base-image'
+                    evented: false
                 });
-                canvas.add(img);
-                canvas.sendToBack(img);
-                canvas.discardActiveObject();
-                canvas.renderAll();
-                saveState();
+
+                canvas.setBackgroundImage(img, function() {
+                    canvas.discardActiveObject();
+                    canvas.renderAll();
+                    saveState();
+                });
             });
         };
         reader.readAsDataURL(file);
