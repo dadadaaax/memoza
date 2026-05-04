@@ -166,35 +166,69 @@ window.initMemozor = function() {
             if (fileNameLabel) fileNameLabel.textContent = 'Nie wybrano pliku';
             return;
         }
+
+        if (!file.type || !file.type.startsWith('image/')) {
+            messageDiv.innerHTML = '<span style="color:red">To nie wygląda jak plik obrazka.</span>';
+            return;
+        }
+
         if (fileNameLabel) fileNameLabel.textContent = file.name;
+        messageDiv.textContent = 'Wczytywanie obrazka...';
 
         const reader = new FileReader();
-        reader.onload = function(f) {
-            fabric.Image.fromURL(f.target.result, function(img) {
+
+        reader.onerror = function() {
+            messageDiv.innerHTML = '<span style="color:red">Nie udało się odczytać pliku.</span>';
+        };
+
+        reader.onload = function(event) {
+            const imageElement = new Image();
+
+            imageElement.onerror = function() {
+                messageDiv.innerHTML = '<span style="color:red">Nie udało się wczytać obrazka. Spróbuj pliku JPG, PNG albo WebP.</span>';
+            };
+
+            imageElement.onload = function() {
+                const imageWidth = imageElement.naturalWidth || imageElement.width;
+                const imageHeight = imageElement.naturalHeight || imageElement.height;
+
+                if (!imageWidth || !imageHeight) {
+                    messageDiv.innerHTML = '<span style="color:red">Obrazek ma nieprawidłowy rozmiar.</span>';
+                    return;
+                }
+
                 canvas.clear();
+                canvas.backgroundImage = null;
+
                 const canvasWidth = getEditorWidth();
-                const canvasHeight = Math.max(220, Math.round(canvasWidth * (img.height / img.width)));
+                const canvasHeight = Math.max(220, Math.round(canvasWidth * (imageHeight / imageWidth)));
                 setCanvasSize(canvasWidth, canvasHeight);
 
-                const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
-                img.set({
+                const baseImage = new fabric.Image(imageElement, {
                     originX: 'center',
                     originY: 'center',
                     left: canvas.width / 2,
                     top: canvas.height / 2,
-                    scaleX: scale,
-                    scaleY: scale,
                     selectable: false,
-                    evented: false
+                    evented: false,
+                    excludeFromExport: false
                 });
 
-                canvas.setBackgroundImage(img, function() {
+                const scale = Math.min(canvas.width / imageWidth, canvas.height / imageHeight);
+                baseImage.scale(scale);
+
+                canvas.setBackgroundImage(baseImage, function() {
                     canvas.discardActiveObject();
-                    canvas.renderAll();
+                    canvas.calcOffset();
+                    canvas.requestRenderAll();
+                    messageDiv.textContent = '';
                     saveState();
                 });
-            });
+            };
+
+            imageElement.src = event.target.result;
         };
+
         reader.readAsDataURL(file);
     });
 
