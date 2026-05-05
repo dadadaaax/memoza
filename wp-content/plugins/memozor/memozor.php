@@ -10,6 +10,46 @@ if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly.
 }
 
+/**
+ * Social score seed for ranking experiments.
+ * Stored as post meta and exposed as `social_score` in the WP REST API.
+ */
+function memozor_generate_social_score() {
+    $u1 = max(mt_rand() / mt_getrandmax(), 0.000001);
+    $u2 = max(mt_rand() / mt_getrandmax(), 0.000001);
+    $normal = sqrt(-2 * log($u1)) * cos(2 * pi() * $u2);
+    $score = 100 + (25 * $normal);
+    return round(max(0.01, $score), 4);
+}
+
+function memozor_sanitize_social_score($value) {
+    return (float) $value;
+}
+
+function memozor_register_social_score_meta() {
+    register_post_meta('post', 'memoza_social_score', array(
+        'type' => 'number',
+        'single' => true,
+        'show_in_rest' => true,
+        'sanitize_callback' => 'memozor_sanitize_social_score',
+        'auth_callback' => '__return_true',
+    ));
+
+    register_rest_field('post', 'social_score', array(
+        'get_callback' => function($post_arr) {
+            $score = get_post_meta($post_arr['id'], 'memoza_social_score', true);
+            return $score === '' ? null : (float) $score;
+        },
+        'schema' => array(
+            'description' => 'Gaussian-seeded social score for future ranking experiments.',
+            'type' => 'number',
+            'context' => array('view', 'edit'),
+        ),
+    ));
+}
+add_action('init', 'memozor_register_social_score_meta');
+
+
 // 1. Enqueue Scripts & Register Shortcode
 function memozor_enqueue_scripts() {
     // Check if we are on a post/page and it has the shortcode
@@ -166,8 +206,9 @@ function memozor_save_image_endpoint(WP_REST_Request $request) {
         return new WP_Error('post_error', 'Could not create post', array('status' => 500));
     }
 
-    // Add meta for identification in admin notice
+    // Add meta for identification in admin notice and future ranking.
     update_post_meta($post_id, '_is_memozor_meme', 1);
+    update_post_meta($post_id, 'memoza_social_score', memozor_generate_social_score());
 
     // Insert into Media Library
     $attachment = array(
