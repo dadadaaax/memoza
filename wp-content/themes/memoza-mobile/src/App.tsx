@@ -8,8 +8,9 @@ interface WPPost {
   title: { rendered: string };
   content: { rendered: string };
   excerpt: { rendered: string };
+  link: string;
   _embedded?: {
-    'wp:featuredmedia'?: Array<{ source_url: string }>;
+    'wp:featuredmedia'?: Array<{ source_url: string; media_details?: { sizes?: Record<string, { source_url: string }> } }>;
   };
 }
 
@@ -33,10 +34,22 @@ const App: React.FC = () => {
   const [hasMore, setHasMore] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [isMemozorOpen, setIsMemozorOpen] = useState(false);
+  const [todayMemes, setTodayMemes] = useState<WPPost[]>([]);
   
   const observerRef = useRef<IntersectionObserver | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const feedRef = useRef<HTMLDivElement>(null);
+
+  const getImageUrl = (post: WPPost, preferredSize: 'thumbnail' | 'medium' | 'full' = 'full') => {
+    const media = post._embedded?.['wp:featuredmedia']?.[0];
+    return media?.media_details?.sizes?.[preferredSize]?.source_url || media?.source_url;
+  };
+
+  const stripHtml = (html: string) => {
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    return div.textContent || div.innerText || '';
+  };
 
   const fetchPosts = async (pageNum: number) => {
     setLoading(true);
@@ -69,6 +82,33 @@ const App: React.FC = () => {
 
   useEffect(() => {
     fetchPosts(1);
+
+    const fetchTodayMemes = async () => {
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+
+      try {
+        const params = new URLSearchParams({
+          _embed: '1',
+          per_page: '10',
+          after: todayStart.toISOString(),
+          orderby: 'date',
+          order: 'desc'
+        });
+        const response = await fetch(`${window.memozaData.apiUrl}?${params.toString()}`, {
+          headers: {
+            'X-WP-Nonce': window.memozaData.nonce
+          }
+        });
+        if (!response.ok) return;
+        const data = await response.json();
+        setTodayMemes(data.filter((post: WPPost) => getImageUrl(post, 'thumbnail')));
+      } catch (error) {
+        console.error('Error fetching today memes:', error);
+      }
+    };
+
+    fetchTodayMemes();
   }, []);
 
   useEffect(() => {
@@ -182,10 +222,30 @@ const App: React.FC = () => {
           <img src={preloaderLogoUrl} alt="Memoza" className="logo" />
         </a>
       </div>
+
+      {todayMemes.length > 0 && (
+        <section className="breaking-memes" aria-label="Dzisiejsze memy">
+          <div className="breaking-memes-header">
+            <span className="breaking-live-dot"></span>
+            <span>Breaking news</span>
+            <strong>memy z dziś</strong>
+          </div>
+          <div className="breaking-memes-list">
+            {todayMemes.map((post) => {
+              const thumbUrl = getImageUrl(post, 'thumbnail');
+              return thumbUrl ? (
+                <a key={post.id} className="breaking-meme-card" href={post.link} title={stripHtml(post.title.rendered)}>
+                  <img src={thumbUrl} alt={stripHtml(post.title.rendered) || 'meme'} loading="lazy" />
+                </a>
+              ) : null;
+            })}
+          </div>
+        </section>
+      )}
       
       <div className="feed-container" ref={feedRef}>
         {posts.map((post) => {
-          const imageUrl = post._embedded?.['wp:featuredmedia']?.[0]?.source_url;
+          const imageUrl = getImageUrl(post, 'full');
           return (
             <div key={post.id} className="post-snap-item">
               <div className="post-content">
