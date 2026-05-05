@@ -9,6 +9,7 @@ interface WPPost {
   content: { rendered: string };
   excerpt: { rendered: string };
   link: string;
+  social_score?: number;
   _embedded?: {
     'wp:featuredmedia'?: Array<{ source_url: string; media_details?: { sizes?: Record<string, { source_url: string }> } }>;
   };
@@ -50,6 +51,10 @@ const App: React.FC = () => {
     const div = document.createElement('div');
     div.innerHTML = html;
     return div.textContent || div.innerText || '';
+  };
+
+  const sortBySocialScore = (items: WPPost[]) => {
+    return [...items].sort((a, b) => (b.social_score || 0) - (a.social_score || 0));
   };
 
   const fetchPosts = async (pageNum: number) => {
@@ -110,13 +115,13 @@ const App: React.FC = () => {
       try {
         const today = await loadMemes(todayStart.toISOString());
         if (today.length > 0) {
-          setBreakingMemes(today);
+          setBreakingMemes(sortBySocialScore(today));
           setBreakingLabel('memy z dziś');
           return;
         }
 
         const latest = await loadMemes();
-        setBreakingMemes(latest);
+        setBreakingMemes(sortBySocialScore(latest));
         setBreakingLabel('ostatnie memy');
       } catch (error) {
         console.error('Error fetching breaking memes:', error);
