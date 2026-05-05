@@ -34,7 +34,8 @@ const App: React.FC = () => {
   const [hasMore, setHasMore] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [isMemozorOpen, setIsMemozorOpen] = useState(false);
-  const [todayMemes, setTodayMemes] = useState<WPPost[]>([]);
+  const [breakingMemes, setBreakingMemes] = useState<WPPost[]>([]);
+  const [breakingLabel, setBreakingLabel] = useState('memy z dziś');
   
   const observerRef = useRef<IntersectionObserver | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -83,32 +84,46 @@ const App: React.FC = () => {
   useEffect(() => {
     fetchPosts(1);
 
-    const fetchTodayMemes = async () => {
+    const fetchBreakingMemes = async () => {
       const todayStart = new Date();
       todayStart.setHours(0, 0, 0, 0);
 
-      try {
+      const loadMemes = async (after?: string) => {
         const params = new URLSearchParams({
           _embed: '1',
           per_page: '10',
-          after: todayStart.toISOString(),
           orderby: 'date',
           order: 'desc'
         });
+        if (after) params.set('after', after);
+
         const response = await fetch(`${window.memozaData.apiUrl}?${params.toString()}`, {
           headers: {
             'X-WP-Nonce': window.memozaData.nonce
           }
         });
-        if (!response.ok) return;
+        if (!response.ok) return [];
         const data = await response.json();
-        setTodayMemes(data.filter((post: WPPost) => getImageUrl(post, 'thumbnail')));
+        return data.filter((post: WPPost) => getImageUrl(post, 'thumbnail'));
+      };
+
+      try {
+        const today = await loadMemes(todayStart.toISOString());
+        if (today.length > 0) {
+          setBreakingMemes(today);
+          setBreakingLabel('memy z dziś');
+          return;
+        }
+
+        const latest = await loadMemes();
+        setBreakingMemes(latest);
+        setBreakingLabel('ostatnie memy');
       } catch (error) {
-        console.error('Error fetching today memes:', error);
+        console.error('Error fetching breaking memes:', error);
       }
     };
 
-    fetchTodayMemes();
+    fetchBreakingMemes();
   }, []);
 
   useEffect(() => {
@@ -223,15 +238,15 @@ const App: React.FC = () => {
         </a>
       </div>
 
-      {todayMemes.length > 0 && (
-        <section className="breaking-memes" aria-label="Dzisiejsze memy">
+      {breakingMemes.length > 0 && (
+        <section className="breaking-memes" aria-label="Polecane memy">
           <div className="breaking-memes-header">
             <span className="breaking-live-dot"></span>
             <span>Breaking news</span>
-            <strong>memy z dziś</strong>
+            <strong>{breakingLabel}</strong>
           </div>
           <div className="breaking-memes-list">
-            {todayMemes.map((post) => {
+            {breakingMemes.map((post) => {
               const thumbUrl = getImageUrl(post, 'thumbnail');
               return thumbUrl ? (
                 <a key={post.id} className="breaking-meme-card" href={post.link} title={stripHtml(post.title.rendered)}>
