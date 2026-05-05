@@ -27,6 +27,7 @@ window.initMemozor = function() {
     const fontFamilySelect = document.getElementById('memozor-font-family');
     const textColorInput = document.getElementById('memozor-text-color');
     const strokeColorInput = document.getElementById('memozor-stroke-color');
+    const strokeWidthInput = document.getElementById('memozor-stroke-width');
     const textSizeInput = document.getElementById('memozor-text-size');
     const saveBtn = document.getElementById('memozor-save');
     const messageDiv = document.getElementById('memozor-message');
@@ -59,6 +60,7 @@ window.initMemozor = function() {
     function keepTextReadable(text) {
         text.set({
             lockUniScaling: true,
+            lockScalingFlip: true,
             centeredScaling: true,
             fontWeight: '900',
             paintFirst: 'stroke',
@@ -67,6 +69,11 @@ window.initMemozor = function() {
             lineHeight: 0.9,
             shadow: new fabric.Shadow({ color: 'rgba(0,0,0,0.55)', blur: 2, offsetX: 1, offsetY: 1 })
         });
+        text.setControlsVisibility({ mt: false, mb: false, ml: false, mr: false });
+    }
+
+    function getStrokeWidth() {
+        return strokeWidthInput ? parseInt(strokeWidthInput.value, 10) : 3;
     }
 
     function saveState() {
@@ -220,7 +227,7 @@ window.initMemozor = function() {
             fontFamily: selectedFont,
             fill: textColorInput.value,
             stroke: strokeColorInput.value,
-            strokeWidth: Math.max(2, Math.round(parseInt(textSizeInput.value, 10) / 16)),
+            strokeWidth: getStrokeWidth(),
             fontSize: parseInt(textSizeInput.value, 10),
             originX: 'center',
             originY: 'center',
@@ -250,6 +257,7 @@ window.initMemozor = function() {
             textColorInput.value = activeObj.fill;
             strokeColorInput.value = activeObj.stroke;
             textSizeInput.value = activeObj.fontSize;
+            if (strokeWidthInput) strokeWidthInput.value = activeObj.strokeWidth || 0;
         }
     }
 
@@ -284,11 +292,22 @@ window.initMemozor = function() {
     });
     strokeColorInput.addEventListener('change', function() { saveState(); });
 
+    if (strokeWidthInput) {
+        strokeWidthInput.addEventListener('input', function() {
+            const activeObj = canvas.getActiveObject();
+            if (activeObj && activeObj.type === 'i-text') {
+                activeObj.set('strokeWidth', parseInt(this.value, 10));
+                canvas.renderAll();
+            }
+        });
+        strokeWidthInput.addEventListener('change', function() { saveState(); });
+    }
+
     textSizeInput.addEventListener('input', function() {
         const activeObj = canvas.getActiveObject();
         if (activeObj && activeObj.type === 'i-text') {
             const fontSize = parseInt(this.value, 10);
-            activeObj.set({ fontSize, strokeWidth: Math.max(2, Math.round(fontSize / 16)) });
+            activeObj.set({ fontSize });
             keepTextReadable(activeObj);
             canvas.renderAll();
         }
@@ -336,7 +355,8 @@ window.initMemozor = function() {
             }
 
             if (response.ok && result.success) {
-                window.location.href = result.url;
+                messageDiv.innerHTML = '<span style="color:#22c55e">Mem wysłany do akceptacji. Pojawi się na stronie po zatwierdzeniu przez moderatora.</span>';
+                saveBtn.disabled = true;
             } else {
                 messageDiv.innerHTML = `<span style="color:red">Błąd zapisywania mema: ${result.message || result.code || 'Unknown error'}</span>`;
             }

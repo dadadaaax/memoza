@@ -22,8 +22,8 @@ function memozor_enqueue_scripts() {
         wp_enqueue_style('memozor-fonts', 'https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Oswald:wght@700&family=Creepster&family=Press+Start+2P&display=swap', array(), null);
 
         // Plugin Scripts & Styles
-        wp_enqueue_style('memozor-css', plugin_dir_url(__FILE__) . 'css/memozor.css', array(), '1.2.2');
-        wp_enqueue_script('memozor-js', plugin_dir_url(__FILE__) . 'js/memozor.js', array('fabric-js'), '1.2.2', true);
+        wp_enqueue_style('memozor-css', plugin_dir_url(__FILE__) . 'css/memozor.css', array(), '1.2.3');
+        wp_enqueue_script('memozor-js', plugin_dir_url(__FILE__) . 'js/memozor.js', array('fabric-js'), '1.2.3', true);
 
         // Localize script to pass REST API details
         wp_localize_script('memozor-js', 'memozorSettings', array(
@@ -70,13 +70,14 @@ function memozor_editor_shortcode() {
             <label>Kolor tekstu <input type="color" id="memozor-text-color" value="#ffffff"></label>
             <label>Kolor obrysu <input type="color" id="memozor-stroke-color" value="#000000"></label>
             <label class="memozor-size-control">Rozmiar tekstu <input type="range" id="memozor-text-size" min="10" max="150" value="40"></label>
+            <label class="memozor-outline-control">Grubość obrysu <input type="range" id="memozor-stroke-width" min="0" max="16" value="3"></label>
             <div class="memozor-history-actions">
                 <button type="button" id="memozor-undo" disabled title="Cofnij ostatnią zmianę">↶ Cofnij</button>
                 <button type="button" id="memozor-redo" disabled title="Przywróć zmianę">↷ Przywróć</button>
             </div>
             <button type="button" id="memozor-save">3. Zapisz mema</button>
         </div>
-        <p class="memozor-help">Wskazówka: dotknij tekstu, żeby go edytować. Przeciągnij rogi, żeby zmienić rozmiar tekstu. Obrazek zostaje nieruchomy w ramce.</p>
+        <p class="memozor-help">Wskazówka: dotknij tekstu, żeby go edytować. Przeciągnij rogi, żeby powiększyć lub zmniejszyć tekst bez rozciągania. Obrazek zostaje nieruchomy w ramce.</p>
         <div id="memozor-message"></div>
     </div>
     <?php

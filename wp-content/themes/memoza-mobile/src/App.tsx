@@ -160,13 +160,14 @@ const App: React.FC = () => {
                 <label>Kolor tekstu <input type="color" id="memozor-text-color" defaultValue="#ffffff" /></label>
                 <label>Kolor obrysu <input type="color" id="memozor-stroke-color" defaultValue="#000000" /></label>
                 <label className="memozor-size-control">Rozmiar tekstu <input type="range" id="memozor-text-size" min="10" max="150" defaultValue="40" /></label>
+                <label className="memozor-outline-control">Grubość obrysu <input type="range" id="memozor-stroke-width" min="0" max="16" defaultValue="3" /></label>
                 <div className="memozor-history-actions">
                     <button type="button" id="memozor-undo" disabled title="Cofnij ostatnią zmianę">↶ Cofnij</button>
                     <button type="button" id="memozor-redo" disabled title="Przywróć zmianę">↷ Przywróć</button>
                 </div>
                 <button type="button" id="memozor-save">3. Zapisz mema</button>
             </div>
-            <p className="memozor-help">Wskazówka: dotknij tekstu, żeby go edytować. Przeciągnij rogi, żeby zmienić rozmiar tekstu. Obrazek zostaje nieruchomy w ramce.</p>
+            <p className="memozor-help">Wskazówka: dotknij tekstu, żeby go edytować. Przeciągnij rogi, żeby powiększyć lub zmniejszyć tekst bez rozciągania. Obrazek zostaje nieruchomy w ramce.</p>
             <div id="memozor-message"></div>
           </div>
         </div>

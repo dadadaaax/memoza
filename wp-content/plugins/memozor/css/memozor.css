@@ -121,7 +121,8 @@
 }
 
 .memozor-file-control,
-.memozor-size-control {
+.memozor-size-control,
+.memozor-outline-control {
     flex: 1 1 220px;
 }
 
